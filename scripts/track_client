@@ -9,7 +9,7 @@ from sr_point_cloud.msg import *
 if __name__ == '__main__':
     rospy.init_node('track_client')
     client = actionlib.SimpleActionClient(
-            'tracker/track', TrackAction)
+            'cloud_tracker/track', TrackAction)
     client.wait_for_server()
 
     cmd = sys.argv[1]

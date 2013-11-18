@@ -146,14 +146,14 @@ target_link_libraries(tracker
 # See: http://bugs.orocos.org/show_bug.cgi?id=1035
 set_target_properties(tracker PROPERTIES LINK_FLAGS -L${orocos_kdl_LIBRARY_DIRS})
 
-# sr_pcl_triangulator #
+# triangulator #
 #######################
 
-add_executable(sr_pcl_triangulator src/sr_pcl_triangulator.cpp)
+add_executable(triangulator src/triangulator.cpp)
 
-add_dependencies(sr_pcl_triangulator ${PROJECT_NAME}_gencfg)
+add_dependencies(triangulator ${PROJECT_NAME}_gencfg)
 
-target_link_libraries(sr_pcl_triangulator
+target_link_libraries(triangulator
   ${catkin_LIBRARIES}
   ${boost_LIBRARIES}
 )

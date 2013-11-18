@@ -12,7 +12,7 @@
         <remap from="~input/points" to="/camera/depth_registered/points" />
     </node>
 
-    <node name="sr_pcl_triangulator" pkg="sr_point_cloud" type="sr_pcl_triangulator" output="screen">
+    <node name="cloud_triangulator" pkg="sr_point_cloud" type="triangulator" output="screen">
         <remap from="~input/points" to="cloud_tracker/result/points" />
         <remap from="~output/mesh" to="cloud_tracker/result/mesh" />
     </node>

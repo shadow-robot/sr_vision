@@ -138,7 +138,7 @@ protected:
 int
 main (int argc, char** argv)
 {
-  ros::init (argc, argv, "sr_pcl_triangulator");
+  ros::init (argc, argv, "cloud_triangulator");
   sr_point_cloud::Triangulator node;
   node.run();
   return 0;
