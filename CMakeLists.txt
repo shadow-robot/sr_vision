@@ -124,18 +124,18 @@ include_directories(
 #   src/${PROJECT_NAME}/sr_point_cloud.cpp
 # )
 
-# bin/sr_pcl_tracker #
+# bin/tracker #
 ######################
 
 ## Declare a cpp executable
-add_executable(sr_pcl_tracker src/sr_pcl_tracker.cpp)
+add_executable(tracker src/tracker.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(sr_pcl_tracker ${PROJECT_NAME}_gencfg)
+add_dependencies(tracker ${PROJECT_NAME}_gencfg)
 
 ## Specify libraries to link a library or executable target against
-target_link_libraries(sr_pcl_tracker
+target_link_libraries(tracker
   ${catkin_LIBRARIES}
   ${boost_LIBRARIES}
   ${orocos_kdl_LIBRARIES}
@@ -144,7 +144,7 @@ target_link_libraries(sr_pcl_tracker
 # Work around a bug in kdl cmake. Without this we get error:
 # /usr/bin/ld: cannot find -lorocos-kdl
 # See: http://bugs.orocos.org/show_bug.cgi?id=1035
-set_target_properties(sr_pcl_tracker PROPERTIES LINK_FLAGS -L${orocos_kdl_LIBRARY_DIRS})
+set_target_properties(tracker PROPERTIES LINK_FLAGS -L${orocos_kdl_LIBRARY_DIRS})
 
 # sr_pcl_triangulator #
 #######################
@@ -175,7 +175,7 @@ target_link_libraries(sr_pcl_triangulator
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS sr_pcl_tracker sr_pcl_tracker_node
+# install(TARGETS tracker tracker_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -200,7 +200,7 @@ target_link_libraries(sr_pcl_triangulator
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_sr_pcl_tracker.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_tracker.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
