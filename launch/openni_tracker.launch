@@ -1,0 +1,19 @@
+<launch>
+    <!-- Start the OpenNI camera -->
+    <include file="$(find openni_launch)/launch/openni.launch" />
+
+    <!-- Tracker using NI camera feed as input cloud -->
+    <node name="sr_pcl_tracker" pkg="sr_pcl_tracker" type="sr_pcl_tracker" output="screen">
+        <!-- This fails with:
+        Failed to find a field named: 'rgb'. Cannot convert message to PCL
+        type.
+        -->
+        <!-- <remap from="~input/points" to="/camera/depth/points" /> -->
+        <remap from="~input/points" to="/camera/depth_registered/points" />
+    </node>
+
+    <node name="sr_pcl_triangulator" pkg="sr_pcl_tracker" type="sr_pcl_triangulator" output="screen">
+        <remap from="~input/points" to="sr_pcl_tracker/result/points" />
+        <remap from="~output/mesh" to="sr_pcl_tracker/result/mesh" />
+    </node>
+</launch>

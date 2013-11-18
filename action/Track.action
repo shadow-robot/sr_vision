@@ -1,0 +1,10 @@
+# Goal
+# What to track.
+# 'nearest' - Object nearest the camera
+# 'centered' - Object in the center of the camera view.
+string target
+---
+# Feedback
+#TODO Anything needed here beyond the topics above? object_id when we have recognition?
+---
+# Result
