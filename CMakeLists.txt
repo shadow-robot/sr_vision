@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sr_pcl_tracker)
+project(sr_point_cloud)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -120,8 +120,8 @@ include_directories(
 )
 
 ## Declare a cpp library
-# add_library(sr_pcl_tracker
-#   src/${PROJECT_NAME}/sr_pcl_tracker.cpp
+# add_library(sr_point_cloud
+#   src/${PROJECT_NAME}/sr_point_cloud.cpp
 # )
 
 # bin/sr_pcl_tracker #

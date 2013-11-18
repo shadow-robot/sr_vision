@@ -4,7 +4,7 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #include <dynamic_reconfigure/server.h>
-#include "sr_pcl_tracker/SrPclTriangulatorConfig.h"
+#include "sr_point_cloud/SrPclTriangulatorConfig.h"
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
@@ -19,7 +19,7 @@
 #include <pcl/surface/gp3.h>
 #include <pcl/io/vtk_io.h>
 
-namespace sr_pcl_tracker {
+namespace sr_point_cloud {
 
 class Triangulator {
 
@@ -133,13 +133,13 @@ protected:
 
 }; // Triangulator
 
-} // sr_pcl_tracker::
+} // sr_point_cloud::
 
 int
 main (int argc, char** argv)
 {
   ros::init (argc, argv, "sr_pcl_triangulator");
-  sr_pcl_tracker::Triangulator node;
+  sr_point_cloud::Triangulator node;
   node.run();
   return 0;
 }

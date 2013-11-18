@@ -4,7 +4,7 @@ import sys
 import rospy
 import actionlib
 
-from sr_pcl_tracker.msg import *
+from sr_point_cloud.msg import *
 
 if __name__ == '__main__':
     rospy.init_node('track_client')

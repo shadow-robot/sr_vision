@@ -18,7 +18,7 @@
 
 #include <pcl/surface/convex_hull.h>
 
-namespace sr_pcl_tracker {
+namespace sr_point_cloud {
 
 template<typename PointType>
 class ClusterSegmentor
@@ -289,4 +289,4 @@ class ClusterSegmentor
     std::vector<pcl::Vertices> hull_vertices_;
 };
 
-} // sr_pcl_tracker
+} // sr_point_cloud

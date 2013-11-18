@@ -5,14 +5,14 @@
 #include <geometry_msgs/PoseStamped.h>
 
 #include <actionlib/server/simple_action_server.h>
-#include "sr_pcl_tracker/TrackAction.h"
+#include "sr_point_cloud/TrackAction.h"
 
 #include <dynamic_reconfigure/server.h>
-#include "sr_pcl_tracker/SrPclTrackerConfig.h"
+#include "sr_point_cloud/SrPclTrackerConfig.h"
 
 #include <kdl/frames.hpp>
 
-#include "sr_pcl_tracker/cluster_segmentor.h"
+#include "sr_point_cloud/cluster_segmentor.h"
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
@@ -45,7 +45,7 @@
 #include <pcl/filters/approximate_voxel_grid.h>
 
 
-namespace sr_pcl_tracker {
+namespace sr_point_cloud {
 
 using namespace pcl::tracking;
 
@@ -58,7 +58,7 @@ public:
     typedef typename Cloud::Ptr CloudPtr;
     typedef typename Cloud::ConstPtr CloudConstPtr;
     typedef ParticleFilterTracker<PointType, ParticleT> ParticleFilter;
-    typedef actionlib::SimpleActionServer<sr_pcl_tracker::TrackAction> TrackServer;
+    typedef actionlib::SimpleActionServer<sr_point_cloud::TrackAction> TrackServer;
 
     enum SegmentSort
     {
@@ -353,13 +353,13 @@ protected:
 
 }; // Tracker
 
-} // sr_pcl_tracker
+} // sr_point_cloud
 
 int
 main (int argc, char** argv)
 {
-  ros::init (argc, argv, "sr_pcl_tracker");
-  sr_pcl_tracker::Tracker node;
+  ros::init (argc, argv, "sr_point_cloud");
+  sr_point_cloud::Tracker node;
   node.run();
   return 0;
 }

@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package>
-  <name>sr_pcl_tracker</name>
+  <name>sr_point_cloud</name>
   <version>0.0.1</version>
   <description>Point cloud object recognition and tracking.</description>
 
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://ros.org/wiki/sr_pcl_tracker</url> -->
+  <!-- <url type="website">http://ros.org/wiki/sr_point_cloud</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->
