@@ -204,20 +204,32 @@ protected:
     track_goal_cb ()
     {
       TrackServer::GoalConstPtr goal = track_server_.acceptNewGoal();
+
+      // Did we get a target
       std::string target = goal->target;
-      if ( target == "nearest" )
-        segmentReferece(SEGMENT_SORT_BY_DISTANCE);
-      else if ( target == "centered" )
-        segmentReferece(SEGMENT_SORT_BY_CENTERED);
-      else
-      {
-        std::stringstream ss;
-        ss << "Unknown target: " << target;
-        ROS_ERROR_STREAM(ss.str());
-        track_server_.setAborted(TrackResult(), ss.str());
-        CloudPtr ref_cloud(new Cloud);
-        trackCloud(ref_cloud);
+      if ( target != "" ) {
+        if ( target == "nearest" )
+          segmentReferece(SEGMENT_SORT_BY_DISTANCE);
+        else if ( target == "centered" )
+          segmentReferece(SEGMENT_SORT_BY_CENTERED);
+        else
+        {
+          std::stringstream ss;
+          ss << "Unknown target: " << target;
+          ROS_ERROR_STREAM(ss.str());
+          track_server_.setAborted(TrackResult(), ss.str());
+          CloudPtr ref_cloud(new Cloud);
+          trackCloud(ref_cloud);
+        }
+        return;
       }
+
+      // No target, try the cloud
+      CloudPtr ref_cloud(new Cloud);
+      sensor_msgs::PointCloud2 input = goal->cloud;
+      pcl::fromROSMsg(input, *ref_cloud);
+      trackCloud(ref_cloud);
+
     }
 
     void

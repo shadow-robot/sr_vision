@@ -1,8 +1,11 @@
 # Goal
-# What to track.
+# Give one of the following.
+# 1. Cluster to track.
 # 'nearest' - Object nearest the camera
 # 'centered' - Object in the center of the camera view.
 string target
+# 2. Cloud to track
+sensor_msgs/PointCloud2 cloud
 ---
 # Feedback
 #TODO Anything needed here beyond the topics above? object_id when we have recognition?
