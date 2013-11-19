@@ -82,8 +82,8 @@ generate_messages(
 ##      dynamic reconfigure      ##
 ###################################
 generate_dynamic_reconfigure_options(
-  cfg/SrPclTracker.cfg
-  cfg/SrPclTriangulator.cfg
+  cfg/Tracker.cfg
+  cfg/Triangulator.cfg
   #...
 )
 
