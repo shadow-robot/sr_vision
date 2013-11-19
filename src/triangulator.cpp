@@ -4,7 +4,7 @@
 #include <sensor_msgs/PointCloud2.h>
 
 #include <dynamic_reconfigure/server.h>
-#include "sr_point_cloud/SrPclTriangulatorConfig.h"
+#include "sr_point_cloud/TriangulatorConfig.h"
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
@@ -29,7 +29,7 @@ protected:
 
     ros::NodeHandle nh_;
 
-    dynamic_reconfigure::Server<SrPclTriangulatorConfig> config_server_;
+    dynamic_reconfigure::Server<TriangulatorConfig> config_server_;
     double mu_;
     int maximum_nearest_neighbors_;
     double maximum_surface_angle_;
@@ -60,7 +60,7 @@ public:
 protected:
 
     void
-    config_cb(SrPclTriangulatorConfig &config, uint32_t level)
+    config_cb(TriangulatorConfig &config, uint32_t level)
     {
         mu_ = config.mu;
         maximum_nearest_neighbors_ = config.maximum_nearest_neighbors;

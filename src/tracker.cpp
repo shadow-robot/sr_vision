@@ -8,7 +8,7 @@
 #include "sr_point_cloud/TrackAction.h"
 
 #include <dynamic_reconfigure/server.h>
-#include "sr_point_cloud/SrPclTrackerConfig.h"
+#include "sr_point_cloud/TrackerConfig.h"
 
 #include <kdl/frames.hpp>
 
@@ -167,7 +167,7 @@ protected:
     }
 
     void
-    config_cb(SrPclTrackerConfig &config, uint32_t level)
+    config_cb(TrackerConfig &config, uint32_t level)
     {
         //ROS_INFO("Reconfigure Request: %f %f %f", config.downsampling_grid_size, config.filter_z_min, config.filter_z_max );
         downsampling_grid_size_ = config.downsampling_grid_size;
@@ -338,7 +338,7 @@ protected:
     }
 
     ros::NodeHandle nh_, nh_home_;
-    dynamic_reconfigure::Server<SrPclTrackerConfig> config_server_;
+    dynamic_reconfigure::Server<TrackerConfig> config_server_;
     ros::Subscriber input_sub_;
     ros::Publisher output_downsampled_pub_, particle_cloud_pub_, result_cloud_pub_, result_pose_pub_;
     TrackServer track_server_;
