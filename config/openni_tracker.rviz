@@ -125,7 +125,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.01
       Style: Points
-      Topic: /cloud_tracker/cloud_downsampled/points
+      Topic: /point_cloud_tracker/cloud_downsampled/points
       Use Fixed Frame: true
       Use rainbow: false
       Value: true
@@ -154,7 +154,7 @@ Visualization Manager:
       Size (Pixels): 3
       Size (m): 0.01
       Style: Points
-      Topic: /cloud_tracker/result/points
+      Topic: /point_cloud_tracker/result/points
       Use Fixed Frame: true
       Use rainbow: false
       Value: true
@@ -170,7 +170,7 @@ Visualization Manager:
       Shaft Length: 0.1
       Shaft Radius: 0.05
       Shape: Arrow
-      Topic: /cloud_tracker/result/pose
+      Topic: /point_cloud_tracker/result/pose
       Value: true
   Enabled: true
   Global Options:
