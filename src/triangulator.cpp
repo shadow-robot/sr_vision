@@ -2,6 +2,7 @@
 
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
+#include <shape_msgs/Mesh.h>
 
 #include <dynamic_reconfigure/server.h>
 #include "sr_point_cloud/TriangulatorConfig.h"
@@ -132,13 +133,51 @@ protected:
     pcl_conversions::fromPCL(triangles, mesh);
     output_pub_.publish(mesh);
 
+    // Convert to shape_msgs::Mesh type and publish
+    shape_msgs::Mesh shapeMesh;
+    this->fromPCLPolygonMesh(triangles, shapeMesh);
+
     // Debug
-    //pcl::io::saveVTKFile("mesh.vtk", triangles);
+    // pcl::io::saveVTKFile("mesh.vtk", triangles);
+  }
+
+  void
+  fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
+                     shape_msgs::Mesh &shapeMesh)
+  {
+    const pcl::PCLPointCloud2 cloud2 = pclMesh.cloud;
+    const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
+
+    pcl::PointCloud<pcl::PointXYZ> cloud;
+    pcl::fromPCLPointCloud2(cloud2, cloud);
+
+    // Set the actual vertices that make up the mesh.
+    for (size_t i = 0; cloud.size(); i++)
+    {
+       geometry_msgs::Point vertex;
+       const pcl::PointXYZ &curr_point = cloud.at(i);
+       vertex.x = curr_point.x;
+       vertex.y = curr_point.y;
+       vertex.z = curr_point.z;
+       shapeMesh.vertices.push_back(vertex);
+    }
+
+    // Set the list of triangles.
+    for (size_t i = 0; i < polygons.size(); i++)
+    {
+      shape_msgs::MeshTriangle triangle;
+      const pcl::Vertices &curr_poly = polygons[i];
+      ROS_ASSERT(curr_poly.vertices.size() == 3);
+      triangle.vertex_indices[0] = curr_poly.vertices[0];
+      triangle.vertex_indices[1] = curr_poly.vertices[1];
+      triangle.vertex_indices[2] = curr_poly.vertices[2];
+      shapeMesh.triangles.push_back(triangle);
+    }
   }
 
 }; // Triangulator
 
-} // sr_point_cloud::
+} // End of namespace sr_point_cloud
 
 //-------------------------------------------------------------------------------
 
