@@ -111,7 +111,10 @@ protected:
         gp3.setMaximumSurfaceAngle(maximum_surface_angle_);
         gp3.setMinimumAngle(minimum_angle_);
         gp3.setMaximumAngle(maximum_angle_);
-        gp3.setNormalConsistency(false);
+        // The triangles generatea by GreedyProjectionTriangulation are often misdirected.
+        // Solution: Use gp3.setNormalConsistency(true).
+        // URL: http://www.pcl-users.org/Help-GreedyProjectionTriangulation-td3637361.html
+        gp3.setNormalConsistency(true);
 
         // Get result
         gp3.setInputCloud (cloud_with_normals);
