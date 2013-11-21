@@ -148,14 +148,14 @@ protected:
     const pcl::PCLPointCloud2 cloud2 = pclMesh.cloud;
     const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
-    pcl::PointCloud<pcl::PointXYZ> cloud;
+    Cloud cloud;
     pcl::fromPCLPointCloud2(cloud2, cloud);
 
     // Set the actual vertices that make up the mesh.
     for (size_t i = 0; cloud.size(); i++)
     {
        geometry_msgs::Point vertex;
-       const pcl::PointXYZ &curr_point = cloud.at(i);
+       const PointType &curr_point = cloud.at(i);
        vertex.x = curr_point.x;
        vertex.y = curr_point.y;
        vertex.z = curr_point.z;
