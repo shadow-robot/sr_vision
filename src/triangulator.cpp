@@ -19,6 +19,8 @@
 #include <pcl/surface/gp3.h>
 #include <pcl/io/vtk_io.h>
 
+//-------------------------------------------------------------------------------
+
 namespace sr_point_cloud {
 
 class Triangulator {
@@ -71,7 +73,7 @@ protected:
 
   /*
    * Runs the triangulation. Based on this:
-   * http://www.pointclouds.org/documentation/tutorials/greedy_projection.php#greedy-triangulation
+   * http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
    */
   void
   cloud_cb (const Cloud::ConstPtr& cloud)
@@ -138,6 +140,8 @@ protected:
 
 } // sr_point_cloud::
 
+//-------------------------------------------------------------------------------
+
 int
 main (int argc, char** argv)
 {
@@ -146,3 +150,5 @@ main (int argc, char** argv)
   node.run();
   return 0;
 }
+
+//-------------------------------------------------------------------------------
