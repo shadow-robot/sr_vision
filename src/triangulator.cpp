@@ -91,7 +91,7 @@ protected:
    * http://pointclouds.org/documentation/tutorials/resampling.php
    */
   void
-  cloud_cb (Cloud::ConstPtr cloud)
+  cloud_cb (const Cloud::ConstPtr &cloud)
   {
     input_ = cloud;
 
