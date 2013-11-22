@@ -14,11 +14,12 @@
 
 // PCL specific includes
 #include <pcl/point_types.h>
-#include <pcl/io/pcd_io.h>
-#include <pcl/kdtree/kdtree_flann.h>
 #include <pcl/features/normal_3d.h>
-#include <pcl/surface/gp3.h>
+#include <pcl/kdtree/kdtree_flann.h>
+#include <pcl/io/pcd_io.h>
 #include <pcl/io/vtk_io.h>
+#include <pcl/surface/gp3.h>
+#include <pcl/surface/mls.h>
 
 //-------------------------------------------------------------------------------
 
@@ -32,6 +33,10 @@ protected:
 
   ros::NodeHandle nh_;
 
+  // Use a Moving Least Squares (MLS) surface reconstruction method
+  // to smooth and resample noisy data?
+  bool resample_;
+
   dynamic_reconfigure::Server<TriangulatorConfig> config_server_;
   double mu_;
   int maximum_nearest_neighbors_;
@@ -39,19 +44,25 @@ protected:
   double minimum_angle_;
   double maximum_angle_;
 
+  double gp3_search_radius_;
+  double mls_search_radius_;
+
   ros::Subscriber input_sub_;
   ros::Publisher pcl_output_pub_;
   ros::Publisher shape_output_pub_;
   Cloud::ConstPtr input_;
 
 public:
-  Triangulator()
+  Triangulator(bool resample)
     : nh_("~")
+    , resample_(resample)
     , mu_(2.5)
     , maximum_nearest_neighbors_(100)
     , maximum_surface_angle_(M_PI/4) // 45 degs
     , minimum_angle_(M_PI/18) // 10 degs
     , maximum_angle_(2*M_PI/3) // 120 degs
+    , gp3_search_radius_(0.025)
+    , mls_search_radius_(0.03)
   {
     // Setup ROS topics and services
     config_server_.setCallback( boost::bind(&Triangulator::config_cb, this, _1, _2) );
@@ -75,31 +86,63 @@ protected:
   }
 
   /*
-   * Runs the triangulation. Based on this:
+   * Runs the triangulation. Based on:
    * http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
+   * http://pointclouds.org/documentation/tutorials/resampling.php
    */
   void
   cloud_cb (const Cloud::ConstPtr& cloud)
   {
     input_ = cloud;
 
-    // Normal estimation*
-    pcl::NormalEstimation<PointType, pcl::Normal> n;
-    pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
     pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
-    tree->setInputCloud (cloud);
-    n.setInputCloud (cloud);
-    n.setSearchMethod (tree);
-    n.setKSearch (20);
-    n.compute (*normals);
-    //* normals should contain the point normals + surface curvatures
 
-    // Concatenate the XYZ and normal fields*
-    pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals (new pcl::PointCloud<pcl::PointNormal>);
-    pcl::concatenateFields (*cloud, *normals, *cloud_with_normals);
-    //* cloud_with_normals = cloud + normals
+    // Concatenate the XYZ and normal fields
+    pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals;
+    if (!resample_)
+    {
+      // Follow "Fast triangulation of unordered point clouds" @
+      // http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
 
-    // Create search tree*
+      // Normal estimation
+      pcl::NormalEstimation<PointType, pcl::Normal> n;
+      pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
+      tree->setInputCloud (cloud);
+      n.setInputCloud (cloud);
+      n.setSearchMethod (tree);
+      n.setKSearch (20);
+      n.compute (*normals);
+      // normals should contain the point normals + surface curvatures
+
+      cloud_with_normals.reset (new pcl::PointCloud<pcl::PointNormal>);
+      pcl::concatenateFields (*cloud, *normals, *cloud_with_normals);
+    }
+    else
+    {
+      // Use MSL surface reconstruction method to smooth and resample noisy data.
+      // URL: http://pointclouds.org/documentation/tutorials/resampling.php
+
+      // Init object (second point type is for the normals, even if unused)
+      pcl::MovingLeastSquares<PointType, pcl::PointNormal> mls;
+
+      mls.setComputeNormals (true);
+
+      // Set parameters
+      mls.setInputCloud (cloud);
+      mls.setPolynomialFit (true);
+      mls.setSearchMethod (tree);
+      mls.setSearchRadius (mls_search_radius_);
+
+      // Reconstruct.
+      pcl::PointCloud<pcl::PointNormal> mls_points;
+      mls.process (mls_points);
+
+      // Set shared_ptr cloud_with_normals
+      cloud_with_normals = boost::make_shared< pcl::PointCloud<pcl::PointNormal> > (mls_points);
+    }
+    // cloud_with_normals = cloud + normals
+
+    // Create search tree
     pcl::search::KdTree<pcl::PointNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointNormal>);
     tree2->setInputCloud (cloud_with_normals);
 
@@ -108,7 +151,7 @@ protected:
     pcl::PolygonMesh triangles;
 
     // Set the maximum distance between connected points (maximum edge length)
-    gp3.setSearchRadius (0.025);
+    gp3.setSearchRadius (gp3_search_radius_);
 
     // Set typical values for the parameters
     gp3.setMu (mu_);
@@ -187,8 +230,13 @@ int
 main (int argc, char** argv)
 {
   ros::init (argc, argv, "point_cloud_triangulator");
-  sr_point_cloud::Triangulator node;
+
+  // Use a Moving Least Squares (MLS) surface reconstruction method
+  // to smooth and resample noisy data?
+  bool resample = true;
+  sr_point_cloud::Triangulator node(resample);
   node.run();
+
   return 0;
 }
 
