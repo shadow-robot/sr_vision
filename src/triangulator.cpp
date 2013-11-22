@@ -155,7 +155,7 @@ protected:
     pcl::fromPCLPointCloud2(cloud2, cloud);
 
     // Set the actual vertices that make up the mesh.
-    for (size_t i = 0; cloud.size(); i++)
+    for (size_t i = 0; i < cloud.size(); i++)
     {
       geometry_msgs::Point vertex;
       const PointType &curr_point = cloud.at(i);
