@@ -190,10 +190,10 @@ protected:
 
   void
   fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
-                     pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals,
+                     const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
                      shape_msgs::Mesh &shapeMesh)
   {
-    // Use input_ instead of cloud2 (no conversion required).
+    // Use cloud_with_normals instead of cloud2 (no conversion required).
     // const pcl::PCLPointCloud2 cloud2 = pclMesh.cloud;
     const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
