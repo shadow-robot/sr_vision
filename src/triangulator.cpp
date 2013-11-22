@@ -40,7 +40,8 @@ protected:
   double maximum_angle_;
 
   ros::Subscriber input_sub_;
-  ros::Publisher output_pub_;
+  ros::Publisher pcl_output_pub_;
+  ros::Publisher shape_output_pub_;
   Cloud::ConstPtr input_;
 
 public:
@@ -55,7 +56,8 @@ public:
     // Setup ROS topics and services
     config_server_.setCallback( boost::bind(&Triangulator::config_cb, this, _1, _2) );
     input_sub_ = nh_.subscribe("input/points", 1, &Triangulator::cloud_cb, this);
-    output_pub_ = nh_.advertise<pcl_msgs::PolygonMesh>("output/mesh", 1);
+    pcl_output_pub_ = nh_.advertise<pcl_msgs::PolygonMesh>("output/pcl/mesh", 1);
+    shape_output_pub_ = nh_.advertise<shape_msgs::Mesh>("output/shape/mesh", 1);
   }
 
   void run () { ros::spin(); }
@@ -129,13 +131,14 @@ protected:
     std::vector<int> states = gp3.getPointStates();
 
     // Convert to ROS type and publish
-    pcl_msgs::PolygonMesh mesh;
-    pcl_conversions::fromPCL(triangles, mesh);
-    output_pub_.publish(mesh);
+    pcl_msgs::PolygonMesh pclMesh;
+    pcl_conversions::fromPCL(triangles, pclMesh);
+    pcl_output_pub_.publish(pclMesh);
 
     // Convert to shape_msgs::Mesh type and publish
     shape_msgs::Mesh shapeMesh;
     this->fromPCLPolygonMesh(triangles, shapeMesh);
+    shape_output_pub_.publish(shapeMesh);
 
     // Debug
     // pcl::io::saveVTKFile("mesh.vtk", triangles);
@@ -154,12 +157,12 @@ protected:
     // Set the actual vertices that make up the mesh.
     for (size_t i = 0; cloud.size(); i++)
     {
-       geometry_msgs::Point vertex;
-       const PointType &curr_point = cloud.at(i);
-       vertex.x = curr_point.x;
-       vertex.y = curr_point.y;
-       vertex.z = curr_point.z;
-       shapeMesh.vertices.push_back(vertex);
+      geometry_msgs::Point vertex;
+      const PointType &curr_point = cloud.at(i);
+      vertex.x = curr_point.x;
+      vertex.y = curr_point.y;
+      vertex.z = curr_point.z;
+      shapeMesh.vertices.push_back(vertex);
     }
 
     // Set the list of triangles.
