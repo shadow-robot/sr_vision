@@ -91,7 +91,7 @@ protected:
    * http://pointclouds.org/documentation/tutorials/resampling.php
    */
   void
-  cloud_cb (const Cloud::ConstPtr& cloud)
+  cloud_cb (Cloud::ConstPtr cloud)
   {
     input_ = cloud;
 
@@ -179,8 +179,9 @@ protected:
     pcl_output_pub_.publish(pclMesh);
 
     // Convert to shape_msgs::Mesh type and publish
+    // The given cloud should NOT be used after resampling.
     shape_msgs::Mesh shapeMesh;
-    this->fromPCLPolygonMesh(triangles, shapeMesh);
+    this->fromPCLPolygonMesh(triangles, cloud_with_normals, shapeMesh);
     shape_output_pub_.publish(shapeMesh);
 
     // Debug
@@ -189,6 +190,7 @@ protected:
 
   void
   fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
+                     pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals,
                      shape_msgs::Mesh &shapeMesh)
   {
     // Use input_ instead of cloud2 (no conversion required).
@@ -196,11 +198,10 @@ protected:
     const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
     // Set the actual vertices that make up the mesh.
-    const Cloud::ConstPtr& cloud = input_;
-    for (size_t i = 0; i < cloud->size(); i++)
+    for (size_t i = 0; i < cloud_with_normals->size(); i++)
     {
       geometry_msgs::Point vertex;
-      const PointType &curr_point = cloud->at(i);
+      const pcl::PointNormal &curr_point = cloud_with_normals->at(i);
       vertex.x = curr_point.x;
       vertex.y = curr_point.y;
       vertex.z = curr_point.z;
