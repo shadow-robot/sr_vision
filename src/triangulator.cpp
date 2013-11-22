@@ -137,26 +137,23 @@ protected:
 
     // Convert to shape_msgs::Mesh type and publish
     shape_msgs::Mesh shapeMesh;
-    this->fromPCLPolygonMesh(cloud, triangles, shapeMesh);
+    this->fromPCLPolygonMesh(triangles, shapeMesh);
     shape_output_pub_.publish(shapeMesh);
 
     // Debug
     // pcl::io::saveVTKFile("mesh.vtk", triangles);
   }
 
-  /*
-   * The point cloud is also stored inside pclMesh as pcl::PCLPointCloud2.
-   */
   void
-  fromPCLPolygonMesh(const Cloud::ConstPtr& cloud,
-                     const pcl::PolygonMesh &pclMesh,
+  fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
                      shape_msgs::Mesh &shapeMesh)
   {
-    // Use const Cloud::ConstPtr& cloud instead (no conversion required).
+    // Use input_ instead of cloud2 (no conversion required).
     // const pcl::PCLPointCloud2 cloud2 = pclMesh.cloud;
     const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
     // Set the actual vertices that make up the mesh.
+    const Cloud::ConstPtr& cloud = input_;
     for (size_t i = 0; i < cloud->size(); i++)
     {
       geometry_msgs::Point vertex;
