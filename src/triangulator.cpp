@@ -42,7 +42,7 @@ protected:
   ros::Subscriber input_sub_;
   ros::Publisher pcl_output_pub_;
   ros::Publisher shape_output_pub_;
-  Cloud::ConstPtr input_;
+  Cloud::ConstPtr cloud_;
 
 public:
   Triangulator()
@@ -81,7 +81,7 @@ protected:
   void
   cloud_cb (const Cloud::ConstPtr& cloud)
   {
-    input_ = cloud;
+    cloud_ = cloud;
 
     // Normal estimation*
     pcl::NormalEstimation<PointType, pcl::Normal> n;
@@ -148,16 +148,13 @@ protected:
   fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
                      shape_msgs::Mesh &shapeMesh)
   {
-    // Use input_ instead of cloud2 (no conversion required).
-    // const pcl::PCLPointCloud2 cloud2 = pclMesh.cloud;
     const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
     // Set the actual vertices that make up the mesh.
-    const Cloud::ConstPtr& cloud = input_;
-    for (size_t i = 0; i < cloud->size(); i++)
+    for (size_t i = 0; i < cloud_->size(); i++)
     {
       geometry_msgs::Point vertex;
-      const PointType &curr_point = cloud->at(i);
+      const PointType &curr_point = cloud_->at(i);
       vertex.x = curr_point.x;
       vertex.y = curr_point.y;
       vertex.z = curr_point.z;
