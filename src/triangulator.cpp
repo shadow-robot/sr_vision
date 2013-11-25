@@ -50,7 +50,6 @@ protected:
   ros::Subscriber input_sub_;
   ros::Publisher pcl_output_pub_;
   ros::Publisher shape_output_pub_;
-  Cloud::ConstPtr input_;
 
 public:
   Triangulator(bool resample)
@@ -93,8 +92,6 @@ protected:
   void
   cloud_cb (const Cloud::ConstPtr &cloud)
   {
-    input_ = cloud;
-
     pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
     // Concatenate the XYZ and normal fields
@@ -193,8 +190,6 @@ protected:
                      const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
                      shape_msgs::Mesh &shapeMesh)
   {
-    // Use cloud_with_normals instead of cloud2 (no conversion required).
-    // const pcl::PCLPointCloud2 cloud2 = pclMesh.cloud;
     const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
     // Set the actual vertices that make up the mesh.
