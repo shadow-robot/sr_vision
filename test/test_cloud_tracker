@@ -1,0 +1,53 @@
+#!/usr/bin/env python
+
+import rospy;
+import unittest;
+from sensor_msgs.msg import *
+from geometry_msgs.msg import *
+
+## A sample python unit test
+class TestCloudTracker(unittest.TestCase):
+
+    def assertIsPublishing(self, topic, topic_type, timeout = 3.0):
+        """Test if a topic is publishing something of the correct type."""
+        is_publishing = False;
+        err = None
+        try:
+            rospy.wait_for_message(topic, topic_type, timeout = timeout)
+        except Exception as err:
+            pass
+        else:
+            is_publishing = True;
+        self.assertTrue(is_publishing, topic + " is not publishing : " + str(err));
+        return is_publishing
+
+    def assertIsNotPublishing(self, topic, topic_type, timeout = 3.0):
+        """Test if a topic is not publishing something of the correct type."""
+        is_publishing = False;
+        try:
+            rospy.wait_for_message(topic, topic_type, timeout = timeout)
+        except rospy.ROSException as err:
+            if str(err).startswith("timeout exceeded"):
+                is_publishing = False
+            else:
+                raise
+        except:
+            raise
+        else:
+            is_publishing = True;
+        self.assertTrue(not is_publishing, topic + " is publishing");
+        return is_publishing
+
+    def test_basic(self):
+        """At startup we should see a target cloud but no result yet."""
+        self.assertIsPublishing('/point_cloud_tracker/cloud_downsampled/points', PointCloud2 )
+        self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
+        self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
+
+
+if __name__ == '__main__':
+    import rostest
+    rospy.init_node('test_cloud_tracker')
+    rostest.rosrun('sr_point_cloud', 'test_bare_bones', TestCloudTracker)
+
+
