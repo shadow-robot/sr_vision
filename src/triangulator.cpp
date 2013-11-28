@@ -1,22 +1,16 @@
-#include <sstream>
-
 #include <ros/ros.h>
-#include <sensor_msgs/PointCloud2.h>
 #include <shape_msgs/Mesh.h>
-
 #include <dynamic_reconfigure/server.h>
-#include "sr_point_cloud/TriangulatorConfig.h"
+#include <sr_point_cloud/TriangulatorConfig.h>
 
-// ROS pcl includes
-#include "pcl_conversions/pcl_conversions.h"
-#include "pcl_ros/point_cloud.h" // Allow use of PCL cloud types for pubs and subs
-#include "pcl_msgs/PolygonMesh.h"
+// ROS PCL specific includes
+#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs/subs
+#include <pcl_msgs/PolygonMesh.h>
 
 // PCL specific includes
 #include <pcl/point_types.h>
 #include <pcl/features/normal_3d.h>
 #include <pcl/kdtree/kdtree_flann.h>
-#include <pcl/io/pcd_io.h>
 #include <pcl/io/vtk_io.h>
 #include <pcl/surface/gp3.h>
 #include <pcl/surface/mls.h>
