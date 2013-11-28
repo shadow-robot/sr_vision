@@ -227,12 +227,8 @@ int
 main (int argc, char** argv)
 {
   ros::init (argc, argv, "point_cloud_triangulator");
-
-  // Use a Moving Least Squares (MLS) surface reconstruction method
-  // to smooth and resample noisy data?
   sr_point_cloud::Triangulator node;
   node.run();
-
   return 0;
 }
 
