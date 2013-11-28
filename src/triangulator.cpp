@@ -52,9 +52,9 @@ protected:
   ros::Publisher shape_output_pub_;
 
 public:
-  Triangulator(bool resample)
+  Triangulator()
     : nh_("~")
-    , resample_(resample)
+    , resample_(true)
     , mu_(2.5)
     , maximum_nearest_neighbors_(100)
     , maximum_surface_angle_(M_PI/4) // 45 degs
@@ -77,6 +77,7 @@ protected:
   void
   config_cb(TriangulatorConfig &config, uint32_t level)
   {
+    resample_ = config.resample;
     mu_ = config.mu;
     maximum_nearest_neighbors_ = config.maximum_nearest_neighbors;
     maximum_surface_angle_ = config.maximum_surface_angle;
@@ -229,8 +230,7 @@ main (int argc, char** argv)
 
   // Use a Moving Least Squares (MLS) surface reconstruction method
   // to smooth and resample noisy data?
-  bool resample = true;
-  sr_point_cloud::Triangulator node(resample);
+  sr_point_cloud::Triangulator node;
   node.run();
 
   return 0;
