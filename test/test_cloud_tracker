@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-import rospy;
+import rospy, actionlib;
 import unittest;
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
+from sr_point_cloud.msg import *
 
 ## A sample python unit test
 class TestCloudTracker(unittest.TestCase):
@@ -41,6 +42,26 @@ class TestCloudTracker(unittest.TestCase):
     def test_basic(self):
         """At startup we should see a target cloud but no result yet."""
         self.assertIsPublishing('/point_cloud_tracker/cloud_downsampled/points', PointCloud2 )
+        self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
+        self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
+
+    def test_track_action(self):
+        """
+        Send a track goal, test we are tracking something, then stop the
+        gaol and test we stop tracking things.
+        """
+        client = actionlib.SimpleActionClient('point_cloud_tracker/track', TrackAction)
+        client.wait_for_server()
+        goal = TrackGoal()
+        goal.target = "centered"
+        client.send_goal(goal)
+        rospy.sleep(1)
+        self.assertIsPublishing('/point_cloud_tracker/result/points', PointCloud2 )
+        self.assertIsPublishing('/point_cloud_tracker/result/pose', PoseStamped )
+        # @todo - grab the message and test for sensible looking values, e.g
+        # that the result cloud has some points.
+        client.cancel_all_goals()
+        rospy.sleep(1)
         self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
         self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
 
