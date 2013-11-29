@@ -5,6 +5,7 @@ project(sr_point_cloud)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  actionlib
   message_generation
   dynamic_reconfigure
   actionlib_msgs
@@ -126,11 +127,16 @@ include_directories(
 ######################
 
 ## Declare a cpp executable
-add_executable(tracker src/tracker.cpp)
+add_executable(tracker
+  src/tracker.cpp
+)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-add_dependencies(tracker ${PROJECT_NAME}_gencfg ${PROJECT_NAME}_gencpp)
+add_dependencies(tracker
+  ${PROJECT_NAME}_gencfg
+  ${PROJECT_NAME}_gencpp
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(tracker
@@ -142,14 +148,22 @@ target_link_libraries(tracker
 # Work around a bug in kdl cmake. Without this we get error:
 # /usr/bin/ld: cannot find -lorocos-kdl
 # See: http://bugs.orocos.org/show_bug.cgi?id=1035
-set_target_properties(tracker PROPERTIES LINK_FLAGS -L${orocos_kdl_LIBRARY_DIRS})
+set_target_properties(tracker
+  PROPERTIES LINK_FLAGS
+  -L${orocos_kdl_LIBRARY_DIRS}
+)
 
 # triangulator #
 #######################
 
-add_executable(triangulator src/triangulator.cpp)
+add_executable(triangulator
+  src/triangulator.cpp
+)
 
-add_dependencies(triangulator ${PROJECT_NAME}_gencfg)
+add_dependencies(triangulator
+  ${PROJECT_NAME}_gencfg
+  sr_grasp_msgs_gencpp
+)
 
 target_link_libraries(triangulator
   ${catkin_LIBRARIES}

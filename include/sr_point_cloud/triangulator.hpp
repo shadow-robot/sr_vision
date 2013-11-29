@@ -3,7 +3,9 @@
 #include <ros/ros.h>
 #include <shape_msgs/Mesh.h>
 #include <dynamic_reconfigure/server.h>
+#include <actionlib/server/simple_action_server.h>
 #include <sr_point_cloud/TriangulatorConfig.h>
+#include <sr_grasp_msgs/TriangulatorAction.h>
 
 // ROS PCL specific includes
 #include <pcl_conversions/pcl_conversions.h>
@@ -48,20 +50,32 @@ protected:
   ros::Publisher pcl_output_pub_;   // Not defined in the architecture.
   ros::Publisher shape_output_pub_; // Officially defined in the architecture.
 
+  std::string action_name_;
+  actionlib::SimpleActionServer<sr_grasp_msgs::TriangulatorAction> as_tri_;
+  boost::shared_ptr<sr_grasp_msgs::TriangulatorFeedback> feedback_tri_;
+  boost::shared_ptr<sr_grasp_msgs::TriangulatorResult> result_tri_;
+
+  // Auto start the action server?
+  static const bool auto_start_;
+
 public:
-  Triangulator();
+  Triangulator(std::string node_name);
   ~Triangulator();
 
   void run(void);
 
 protected:
-  void config_cb(TriangulatorConfig &config, uint32_t level);
+  void config_cb_(TriangulatorConfig &config, uint32_t level);
 
-  void cloud_cb (const sensor_msgs::PointCloud2 &sensor_pc2);
+  void cloud_cb_(const sensor_msgs::PointCloud2 &sensor_pc2);
 
-  void fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
-                          const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                          shape_msgs::Mesh &shapeMesh);
+  void fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
+                           const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
+                           shape_msgs::Mesh &shapeMesh);
+
+  void goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal);
+
+  void timer_cb_(const ros::WallTimerEvent& event);
 
 }; // Triangulator
 

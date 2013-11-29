@@ -6,7 +6,11 @@ using namespace sr_point_cloud;
 
 //-------------------------------------------------------------------------------
 
-Triangulator::Triangulator()
+const bool Triangulator::auto_start_ = true;
+
+//-------------------------------------------------------------------------------
+
+Triangulator::Triangulator(std::string node_name)
   : nh_("~")
   , resample_(true)
   , mu_(2.5)
@@ -16,12 +20,23 @@ Triangulator::Triangulator()
   , maximum_angle_(2*M_PI/3) // 120 degs
   , gp3_search_radius_(0.025)
   , mls_search_radius_(0.03)
+  , action_name_(node_name)
+  , as_tri_(nh_,
+            node_name,
+            boost::bind(&Triangulator::goal_cb_, this, _1),
+            !Triangulator::auto_start_)
 {
   // Setup ROS topics and services
-  config_server_.setCallback( boost::bind(&Triangulator::config_cb, this, _1, _2) );
-  input_sub_ = nh_.subscribe("input/points", 1, &Triangulator::cloud_cb, this);
+  config_server_.setCallback( boost::bind(&Triangulator::config_cb_, this, _1, _2) );
+  input_sub_ = nh_.subscribe("input/points", 1, &Triangulator::cloud_cb_, this);
   pcl_output_pub_ = nh_.advertise<pcl_msgs::PolygonMesh>("output/pcl/mesh", 1);
   shape_output_pub_ = nh_.advertise<shape_msgs::Mesh>("output/shape/mesh", 1);
+
+  feedback_tri_.reset(new sr_grasp_msgs::TriangulatorFeedback);
+  result_tri_.reset(new sr_grasp_msgs::TriangulatorResult);
+
+  as_tri_.start();
+  ROS_INFO_STREAM("Action server " << action_name_ << " just started.");
 }
 
 //-------------------------------------------------------------------------------
@@ -39,7 +54,7 @@ void Triangulator::run(void)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::config_cb(TriangulatorConfig &config, uint32_t level)
+void Triangulator::config_cb_(TriangulatorConfig &config, uint32_t level)
 {
   resample_ = config.resample;
   mu_ = config.mu;
@@ -56,7 +71,7 @@ void Triangulator::config_cb(TriangulatorConfig &config, uint32_t level)
  * http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
  * http://pointclouds.org/documentation/tutorials/resampling.php
  */
-void Triangulator::cloud_cb (const sensor_msgs::PointCloud2 &sensor_pc2)
+void Triangulator::cloud_cb_(const sensor_msgs::PointCloud2 &sensor_pc2)
 {
   // http://wiki.ros.org/hydro/Migration#PCL
   pcl::PCLPointCloud2 pcl_pc2;
@@ -152,16 +167,16 @@ void Triangulator::cloud_cb (const sensor_msgs::PointCloud2 &sensor_pc2)
   // Convert to shape_msgs::Mesh type and publish
   // The given cloud should NOT be used after resampling.
   shape_msgs::Mesh shapeMesh;
-  this->fromPCLPolygonMesh(triangles, cloud_with_normals, shapeMesh);
+  this->fromPCLPolygonMesh_(triangles, cloud_with_normals, shapeMesh);
   shape_output_pub_.publish(shapeMesh);
 
   // Debug
   // pcl::io::saveVTKFile("mesh.vtk", triangles);
 }
 
-void Triangulator:: fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
-                                       const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                                       shape_msgs::Mesh &shapeMesh)
+void Triangulator:: fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
+                                        const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
+                                        shape_msgs::Mesh &shapeMesh)
 {
   const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
@@ -190,13 +205,27 @@ void Triangulator:: fromPCLPolygonMesh(const pcl::PolygonMesh &pclMesh,
 }
 
 //-------------------------------------------------------------------------------
+
+void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal)
+{
+}
+
+//-------------------------------------------------------------------------------
+
+void Triangulator::timer_cb_(const ros::WallTimerEvent& event)
+{
+  // time_to_quit_ = true;
+}
+
+//-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
 int main (int argc, char** argv)
 {
-  ros::init (argc, argv, "point_cloud_triangulator");
-  sr_point_cloud::Triangulator node;
-  node.run();
+  std::string node_name("point_cloud_triangulator");
+  ros::init (argc, argv, node_name);
+  sr_point_cloud::Triangulator tri_node(node_name);
+  tri_node.run();
   return 0;
 }
 
