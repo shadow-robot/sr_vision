@@ -70,17 +70,12 @@ void Triangulator::config_cb_(TriangulatorConfig &config, uint32_t level)
  * Runs the triangulation. Based on:
  * http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
  * http://pointclouds.org/documentation/tutorials/resampling.php
+ *
+ * Note that the input type is sensor_msgs::PointCloud2 according to the documentation.
+ * However, ROS converts automatically from that type to pcl::PointCloud<pcl::PointXYZ>.
  */
-void Triangulator::cloud_cb_(const sensor_msgs::PointCloud2 &sensor_pc2)
+void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
 {
-  // http://wiki.ros.org/hydro/Migration#PCL
-  pcl::PCLPointCloud2 pcl_pc2;
-  pcl_conversions::toPCL(sensor_pc2, pcl_pc2);
-
-  // Convert to pcl::PointCloud.
-  boost::shared_ptr<Cloud> cloud(new Cloud);
-  pcl::fromPCLPointCloud2(pcl_pc2, *cloud);
-
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
   // Concatenate the XYZ and normal fields

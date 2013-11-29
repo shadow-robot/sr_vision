@@ -8,7 +8,6 @@
 #include <sr_grasp_msgs/TriangulatorAction.h>
 
 // ROS PCL specific includes
-#include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs/subs
 #include <pcl_msgs/PolygonMesh.h>
 
@@ -67,7 +66,7 @@ public:
 protected:
   void config_cb_(TriangulatorConfig &config, uint32_t level);
 
-  void cloud_cb_(const sensor_msgs::PointCloud2 &sensor_pc2);
+  void cloud_cb_(const Cloud::ConstPtr &cloud);
 
   void fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                            const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
