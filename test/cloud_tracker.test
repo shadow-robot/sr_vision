@@ -1,6 +1,6 @@
 
 <launch>
-    <!-- Loop a bag that looks enough like a OPenNI camera -->
+    <!-- Loop a bag that looks enough like a OpenNI camera -->
     <node name="camera_bag" pkg="rosbag" type="play" args="--loop $(find sr_point_cloud)/test/camera-points.bag" />
 
     <!-- Tracker using bag as input cloud -->

@@ -8,7 +8,6 @@ from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from sr_point_cloud.msg import *
 
-## A sample python unit test
 class TestCloudTracker(unittest.TestCase):
 
     # Util methods
