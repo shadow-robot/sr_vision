@@ -11,8 +11,8 @@ const bool Triangulator::auto_start_ = true;
 //-------------------------------------------------------------------------------
 
 Triangulator::Triangulator(std::string node_name)
-  : // nh_("~") /* If executed, action server will not be able to start! */
-  resample_(true)
+  : nh_("~")
+  , resample_(true)
   , mu_(2.5)
   , maximum_nearest_neighbors_(100)
   , maximum_surface_angle_(M_PI/4) // 45 degs
