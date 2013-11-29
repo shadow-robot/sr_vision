@@ -52,6 +52,7 @@ class TestCloudTracker(unittest.TestCase):
     def test_basic(self):
         """At startup we should see a target cloud but no result yet."""
         self.assertIsPublishing('/point_cloud_tracker/cloud_downsampled/points', PointCloud2 )
+        self.assertGreater(len(self.lastMsg().data), 1000)
         self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
         self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
 
