@@ -6,6 +6,7 @@ project(sr_point_cloud)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   message_generation
+  rostest
   dynamic_reconfigure
   actionlib_msgs
   genmsg
@@ -203,3 +204,5 @@ target_link_libraries(triangulator
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
+add_rostest(test/cloud_tracker.test)
