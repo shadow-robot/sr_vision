@@ -83,7 +83,10 @@ class TestCloudTracker(unittest.TestCase):
 
     def test_track_action_cloud(self):
         """Test starting tracker from cloud."""
-        goal = TrackGoal()
+        # track_me.bag contains a single Pointcloud2 message.
+        # Can be created with something like:
+        # $ rosbag record -l1 -Otrack_me /point_cloud_tracker/result/points
+        # When the tracker s tracking an object.
         goal.cloud = self.bag_read_all('track_me.bag')[0]
         self._test_track_action(goal)
 
