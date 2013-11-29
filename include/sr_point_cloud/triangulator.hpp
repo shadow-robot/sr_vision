@@ -68,13 +68,17 @@ protected:
 
   void cloud_cb_(const Cloud::ConstPtr &cloud);
 
-  void fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
-                           const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                           shape_msgs::Mesh &shapeMesh);
-
   void goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal);
 
   void timer_cb_(const ros::WallTimerEvent& event);
+
+  void triangulate(const Cloud::ConstPtr &cloud,
+                   pcl_msgs::PolygonMesh &pclMesh,
+                   shape_msgs::Mesh &shapeMesh);
+
+  void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
+                            const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
+                            shape_msgs::Mesh &shapeMesh);
 
 }; // Triangulator
 

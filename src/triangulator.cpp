@@ -76,6 +76,47 @@ void Triangulator::config_cb_(TriangulatorConfig &config, uint32_t level)
  */
 void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
 {
+  // Triangulate.
+  pcl_msgs::PolygonMesh pclMesh;
+  shape_msgs::Mesh shapeMesh;
+  this->triangulate(cloud, pclMesh, shapeMesh);
+
+  // Publish the mesh.
+  pcl_output_pub_.publish(pclMesh);
+  shape_output_pub_.publish(shapeMesh);
+}
+
+//-------------------------------------------------------------------------------
+
+void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal)
+{
+  // http://wiki.ros.org/hydro/Migration#PCL
+  pcl::PCLPointCloud2 pcl_pc2;
+  pcl_conversions::toPCL(goal->point_cloud, pcl_pc2);
+
+  // Convert to pcl::PointCloud.
+  boost::shared_ptr<Cloud> cloud(new Cloud);
+  pcl::fromPCLPointCloud2(pcl_pc2, *cloud);
+
+  // Triangulate.
+  pcl_msgs::PolygonMesh pclMesh;
+  shape_msgs::Mesh shapeMesh;
+  this->triangulate(cloud, pclMesh, shapeMesh);
+}
+
+//-------------------------------------------------------------------------------
+
+void Triangulator::timer_cb_(const ros::WallTimerEvent& event)
+{
+  // time_to_quit_ = true;
+}
+
+//-------------------------------------------------------------------------------
+
+void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
+                               pcl_msgs::PolygonMesh &pclMesh,
+                               shape_msgs::Mesh &shapeMesh)
+{
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
   // Concatenate the XYZ and normal fields
@@ -154,16 +195,12 @@ void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
   std::vector<int> parts = gp3.getPartIDs();
   std::vector<int> states = gp3.getPointStates();
 
-  // Convert to ROS type and publish
-  pcl_msgs::PolygonMesh pclMesh;
+  // Convert to ROS type
   pcl_conversions::fromPCL(triangles, pclMesh);
-  pcl_output_pub_.publish(pclMesh);
 
-  // Convert to shape_msgs::Mesh type and publish
+  // Convert to shape_msgs::Mesh type
   // The given cloud should NOT be used after resampling.
-  shape_msgs::Mesh shapeMesh;
-  this->fromPCLPolygonMesh_(triangles, cloud_with_normals, shapeMesh);
-  shape_output_pub_.publish(shapeMesh);
+  this->from_PCLPolygonMesh_(triangles, cloud_with_normals, shapeMesh);
 
   // Debug
   // pcl::io::saveVTKFile("mesh.vtk", triangles);
@@ -171,9 +208,9 @@ void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
-                                       const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                                       shape_msgs::Mesh &shapeMesh)
+void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
+                                        const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
+                                        shape_msgs::Mesh &shapeMesh)
 {
   const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
@@ -199,19 +236,6 @@ void Triangulator::fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     triangle.vertex_indices[2] = curr_poly.vertices[2];
     shapeMesh.triangles.push_back(triangle);
   }
-}
-
-//-------------------------------------------------------------------------------
-
-void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal)
-{
-}
-
-//-------------------------------------------------------------------------------
-
-void Triangulator::timer_cb_(const ros::WallTimerEvent& event)
-{
-  // time_to_quit_ = true;
 }
 
 //-------------------------------------------------------------------------------
