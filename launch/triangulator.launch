@@ -1,0 +1,3 @@
+<launch>
+<node name="triangulator" pkg="sr_point_cloud" type="triangulator" output="screen"/>
+</launch>

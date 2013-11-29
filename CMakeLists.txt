@@ -210,10 +210,17 @@ target_link_libraries(triangulator
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_tracker.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+catkin_add_gtest(test_triangulator
+  test/test_triangulator.test
+  test/test_triangulator.cpp)
+if(TARGET test_triangulator)
+  target_link_libraries(test_triangulator
+    ${catkin_LIBRARIES}
+    ${GTEST_LIBRARIES})
+  add_dependencies(test_triangulator
+    sr_grasp_msgs_gencpp
+    ${catkin_EXPORTED_TARGETS})
+endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
