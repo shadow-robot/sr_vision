@@ -8,6 +8,7 @@
   <author email="mark@shadowrobot.com">Mark Pitchless</author>
 
   <!-- The *_depend tags are used to specify dependencies -->
+  <!-- http://wiki.ros.org/pcl/Tutorials -->
   <buildtool_depend>catkin</buildtool_depend>
 
   <build_depend>message_generation</build_depend>
@@ -31,7 +32,7 @@
   <run_depend>orocos_kdl</run_depend>
   <run_depend>pcl_conversions</run_depend>
   <run_depend>pcl_ros</run_depend>
-  <run_depend>libpcl-all-dev</run_depend>
+  <run_depend>libpcl-all</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>sensor_msgs</run_depend>
   <run_depend>dynamic_reconfigure</run_depend>
