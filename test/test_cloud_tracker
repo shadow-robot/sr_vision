@@ -8,13 +8,23 @@ from sr_point_cloud.msg import *
 
 ## A sample python unit test
 class TestCloudTracker(unittest.TestCase):
+    def setUp(self):
+        self.messages = []
+
+    def lastMsg(self):
+        return self.messages[-1]
 
     def assertIsPublishing(self, topic, topic_type, timeout = 3.0):
-        """Test if a topic is publishing something of the correct type."""
+        """
+        Test if a topic is publishing something of the correct type.
+        The message recieved if this works is appended to the self.messages
+        array.
+        """
         is_publishing = False;
         err = None
         try:
-            rospy.wait_for_message(topic, topic_type, timeout = timeout)
+            msg = rospy.wait_for_message(topic, topic_type, timeout = timeout)
+            self.messages.append(msg)
         except Exception as err:
             pass
         else:
@@ -36,7 +46,7 @@ class TestCloudTracker(unittest.TestCase):
             raise
         else:
             is_publishing = True;
-        self.assertTrue(not is_publishing, topic + " is publishing");
+        self.assertFalse(is_publishing, topic + " is publishing");
         return is_publishing
 
     def test_basic(self):
@@ -48,18 +58,32 @@ class TestCloudTracker(unittest.TestCase):
     def test_track_action(self):
         """
         Send a track goal, test we are tracking something, then stop the
-        gaol and test we stop tracking things.
+        goal and test we stop tracking things.
         """
+        # Send goal to the action server
         client = actionlib.SimpleActionClient('point_cloud_tracker/track', TrackAction)
         client.wait_for_server()
         goal = TrackGoal()
         goal.target = "centered"
         client.send_goal(goal)
         rospy.sleep(1)
+
+        # Check that tracking has started
         self.assertIsPublishing('/point_cloud_tracker/result/points', PointCloud2 )
+        self.assertGreater(len(self.lastMsg().data), 100)
+
+        # Check the pose isn't just an empty default pose
         self.assertIsPublishing('/point_cloud_tracker/result/pose', PoseStamped )
-        # @todo - grab the message and test for sensible looking values, e.g
-        # that the result cloud has some points.
+        pose = self.lastMsg().pose
+        self.assertNotEqual(pose.position.x, 0.0)
+        self.assertNotEqual(pose.position.y, 0.0)
+        self.assertNotEqual(pose.position.z, 0.0)
+        self.assertNotEqual(pose.orientation.x, 0.0)
+        self.assertNotEqual(pose.orientation.y, 0.0)
+        self.assertNotEqual(pose.orientation.z, 0.0)
+        self.assertNotEqual(pose.orientation.w, 0.0)
+
+        # Stop the action, check we stop track
         client.cancel_all_goals()
         rospy.sleep(1)
         self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
@@ -69,6 +93,6 @@ class TestCloudTracker(unittest.TestCase):
 if __name__ == '__main__':
     import rostest
     rospy.init_node('test_cloud_tracker')
-    rostest.rosrun('sr_point_cloud', 'test_bare_bones', TestCloudTracker)
+    rostest.rosrun('sr_point_cloud', 'test_cloud_tracker', TestCloudTracker)
 
 
