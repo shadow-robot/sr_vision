@@ -70,8 +70,6 @@ protected:
 
   void goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal);
 
-  void timer_cb_(const ros::WallTimerEvent& event);
-
   void triangulate(const Cloud::ConstPtr &cloud,
                    pcl_msgs::PolygonMesh &pclMesh,
                    shape_msgs::Mesh &shapeMesh);

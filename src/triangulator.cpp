@@ -106,13 +106,6 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::timer_cb_(const ros::WallTimerEvent& event)
-{
-  // time_to_quit_ = true;
-}
-
-//-------------------------------------------------------------------------------
-
 void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
                                pcl_msgs::PolygonMesh &pclMesh,
                                shape_msgs::Mesh &shapeMesh)
