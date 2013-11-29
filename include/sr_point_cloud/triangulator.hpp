@@ -45,8 +45,8 @@ protected:
   double mls_search_radius_;
 
   ros::Subscriber input_sub_;
-  ros::Publisher pcl_output_pub_;
-  ros::Publisher shape_output_pub_;
+  ros::Publisher pcl_output_pub_;   // Not defined in the architecture.
+  ros::Publisher shape_output_pub_; // Officially defined in the architecture.
 
 public:
   Triangulator();
