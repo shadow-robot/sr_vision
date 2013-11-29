@@ -1,9 +1,4 @@
-#include "sr_grasp_mesh_planner/mesh_obstacle.hpp"
-#include "sr_grasp_mesh_planner/read_ply.hpp"
-#include <sr_grasp_msgs/PlanGraspAction.h>
-#include <geometry_msgs/Point.h>
-#include <shape_msgs/MeshTriangle.h>
-#include <shape_msgs/Mesh.h>
+#include <sr_grasp_msgs/TriangulateAction.h>
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -16,8 +11,9 @@
 
 // Called once when the goal completes
 void done_cb(const actionlib::SimpleClientGoalState& state,
-            const sr_grasp_msgs::PlanGraspResultConstPtr& result)
+             const sr_grasp_msgs::TriangulateResultConstPtr& result)
 {
+  /*
   ROS_INFO("Finished in state [%s]", state.toString().c_str());
   const std::vector<moveit_msgs::Grasp> &grasps = result->grasps;
   EXPECT_GT(grasps.size(), 0);
@@ -28,6 +24,7 @@ void done_cb(const actionlib::SimpleClientGoalState& state,
     EXPECT_GT(grasps[i].grasp_quality, 0);
   }
   ros::shutdown();
+  */
 }
 
 //-------------------------------------------------------------------------------
@@ -42,27 +39,26 @@ void active_cb()
 //-------------------------------------------------------------------------------
 
 // Called every time feedback is received for the goal
-void feedback_cb(const sr_grasp_msgs::PlanGraspFeedbackConstPtr& feedback)
+void feedback_cb(const sr_grasp_msgs::TriangulateFeedbackConstPtr& feedback)
 {
-  ROS_INFO_STREAM("Got feedback of number of stable grasps: " <<
-                  feedback->number_of_synthesized_grasps << ".");
-  EXPECT_GT(feedback->number_of_synthesized_grasps, 0);
+  // No feedback.
 }
 
 //-------------------------------------------------------------------------------
 
-TEST(TestGraspMeshPlanner, testGraspMeshPlanner)
+TEST(TestTriangulator, testTriangulator)
 {
-  std::string package_path  = ros::package::getPath("sr_grasp_mesh_planner");
-  std::string ply_filename = package_path + "/kit/WhiteCup_800.ply";
+  std::string package_path = ros::package::getPath("sr_point_cloud");
+  std::string pcd_filename = package_path + "/test/bun0.pcd";
 
+  /*
   ReadPLY reader;
   if (reader.load(ply_filename.c_str()) != 0)
     ROS_ERROR_STREAM("Failed to load " << ply_filename << " using method ReadPLY::Load.");
   ROS_INFO_STREAM("Number of vertices read  = " << reader.total_vertices_  << ".");
   ROS_INFO_STREAM("Number of triangles read = " << reader.total_triangles_ << ".");
 
-  sr_grasp_msgs::PlanGraspGoal goal;
+  sr_grasp_msgs::TriangulateGoal goal;
 
   // Set the list of triangles.
   for (int i = 0; i < reader.total_triangles_; i++)
@@ -87,7 +83,7 @@ TEST(TestGraspMeshPlanner, testGraspMeshPlanner)
   }
 
   // Create the action client, and true causes the client to spin its own thread.
-  actionlib::SimpleActionClient<sr_grasp_msgs::PlanGraspAction> ac("sr_grasp_mesh_planner", true);
+  actionlib::SimpleActionClient<sr_grasp_msgs::TriangulateAction> ac("sr_grasp_mesh_planner", true);
 
   ROS_INFO_STREAM("Waiting for action server to start.");
   ac.waitForServer();
@@ -97,6 +93,7 @@ TEST(TestGraspMeshPlanner, testGraspMeshPlanner)
   ac.sendGoal(goal, &done_cb, &active_cb, &feedback_cb);
 
   ros::spin();
+  */
 }
 
 //-------------------------------------------------------------------------------
@@ -104,7 +101,7 @@ TEST(TestGraspMeshPlanner, testGraspMeshPlanner)
 int main(int argc, char **argv)
 {
   testing::InitGoogleTest(&argc, argv);
-  ros::init(argc, argv, "test_grasp_mesh_planner");
+  ros::init(argc, argv, "test_triangulator");
   ros::NodeHandle nh;
   return RUN_ALL_TESTS();
 }

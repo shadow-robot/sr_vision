@@ -5,7 +5,7 @@
 #include <dynamic_reconfigure/server.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sr_point_cloud/TriangulatorConfig.h>
-#include <sr_grasp_msgs/TriangulatorAction.h>
+#include <sr_grasp_msgs/TriangulateAction.h>
 
 // ROS PCL specific includes
 #include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs/subs
@@ -50,9 +50,9 @@ protected:
   ros::Publisher shape_output_pub_; // Officially defined in the architecture.
 
   std::string action_name_;
-  actionlib::SimpleActionServer<sr_grasp_msgs::TriangulatorAction> as_tri_;
-  boost::shared_ptr<sr_grasp_msgs::TriangulatorFeedback> feedback_tri_;
-  boost::shared_ptr<sr_grasp_msgs::TriangulatorResult> result_tri_;
+  actionlib::SimpleActionServer<sr_grasp_msgs::TriangulateAction> as_tri_;
+  boost::shared_ptr<sr_grasp_msgs::TriangulateFeedback> feedback_tri_;
+  boost::shared_ptr<sr_grasp_msgs::TriangulateResult> result_tri_;
 
   // Auto start the action server?
   static const bool auto_start_;
@@ -68,7 +68,7 @@ protected:
 
   void cloud_cb_(const Cloud::ConstPtr &cloud);
 
-  void goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal);
+  void goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal);
 
   void triangulate(const Cloud::ConstPtr &cloud,
                    pcl_msgs::PolygonMesh &pclMesh,
