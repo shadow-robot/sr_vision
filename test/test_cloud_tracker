@@ -1,13 +1,19 @@
 #!/usr/bin/env python
 
-import rospy, actionlib;
-import unittest;
+PKG='sr_point_cloud'
+
+import os, unittest;
+import rospy, rospkg, rosbag, actionlib;
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from sr_point_cloud.msg import *
 
 ## A sample python unit test
 class TestCloudTracker(unittest.TestCase):
+
+    # Util methods
+    ###############
+
     def setUp(self):
         self.messages = []
 
@@ -49,6 +55,20 @@ class TestCloudTracker(unittest.TestCase):
         self.assertFalse(is_publishing, topic + " is publishing");
         return is_publishing
 
+    def bag_read_all(self, f):
+        """Read all messages from the given bag file. Path is relative to test dir."""
+        rp = rospkg.RosPack()
+        bag_file = os.path.join(rp.get_path(PKG), 'test', f)
+        bag = rosbag.Bag(bag_file)
+        msgs = []
+        for topic, msg, t in bag.read_messages():
+            msgs.append(msg)
+        return msgs
+
+
+    # Tests
+    ########
+
     def test_basic(self):
         """At startup we should see a target cloud but no result yet."""
         self.assertIsPublishing('/point_cloud_tracker/cloud_downsampled/points', PointCloud2 )
@@ -57,6 +77,18 @@ class TestCloudTracker(unittest.TestCase):
         self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
 
     def test_track_action(self):
+        """Test starting tracker on centered object."""
+        goal = TrackGoal()
+        goal.target = "centered"
+        self._test_track_action(goal)
+
+    def test_track_action_cloud(self):
+        """Test starting tracker from cloud."""
+        goal = TrackGoal()
+        goal.cloud = self.bag_read_all('track_me.bag')[0]
+        self._test_track_action(goal)
+
+    def _test_track_action(self, goal):
         """
         Send a track goal, test we are tracking something, then stop the
         goal and test we stop tracking things.
@@ -64,8 +96,6 @@ class TestCloudTracker(unittest.TestCase):
         # Send goal to the action server
         client = actionlib.SimpleActionClient('point_cloud_tracker/track', TrackAction)
         client.wait_for_server()
-        goal = TrackGoal()
-        goal.target = "centered"
         client.send_goal(goal)
         rospy.sleep(1)
 
@@ -89,6 +119,7 @@ class TestCloudTracker(unittest.TestCase):
         rospy.sleep(1)
         self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
         self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
+
 
 
 if __name__ == '__main__':
