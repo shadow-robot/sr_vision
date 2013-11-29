@@ -1,4 +1,4 @@
 <launch>
-  <node pkg="sr_grasp_mesh_planner" type="sr_grasp_mesh_planner_qt" name="sr_grasp_mesh_planner" output="screen" />
-  <test test-name="test_grasp_mesh_planner" pkg="sr_grasp_mesh_planner" type="test_grasp_mesh_planner" />
+<node name="triangulator" pkg="sr_point_cloud" type="triangulator" output="screen" />
+<test test-name="test_triangulator" pkg="sr_point_cloud" type="test_triangulator" />
 </launch>

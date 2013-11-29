@@ -6,6 +6,7 @@
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
   <license>Private</license>
   <author email="mark@shadowrobot.com">Mark Pitchless</author>
+  <author email="yi@shadowrobot.com">Yi Li</author>
 
   <!-- The *_depend tags are used to specify dependencies -->
   <!-- http://wiki.ros.org/pcl/Tutorials -->

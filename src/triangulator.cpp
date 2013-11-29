@@ -11,8 +11,8 @@ const bool Triangulator::auto_start_ = true;
 //-------------------------------------------------------------------------------
 
 Triangulator::Triangulator(std::string node_name)
-  : nh_("~")
-  , resample_(true)
+  : // nh_("~") /* If executed, action server will not be able to start! */
+  resample_(true)
   , mu_(2.5)
   , maximum_nearest_neighbors_(100)
   , maximum_surface_angle_(M_PI/4) // 45 degs
@@ -22,7 +22,7 @@ Triangulator::Triangulator(std::string node_name)
   , mls_search_radius_(0.03)
   , action_name_(node_name)
   , as_tri_(nh_,
-            node_name,
+            action_name_,
             boost::bind(&Triangulator::goal_cb_, this, _1),
             !Triangulator::auto_start_)
 {
@@ -99,7 +99,7 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
   pcl::fromPCLPointCloud2(pcl_pc2, *cloud);
 
   // Publish info to the console for the user.
-  ROS_INFO_STREAM(action_name_ << ": Executing Triangulator::goal_cb_");
+  ROS_INFO_STREAM("Action " << action_name_ << ": Executing Triangulator::goal_cb_");
 
   // Triangulate.
   pcl_msgs::PolygonMesh pclMesh;
@@ -110,7 +110,7 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
 
   // Set the action state to succeeded.
   as_tri_.setSucceeded(*result_tri_);
-  ROS_INFO_STREAM(action_name_ << ": Succeeded");
+  ROS_INFO_STREAM("Action " << action_name_ << ": Succeeded");
 }
 
 //-------------------------------------------------------------------------------
