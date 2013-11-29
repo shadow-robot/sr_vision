@@ -98,10 +98,19 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulatorGoalConstPtr &goal)
   boost::shared_ptr<Cloud> cloud(new Cloud);
   pcl::fromPCLPointCloud2(pcl_pc2, *cloud);
 
+  // Publish info to the console for the user.
+  ROS_INFO_STREAM(action_name_ << ": Executing Triangulator::goal_cb_");
+
   // Triangulate.
   pcl_msgs::PolygonMesh pclMesh;
   shape_msgs::Mesh shapeMesh;
   this->triangulate(cloud, pclMesh, shapeMesh);
+  result_tri_->pcl_mesh = pclMesh;
+  result_tri_->shape_mesh = shapeMesh;
+
+  // Set the action state to succeeded.
+  as_tri_.setSucceeded(*result_tri_);
+  ROS_INFO_STREAM(action_name_ << ": Succeeded");
 }
 
 //-------------------------------------------------------------------------------
