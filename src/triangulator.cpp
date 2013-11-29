@@ -169,9 +169,11 @@ void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
   // pcl::io::saveVTKFile("mesh.vtk", triangles);
 }
 
-void Triangulator:: fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
-                                        const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                                        shape_msgs::Mesh &shapeMesh)
+//-------------------------------------------------------------------------------
+
+void Triangulator::fromPCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
+                                       const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
+                                       shape_msgs::Mesh &shapeMesh)
 {
   const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
