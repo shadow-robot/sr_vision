@@ -56,8 +56,16 @@ void Triangulator::config_cb(TriangulatorConfig &config, uint32_t level)
  * http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
  * http://pointclouds.org/documentation/tutorials/resampling.php
  */
-void Triangulator::cloud_cb (const Cloud::ConstPtr &cloud)
+void Triangulator::cloud_cb (const sensor_msgs::PointCloud2 &sensor_pc2)
 {
+  // http://wiki.ros.org/hydro/Migration#PCL
+  pcl::PCLPointCloud2 pcl_pc2;
+  pcl_conversions::toPCL(sensor_pc2, pcl_pc2);
+
+  // Convert to pcl::PointCloud.
+  boost::shared_ptr<Cloud> cloud(new Cloud);
+  pcl::fromPCLPointCloud2(pcl_pc2, *cloud);
+
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
   // Concatenate the XYZ and normal fields
