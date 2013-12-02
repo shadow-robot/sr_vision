@@ -83,6 +83,7 @@ generate_messages(
 generate_dynamic_reconfigure_options(
   cfg/Tracker.cfg
   cfg/Triangulator.cfg
+  cfg/ClusterSegmentor.cfg
   #...
 )
 
@@ -155,6 +156,19 @@ target_link_libraries(triangulator
   ${catkin_LIBRARIES}
   ${boost_LIBRARIES}
 )
+
+# cluster_segmentor #
+#####################
+
+add_executable(cluster_segmentor src/cluster_segmentor_node.cpp)
+
+add_dependencies(cluster_segmentor ${PROJECT_NAME}_gencfg)
+
+target_link_libraries(cluster_segmentor
+  ${catkin_LIBRARIES}
+  ${boost_LIBRARIES}
+)
+
 
 #############
 ## Install ##
