@@ -1,0 +1,12 @@
+
+<launch>
+    <!-- Loop a bag that looks enough like a OpenNI camera -->
+    <node name="camera_bag" pkg="rosbag" type="play" args="--loop $(find sr_point_cloud)/test/camera-points.bag" />
+
+    <!-- Tracker using bag as input cloud -->
+    <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
+        <remap from="~input/points" to="/camera/depth_registered/points" />
+    </node>
+
+    <test test-name="test_cloud_tracker" pkg="sr_point_cloud" type="test_cloud_tracker" />
+</launch>
