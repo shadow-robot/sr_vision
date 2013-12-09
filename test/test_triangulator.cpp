@@ -68,7 +68,7 @@ TEST(TestTriangulator, testTriangulator)
 
   // Create the action client, and true causes the client to spin its own thread.
   // true -> don't need ros::spin()
-  std::string action_name("triangulator/point_cloud_triangulator");
+  std::string action_name("triangulator/triangulate");
   actionlib::SimpleActionClient<sr_grasp_msgs::TriangulateAction> ac(action_name, true);
 
   ROS_INFO_STREAM("Waiting for action server to start.");

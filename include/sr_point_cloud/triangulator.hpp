@@ -58,7 +58,7 @@ protected:
   static const bool auto_start_;
 
 public:
-  Triangulator(std::string node_name);
+  Triangulator();
   ~Triangulator();
 
   void run(void);

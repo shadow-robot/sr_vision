@@ -10,7 +10,7 @@ const bool Triangulator::auto_start_ = true;
 
 //-------------------------------------------------------------------------------
 
-Triangulator::Triangulator(std::string node_name)
+Triangulator::Triangulator()
   : nh_("~")
   , resample_(true)
   , mu_(2.5)
@@ -20,7 +20,7 @@ Triangulator::Triangulator(std::string node_name)
   , maximum_angle_(2*M_PI/3) // 120 degs
   , gp3_search_radius_(0.025)
   , mls_search_radius_(0.03)
-  , action_name_(node_name)
+  , action_name_("triangulate")
   , as_tri_(nh_,
             action_name_,
             boost::bind(&Triangulator::goal_cb_, this, _1),
@@ -245,9 +245,8 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
 
 int main (int argc, char** argv)
 {
-  std::string node_name("point_cloud_triangulator");
-  ros::init (argc, argv, node_name);
-  sr_point_cloud::Triangulator tri_node(node_name);
+  ros::init (argc, argv, "point_cloud_triangulator");
+  sr_point_cloud::Triangulator tri_node;
   tri_node.run();
   return 0;
 }
