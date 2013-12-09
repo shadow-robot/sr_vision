@@ -1,6 +1,8 @@
 <launch>
     <!-- Start the OpenNI camera -->
-    <include file="$(find openni_launch)/launch/openni.launch" />
+    <include file="$(find openni_launch)/launch/openni.launch">
+      <arg name="depth_registration" default="true" />
+    </include>
 
     <!-- Tracker using NI camera feed as input cloud -->
     <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
