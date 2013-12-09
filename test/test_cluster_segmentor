@@ -1,0 +1,28 @@
+#!/usr/bin/env python
+
+PKG='sr_point_cloud'
+
+import os, unittest;
+import rospy, actionlib;
+from object_recognition_msgs.msg import *
+
+class TestClusterSegmentor(unittest.TestCase):
+
+    def test_recognise_action(self):
+        """Test starting tracker on centered object."""
+        # Send goal to the action server
+        goal = ObjectRecognitionGoal()
+        client = actionlib.SimpleActionClient('cluster_segmentor/recognise_objects', ObjectRecognitionAction)
+        client.wait_for_server()
+        client.send_goal(goal)
+        self.assertTrue(client.wait_for_result(rospy.Duration.from_sec(20.0)),
+                "Action did not return within the timelimit")
+        res = client.get_result()
+        self.assertTrue(res)
+
+if __name__ == '__main__':
+    import rostest
+    rospy.init_node('test_cluster_segmentor')
+    rostest.rosrun('sr_point_cloud', 'test_cluster_segmentor', TestClusterSegmentor)
+
+
