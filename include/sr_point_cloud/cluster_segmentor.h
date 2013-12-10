@@ -103,9 +103,9 @@ class ClusterSegmentor
         temp_cloud.reset (new Cloud);
         extractSegmentCluster (cluster_indices, i, *temp_cloud);
         results.push_back(temp_cloud);
-        std::stringstream filename;
-        filename << "segment_cluster_" << i << ".pcd";
-        pcl::io::savePCDFileASCII(filename.str(), *temp_cloud);
+        //std::stringstream filename;
+        //filename << "segment_cluster_" << i << ".pcd";
+        //pcl::io::savePCDFileASCII(filename.str(), *temp_cloud);
       }
     }
 
@@ -208,7 +208,7 @@ class ClusterSegmentor
 
           extractNonPlanePoints (input_, cloud_hull_, *nonplane_cloud_);
           target_cloud_ = nonplane_cloud_;
-          pcl::io::savePCDFileASCII("segment_target_cloud.pcd", *target_cloud_);
+          //pcl::io::savePCDFileASCII("segment_target_cloud.pcd", *target_cloud_);
         }
         else
         {
