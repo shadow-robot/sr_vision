@@ -66,6 +66,14 @@ class ClusterSegmentor
     */
     inline void setClusterTolerance (double tolerance) { cluster_tolerance_ = tolerance; }
 
+    /** \brief Use convex hull, that is extract planes before finding clusters.
+    * \param use_hull
+    */
+    inline void setUseConvexHull (bool use_hull) { use_convex_hull_ = use_hull; }
+
+    /** \brief Get the current use convex hull setting. */
+    inline bool getUseConvexHull () { return (use_convex_hull_); }
+
     /** \brief Get the spatial cluster tolerance as a measure in the L2 Euclidean space. */
     inline double getClusterTolerance () { return (cluster_tolerance_); }
 

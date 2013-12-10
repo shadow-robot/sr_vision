@@ -52,10 +52,9 @@ public:
         config_server_.setCallback( boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2) );
         input_cloud_sub_ = nh_.subscribe("input/points", 1, &ClusterSegmentorNode::cloud_cb_, this);
 
-
         // @todo - would be nice to add a streaming option to the node that
         // constantly streams out the found clusters when on. Will need some
-        // messing around with locks to get this to play nice with the acrionlib
+        // messing around with locks to get this to play nice with the actionlib
         // interface at the same time.
         // See cloud_cb_ for publish code.
         //output_objects_pub_ = nh_.advertise<RecognizedObjectArray>("output/clusters", 1);
@@ -83,7 +82,7 @@ protected:
 
     void config_cb_(sr_point_cloud::ClusterSegmentorConfig &config, uint32_t level)
     {
-      //cluster_segmentor_.setUseConvexHull(config.use_convex_hull);
+      cluster_segmentor_.setUseConvexHull(config.use_convex_hull);
       cluster_segmentor_.setClusterTolerance(config.cluster_tolerance);
       cluster_segmentor_.setMinClusterSize(config.min_cluster_size);
       cluster_segmentor_.setMaxClusterSize(config.max_cluster_size);
@@ -104,8 +103,9 @@ protected:
         input_cloud_ = cloud;
 
       //@todo - streaming interface, see constructor
-      //RecognizedObjectArray out = extract_();
-      //output_objects_pub_.publish(out);
+      //RecognizedObjectArray objs;
+      //extract_(objs);
+      //output_objects_pub_.publish(objs);
     }
 
     void recognize_objects_execute_cb_(const RecognitionServer::GoalConstPtr& goal)
@@ -119,7 +119,6 @@ protected:
 
     void extract_(RecognizedObjectArray &out)
     {
-      ;
       if (!input_cloud_->points.size() > 0)
         return;
 
