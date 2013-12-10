@@ -110,17 +110,18 @@ protected:
 
     void recognize_objects_execute_cb_(const RecognitionServer::GoalConstPtr& goal)
     {
-      RecognizedObjectArray objs = extract_();
       ObjectRecognitionResult res;
+      RecognizedObjectArray objs;
+      extract_(objs);
       res.recognized_objects = objs;
       recognize_objects_as_.setSucceeded(res);
     }
 
-    RecognizedObjectArray extract_()
+    void extract_(RecognizedObjectArray &out)
     {
-      RecognizedObjectArray out;
+      ;
       if (!input_cloud_->points.size() > 0)
-        return out;
+        return;
 
       vector<Cloud::Ptr> clusters;
       cluster_segmentor_.setInputCloud(input_cloud_);
@@ -136,7 +137,6 @@ protected:
         obj.point_clouds.push_back(pc2);
         out.objects.push_back(obj);
       }
-      return out;
     }
 };
 
