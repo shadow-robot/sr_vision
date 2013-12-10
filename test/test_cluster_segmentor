@@ -11,14 +11,22 @@ class TestClusterSegmentor(unittest.TestCase):
     def test_recognise_action(self):
         """Test starting tracker on centered object."""
         # Send goal to the action server
+        timeout = rospy.Duration.from_sec(20.0)
+        client = actionlib.SimpleActionClient(
+                'cluster_segmentor/recognize_objects', ObjectRecognitionAction)
         goal = ObjectRecognitionGoal()
-        client = actionlib.SimpleActionClient('cluster_segmentor/recognise_objects', ObjectRecognitionAction)
-        client.wait_for_server()
+        self.assertTrue(client.wait_for_server(timeout), "Action server not found")
         client.send_goal(goal)
-        self.assertTrue(client.wait_for_result(rospy.Duration.from_sec(20.0)),
+        self.assertTrue(client.wait_for_result(timeout),
                 "Action did not return within the timelimit")
         res = client.get_result()
-        self.assertTrue(res)
+        num_cluster = len(res.recognized_objects.objects)
+        self.assertGreater(num_cluster, 9, "Didn't get enough clusters: %s"%num_cluster)
+
+        # Check the clouds have some data in them
+        for clust in res.recognized_objects.objects:
+            self.assertEqual(len(clust.point_clouds), 1)
+            self.assertGreater(len(clust.point_clouds[0].data), 1000)
 
 if __name__ == '__main__':
     import rostest
