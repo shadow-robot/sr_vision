@@ -239,6 +239,7 @@ add_dependencies(test_triangulator
 )
 
 add_rostest(test/cloud_tracker.test)
+add_rostest(test/cluster_segmentor.test)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
