@@ -119,7 +119,7 @@ protected:
 
     void extract_(RecognizedObjectArray &out)
     {
-      if (!input_cloud_->points.size() > 0)
+      if (input_cloud_->points.empty())
         return;
 
       vector<Cloud::Ptr> clusters;
