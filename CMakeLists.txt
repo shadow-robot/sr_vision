@@ -225,7 +225,7 @@ target_link_libraries(cluster_segmentor
 #############
 
 ## Add gtest based cpp test target and link libraries
-add_rostes_gtest(test_triangulator
+add_rostest_gtest(test_triangulator
   test/test_triangulator.test
   test/test_triangulator.cpp)
 target_link_libraries(test_triangulator
