@@ -227,13 +227,16 @@ target_link_libraries(cluster_segmentor
 ## Add gtest based cpp test target and link libraries
 add_rostest_gtest(test_triangulator
   test/test_triangulator.test
-  test/test_triangulator.cpp)
+  test/test_triangulator.cpp
+)
 target_link_libraries(test_triangulator
   ${catkin_LIBRARIES}
-  ${GTEST_LIBRARIES})
+  ${GTEST_LIBRARIES}
+)
 add_dependencies(test_triangulator
   sr_grasp_msgs_gencpp
-  ${catkin_EXPORTED_TARGETS})
+  ${catkin_EXPORTED_TARGETS}
+)
 
 add_rostest(test/cloud_tracker.test)
 
