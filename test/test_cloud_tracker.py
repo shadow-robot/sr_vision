@@ -1,9 +1,10 @@
 #!/usr/bin/env python
 
-PKG='sr_point_cloud'
+PKG = 'sr_point_cloud'
+NAME = 'test_cloud_tracker'
 
 import os, unittest;
-import rospy, rospkg, rosbag, actionlib;
+import rospy, rostest, rospkg, rosbag, actionlib;
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from sr_point_cloud.msg import *
@@ -87,6 +88,7 @@ class TestCloudTracker(unittest.TestCase):
         # Can be created with something like:
         # $ rosbag record -l1 -Otrack_me /point_cloud_tracker/result/points
         # When the tracker s tracking an object.
+        goal = TrackGoal()
         goal.cloud = self.bag_read_all('track_me.bag')[0]
         self._test_track_action(goal)
 
@@ -122,11 +124,8 @@ class TestCloudTracker(unittest.TestCase):
         self.assertIsNotPublishing('/point_cloud_tracker/result/points', PointCloud2 )
         self.assertIsNotPublishing('/point_cloud_tracker/result/pose', PoseStamped )
 
-
-
 if __name__ == '__main__':
-    import rostest
-    rospy.init_node('test_cloud_tracker')
-    rostest.rosrun('sr_point_cloud', 'test_cloud_tracker', TestCloudTracker)
+    rospy.init_node(NAME)
+    rostest.rosrun(PKG, NAME, TestCloudTracker)
 
 

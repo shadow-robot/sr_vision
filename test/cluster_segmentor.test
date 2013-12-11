@@ -1,4 +1,3 @@
-
 <launch>
     <!-- Loop a bag that looks enough like a OpenNI camera -->
     <node name="camera_bag" pkg="rosbag" type="play" args="--loop $(find sr_point_cloud)/test/camera-points.bag" />
@@ -8,5 +7,5 @@
         <remap from="~input/points" to="/camera/depth_registered/points" />
     </node>
 
-    <test test-name="test_cluster_segmentor" pkg="sr_point_cloud" type="test_cluster_segmentor" />
+    <test test-name="test_cluster_segmentor" pkg="sr_point_cloud" type="test_cluster_segmentor.py" />
 </launch>
