@@ -25,12 +25,16 @@ class TestClusterSegmentor(unittest.TestCase):
         self.assertGreater(num_cluster, 9, "Didn't get enough clusters: %s"%num_cluster)
 
         for obj in res.recognized_objects.objects:
-            # Should have the same farme as the camera
+            # Should have the same frame as the camera
             self.assertEqual(obj.header.frame_id, '/camera_rgb_optical_frame')
+            # Should have had a position set, ie not the default pose.
+            self.assertNotEqual(obj.pose.pose.pose.position.x, 0.0)
+            self.assertNotEqual(obj.pose.pose.pose.position.y, 0.0)
+            self.assertNotEqual(obj.pose.pose.pose.position.z, 0.0)
             # Check the clouds have some data in them
             self.assertEqual(len(obj.point_clouds), 1)
             self.assertGreater(len(obj.point_clouds[0].data), 1000)
-            # Should have the same farme as the camera
+            # Cloud should have the same frame as the camera
             self.assertEqual(obj.point_clouds[0].header.frame_id, '/camera_rgb_optical_frame')
 
 if __name__ == '__main__':

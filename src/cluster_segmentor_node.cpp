@@ -21,6 +21,7 @@
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
 #include <pcl/filters/filter.h>
+#include <pcl/common/centroid.h>
 
 #include <sensor_msgs/PointCloud2.h>
 #include <object_recognition_msgs/RecognizedObject.h>
@@ -135,9 +136,15 @@ protected:
         sensor_msgs::PointCloud2 pc2;
         pcl::toROSMsg(*cluster_cloud, pc2);
         pc2.header = head;
+        Eigen::Vector4f centroid;
+        pcl::compute3DCentroid<PointType>(*cluster_cloud, centroid);
+
         RecognizedObject obj;
         obj.header = head;
         obj.point_clouds.push_back(pc2);
+        obj.pose.pose.pose.position.x = centroid.x();
+        obj.pose.pose.pose.position.y = centroid.y();
+        obj.pose.pose.pose.position.z = centroid.z();
         out.objects.push_back(obj);
       }
     }
