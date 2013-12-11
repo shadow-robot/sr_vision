@@ -127,12 +127,16 @@ protected:
       ROS_INFO("Segmenting cloud...");
       cluster_segmentor_.extract(clusters);
       ROS_INFO("... found %i clusters", (int)clusters.size());
+
+      std_msgs::Header head = pcl_conversions::fromPCL(input_cloud_->header);
       for (vector<Cloud::Ptr>::const_iterator it = clusters.begin(); it != clusters.end(); ++it)
       {
         Cloud::Ptr cluster_cloud = *it;
-        RecognizedObject obj;
         sensor_msgs::PointCloud2 pc2;
         pcl::toROSMsg(*cluster_cloud, pc2);
+        pc2.header = head;
+        RecognizedObject obj;
+        obj.header = head;
         obj.point_clouds.push_back(pc2);
         out.objects.push_back(obj);
       }
