@@ -142,6 +142,7 @@ protected:
         RecognizedObject obj;
         obj.header = head;
         obj.point_clouds.push_back(pc2);
+        obj.pose.header = head;
         obj.pose.pose.pose.position.x = centroid.x();
         obj.pose.pose.pose.position.y = centroid.y();
         obj.pose.pose.pose.position.z = centroid.z();

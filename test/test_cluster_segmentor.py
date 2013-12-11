@@ -28,6 +28,7 @@ class TestClusterSegmentor(unittest.TestCase):
             # Should have the same frame as the camera
             self.assertEqual(obj.header.frame_id, '/camera_rgb_optical_frame')
             # Should have had a position set, ie not the default pose.
+            self.assertEqual(obj.pose.header.frame_id, '/camera_rgb_optical_frame')
             self.assertNotEqual(obj.pose.pose.pose.position.x, 0.0)
             self.assertNotEqual(obj.pose.pose.pose.position.y, 0.0)
             self.assertNotEqual(obj.pose.pose.pose.position.z, 0.0)
