@@ -18,8 +18,8 @@
 #include <dynamic_reconfigure/server.h>
 #include "sr_point_cloud/ClusterSegmentorConfig.h"
 
-#include "pcl_conversions/pcl_conversions.h"
-#include "pcl_ros/point_cloud.h" // Allow use of PCL cloud types for pubs and subs
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
 #include <pcl/filters/filter.h>
 
 #include <sensor_msgs/PointCloud2.h>
@@ -30,7 +30,7 @@
 
 namespace sr_point_cloud {
 
-using namespace std;
+using std::vector;
 using namespace object_recognition_msgs;
 
 class ClusterSegmentorNode {
@@ -93,7 +93,7 @@ protected:
       if (remove_nan_)
       {
         // Convex hull does not like a cloud with NaN in (which kinect give us).
-        std::vector<int> indices;
+        vector<int> indices;
         Cloud::Ptr clean_cloud(new Cloud);
         pcl::removeNaNFromPointCloud(*cloud, *clean_cloud, indices);
         input_cloud_ = clean_cloud;
