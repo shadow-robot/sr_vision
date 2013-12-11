@@ -1,4 +1,4 @@
 <launch>
-<node name="triangulator" pkg="sr_point_cloud" type="triangulator" output="screen" />
-<test test-name="test_triangulator" pkg="sr_point_cloud" type="test_triangulator" />
+    <node name="triangulator" pkg="sr_point_cloud" type="triangulator" output="screen" />
+    <test test-name="test_triangulator" pkg="sr_point_cloud" type="test_triangulator" />
 </launch>
