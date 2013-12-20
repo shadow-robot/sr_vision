@@ -150,10 +150,10 @@ target_link_libraries(tracker
 # Work around a bug in kdl cmake. Without this we get error:
 # /usr/bin/ld: cannot find -lorocos-kdl
 # See: http://bugs.orocos.org/show_bug.cgi?id=1035
-set_target_properties(tracker
-  PROPERTIES LINK_FLAGS
-  -L${orocos_kdl_LIBRARY_DIRS}
-)
+#set_target_properties(tracker
+#  PROPERTIES LINK_FLAGS
+#  -L${orocos_kdl_LIBRARY_DIRS}
+#)
 
 # triangulator #
 #######################
