@@ -52,7 +52,7 @@ using namespace pcl::tracking;
 class Tracker {
 
 public:
-    typedef pcl::PointXYZ PointType;
+    typedef pcl::PointXYZRGB PointType;
     typedef ParticleXYZRPY ParticleT;
     typedef pcl::PointCloud<PointType> Cloud;
     typedef typename Cloud::Ptr CloudPtr;
@@ -143,22 +143,23 @@ protected:
         tracker_->setUseNormal(false);
 
         // setup coherences
-        typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr coherence =
-                typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr(
-                        new ApproxNearestPairPointCloudCoherence<PointType>());
+        ApproxNearestPairPointCloudCoherence<PointType>::Ptr coherence(
+            new ApproxNearestPairPointCloudCoherence<PointType>());
 
-        boost::shared_ptr<DistanceCoherence<PointType> > distance_coherence = boost::shared_ptr<
-                DistanceCoherence<PointType> >(new DistanceCoherence<PointType>());
+        boost::shared_ptr<DistanceCoherence<PointType> > distance_coherence(
+            new DistanceCoherence<PointType>());
         coherence->addPointCoherence(distance_coherence);
-/*
- * If we use color coherance we must have and XYZRGB cloud coming in.
- * If we dont use it then any cloud with XYZ should work.
- * TODO: Can we detect RGB clounds and turn this on if it will work?
-        boost::shared_ptr<HSVColorCoherence<PointType> > color_coherence = boost::shared_ptr<
-                HSVColorCoherence<PointType> >(new HSVColorCoherence<PointType>());
+
+        /*
+         * Color coherance so we must have and XYZRGB cloud coming in.
+         * ie a depth_registered cloud from a prime sense.
+         * Comment out next 3 lines to use any cloud with just XYZ
+         */
+        boost::shared_ptr<HSVColorCoherence<PointType> > color_coherence(
+            new HSVColorCoherence<PointType>());
         color_coherence->setWeight(0.1);
         coherence->addPointCoherence(color_coherence);
-*/
+
         boost::shared_ptr<pcl::search::Octree<PointType> > search(new pcl::search::Octree<PointType>(0.01));
         coherence->setSearchMethod(search);
         coherence->setMaximumDistance(0.01);
