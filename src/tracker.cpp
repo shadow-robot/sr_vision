@@ -3,6 +3,7 @@
 #include <ros/ros.h>
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
+#include <tf/transform_broadcaster.h>
 
 #include <actionlib/server/simple_action_server.h>
 #include "sr_point_cloud/TrackAction.h"
@@ -15,8 +16,8 @@
 #include "sr_point_cloud/cluster_segmentor.h"
 
 // ROS pcl includes
-#include "pcl_conversions/pcl_conversions.h"
-#include "pcl_ros/point_cloud.h" // Allow use of PCL cloud types for pubs and subs
+#include <pcl_conversions/pcl_conversions.h>
+#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
 
 // PCL specific includes
 #include <pcl/point_cloud.h>
@@ -284,6 +285,23 @@ protected:
                 pose.pose.orientation.x, pose.pose.orientation.y,
                 pose.pose.orientation.z, pose.pose.orientation.w );
         result_pose_pub_.publish(pose);
+
+        // broadcast the frame of the tracked object
+        tf::Vector3 vect(result.x,
+                         result.y,
+                         result.z);
+
+        tf::Quaternion quat(pose.pose.orientation.x,
+                            pose.pose.orientation.y,
+                            pose.pose.orientation.z,
+                            pose.pose.orientation.w);
+
+        target_transform.setOrigin(vect);
+        target_transform.setRotation(quat);
+        target_broadcaster.sendTransform(tf::StampedTransform(target_transform,
+                                                              ros::Time::now(),
+                                                              "camera_rgb_optical_frame",
+                                                              "tracker"));
     }
 
     void
@@ -363,6 +381,9 @@ protected:
     CloudPtr reference_;
     double downsampling_grid_size_;
     double filter_z_min_, filter_z_max_;
+
+    tf::TransformBroadcaster target_broadcaster;
+    tf::Transform target_transform;
 
 }; // Tracker
 
