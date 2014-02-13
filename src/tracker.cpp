@@ -16,8 +16,8 @@
 #include "sr_point_cloud/cluster_segmentor.h"
 
 // ROS pcl includes
-#include <pcl_conversions/pcl_conversions.h>
-#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
+#include "pcl_conversions/pcl_conversions.h"
+#include "pcl_ros/point_cloud.h" // Allow use of PCL cloud types for pubs and subs
 
 // PCL specific includes
 #include <pcl/point_cloud.h>
@@ -384,7 +384,6 @@ protected:
 
     tf::TransformBroadcaster target_broadcaster;
     tf::Transform target_transform;
-
 }; // Tracker
 
 } // sr_point_cloud
