@@ -299,8 +299,8 @@ protected:
         target_transform.setOrigin(vect);
         target_transform.setRotation(quat);
         target_broadcaster.sendTransform(tf::StampedTransform(target_transform,
-                                                              ros::Time::now(),
-                                                              "camera_rgb_optical_frame",
+                                                              input_->header.stamp,
+                                                              input_->header.frame_id,
                                                               "tracker"));
     }
 
