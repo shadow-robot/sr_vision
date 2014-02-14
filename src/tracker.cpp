@@ -70,6 +70,7 @@ public:
     Tracker()
         : nh_home_("~")
         , track_server_(nh_home_, "track", false)
+        , frame_id_("tracker")
         , downsampling_grid_size_(0.01)
         , filter_z_min_(0.0)
         , filter_z_max_(10.0)
@@ -172,6 +173,7 @@ protected:
     config_cb(TrackerConfig &config, uint32_t level)
     {
         //ROS_INFO("Reconfigure Request: %f %f %f", config.downsampling_grid_size, config.filter_z_min, config.filter_z_max );
+        frame_id_ = config.frame_id;
         downsampling_grid_size_ = config.downsampling_grid_size;
         filter_z_min_ = config.filter_z_min;
         filter_z_max_ = config.filter_z_max;
@@ -274,9 +276,11 @@ protected:
         result_cloud->header = input_->header;
         result_cloud_pub_.publish (*result_cloud);
 
+        std_msgs::Header ros_header = pcl_conversions::fromPCL(input_->header);
+
         // Publish the transformation (pose)
         geometry_msgs::PoseStamped pose;
-        pose.header = pcl_conversions::fromPCL(input_->header);
+        pose.header = ros_header;
         pose.pose.position.x = result.x;
         pose.pose.position.y = result.y;
         pose.pose.position.z = result.z;
@@ -299,9 +303,9 @@ protected:
         target_transform.setOrigin(vect);
         target_transform.setRotation(quat);
         target_broadcaster.sendTransform(tf::StampedTransform(target_transform,
-                                                              input_->header.stamp,
-                                                              input_->header.frame_id,
-                                                              "tracker"));
+                                                              ros_header.stamp,
+                                                              ros_header.frame_id,
+                                                              frame_id_));
     }
 
     void
@@ -369,6 +373,7 @@ protected:
     }
 
     ros::NodeHandle nh_, nh_home_;
+    std::string frame_id_;
     dynamic_reconfigure::Server<TrackerConfig> config_server_;
     ros::Subscriber input_sub_;
     ros::Publisher output_downsampled_pub_, particle_cloud_pub_, result_cloud_pub_, result_pose_pub_;
