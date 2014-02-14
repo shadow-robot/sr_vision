@@ -300,12 +300,12 @@ protected:
                             pose.pose.orientation.z,
                             pose.pose.orientation.w);
 
-        target_transform.setOrigin(vect);
-        target_transform.setRotation(quat);
-        target_broadcaster.sendTransform(tf::StampedTransform(target_transform,
-                                                              ros_header.stamp,
-                                                              ros_header.frame_id,
-                                                              frame_id_));
+        target_transform_.setOrigin(vect);
+        target_transform_.setRotation(quat);
+        target_broadcaster_.sendTransform(tf::StampedTransform(target_transform_,
+                                                               ros_header.stamp,
+                                                               ros_header.frame_id,
+                                                               frame_id_));
     }
 
     void
@@ -387,8 +387,8 @@ protected:
     double downsampling_grid_size_;
     double filter_z_min_, filter_z_max_;
 
-    tf::TransformBroadcaster target_broadcaster;
-    tf::Transform target_transform;
+    tf::TransformBroadcaster target_broadcaster_;
+    tf::Transform target_transform_;
 }; // Tracker
 
 } // sr_point_cloud
