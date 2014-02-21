@@ -1,8 +1,13 @@
 <launch>
+    <!-- set to false if you don't want to start the kinect -->
+    <arg name="kinect" default="true"/>
+
     <!-- Start the OpenNI camera -->
-    <include file="$(find openni_launch)/launch/openni.launch">
-      <arg name="depth_registration" value="true" />
-    </include>
+    <group if="$(arg kinect)">
+      <include file="$(find openni_launch)/launch/openni.launch">
+        <arg name="depth_registration" value="true" />
+      </include>
+    </group>
 
     <!-- Tracker using NI camera feed as input cloud -->
     <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
