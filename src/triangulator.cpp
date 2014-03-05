@@ -6,8 +6,6 @@ using namespace sr_point_cloud;
 
 //-------------------------------------------------------------------------------
 
-const bool Triangulator::auto_start_ = true;
-
 //-------------------------------------------------------------------------------
 
 Triangulator::Triangulator()
@@ -24,7 +22,7 @@ Triangulator::Triangulator()
   , as_tri_(nh_,
             action_name_,
             boost::bind(&Triangulator::goal_cb_, this, _1),
-            !Triangulator::auto_start_)
+            false)
 {
   // Setup ROS topics and services
   config_server_.setCallback( boost::bind(&Triangulator::config_cb_, this, _1, _2) );
@@ -104,7 +102,7 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
   // Triangulate.
   pcl_msgs::PolygonMesh pclMesh;
   shape_msgs::Mesh shapeMesh;
-  this->triangulate(cloud, pclMesh, shapeMesh);
+  this->triangulate(cloud, pclMesh, shapeMesh, goal->mirror_mesh);
   result_tri_->pcl_mesh = pclMesh;
   result_tri_->shape_mesh = shapeMesh;
 
@@ -117,7 +115,8 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
 
 void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
                                pcl_msgs::PolygonMesh &pclMesh,
-                               shape_msgs::Mesh &shapeMesh)
+                               shape_msgs::Mesh &shapeMesh,
+                               bool mirror_mesh)
 {
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
