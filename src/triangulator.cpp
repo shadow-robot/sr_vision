@@ -116,7 +116,7 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
 void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
                                pcl_msgs::PolygonMesh &pclMesh,
                                shape_msgs::Mesh &shapeMesh,
-                               bool mirror_mesh)
+                               bool perform_mesh_mirroring)
 {
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
@@ -165,6 +165,10 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   }
   // cloud_with_normals = cloud + normals
 
+  // add mirrored points to the cloud if requested
+  if (perform_mesh_mirroring)
+    mirror_mesh_(cloud_with_normals);
+
   // Create search tree
   pcl::search::KdTree<pcl::PointNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointNormal>);
   tree2->setInputCloud (cloud_with_normals);
@@ -193,8 +197,8 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   gp3.reconstruct (triangles);
 
   // Additional vertex information
-  std::vector<int> parts = gp3.getPartIDs();
-  std::vector<int> states = gp3.getPointStates();
+  //std::vector<int> parts = gp3.getPartIDs();
+  //std::vector<int> states = gp3.getPointStates();
 
   // Convert to ROS type
   pcl_conversions::fromPCL(triangles, pclMesh);
@@ -238,6 +242,52 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     shapeMesh.triangles.push_back(triangle);
   }
 }
+
+void Triangulator::mirror_mesh_(pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals)
+{
+  using namespace Eigen; using namespace pcl; using namespace std;
+
+  // get centroid of point cloud
+  Vector4f centroid4;
+  compute3DCentroid(*cloud_with_normals, centroid4);
+  Matrix<float, 1, 3> centroid = centroid4.head(3);
+
+  // get unit centroid vector
+  Matrix<float, 1, 3> unit_centroid = centroid / centroid.norm();
+
+  // map the points of the cloud to an Eigen matrix (shallow copy) (row major storage)
+  Map<MatrixXf, Aligned, OuterStride<> > points_map = cloud_with_normals->getMatrixXfMap(3, 4, 0);
+  Matrix<float, Dynamic, 3> points = static_cast<Matrix<float, Dynamic, 3> >(points_map);
+
+  // considering each point as a vector from origin to point
+  // find the projection of each vector on centroid vector
+  // and store the length of each projection
+  VectorXf lengths = (points * centroid.transpose());
+
+  // and the projected vectors as columns in the projections matrix
+  Matrix<float, Dynamic, 3> projections = lengths * centroid;
+
+  // find among projections vector with max length
+  float max_length = lengths.maxCoeff();
+
+  // distance for each point is the max length minus own length
+  VectorXf distance = max_length*VectorXf::Ones(lengths.size()) - lengths;
+
+  // each mirrored point of the cloud is
+  // pm = p - 2*distance*unit_centroid
+  Matrix<float, Dynamic, 3> mps = points - 2*distance*unit_centroid;
+
+  // finally add the mirrored points to the cloud
+  for (size_t i = 0; i < mps.rows(); ++i)
+  {
+    PointNormal point;
+    point.x = mps.row(i)(0);
+    point.y = mps.row(i)(1);
+    point.z = mps.row(i)(2);
+    cloud_with_normals->push_back(point);
+  }
+}
+
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------

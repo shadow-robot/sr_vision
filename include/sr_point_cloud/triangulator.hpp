@@ -73,7 +73,9 @@ protected:
   void triangulate(const Cloud::ConstPtr &cloud,
                    pcl_msgs::PolygonMesh &pclMesh,
                    shape_msgs::Mesh &shapeMesh,
-                   bool mirror_mesh));
+                   bool perform_mesh_mirroring = false);
+
+  void mirror_mesh_(pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals);
 
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
