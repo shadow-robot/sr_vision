@@ -1,4 +1,6 @@
 #include "sr_point_cloud/triangulator.hpp"
+#include <pcl/common/pca.h>
+#include <pcl/common/transformation_from_correspondences.h>
 
 //-------------------------------------------------------------------------------
 
@@ -102,7 +104,9 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
   // Triangulate.
   pcl_msgs::PolygonMesh pclMesh;
   shape_msgs::Mesh shapeMesh;
-  this->triangulate(cloud, pclMesh, shapeMesh, goal->mirror_mesh);
+  if (goal->mirror_mesh)
+    mirror_mesh_(*cloud);
+  this->triangulate(cloud, pclMesh, shapeMesh);
 
   if (pclMesh.polygons.size() > 2)
   {
@@ -122,8 +126,7 @@ void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
 
 void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
                                pcl_msgs::PolygonMesh &pclMesh,
-                               shape_msgs::Mesh &shapeMesh,
-                               bool perform_mesh_mirroring)
+                               shape_msgs::Mesh &shapeMesh)
 {
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
@@ -131,8 +134,8 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals;
   if (!resample_)
   {
-    // Follow "Fast triangulation of unordered point clouds" @
-    // http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
+//     Follow "Fast triangulation of unordered point clouds" @
+//     http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
 
     // Normal estimation
     pcl::NormalEstimation<PointType, pcl::Normal> n;
@@ -171,10 +174,6 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
     cloud_with_normals = boost::make_shared< pcl::PointCloud<pcl::PointNormal> > (mls_points);
   }
   // cloud_with_normals = cloud + normals
-
-  // add mirrored points to the cloud if requested
-  if (perform_mesh_mirroring)
-    mirror_mesh_(cloud_with_normals);
 
   // Create search tree
   pcl::search::KdTree<pcl::PointNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointNormal>);
@@ -250,73 +249,75 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
   }
 }
 
-void Triangulator::mirror_mesh_(pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals)
+void Triangulator::mirror_mesh_(Cloud &cloud)
 {
   using namespace Eigen; using namespace pcl; using namespace std;
 
-  // get centroid of point cloud
   Vector4f centroid4;
-  compute3DCentroid(*cloud_with_normals, centroid4);
-  Vector3f centroid = centroid4.head(3);
+  compute3DCentroid(cloud, centroid4);
+  const Vector3f centroid = centroid4.head(3);
   ROS_INFO_STREAM("centroid = " << centroid);
 
-  // get unit centroid vector
-  Vector3f unit_centroid = centroid / centroid.norm();
-  ROS_INFO_STREAM("unit_centroid = " << unit_centroid);
+  // compute principal directions
+  Matrix3f covariance;
+  computeCovarianceMatrixNormalized(cloud, centroid4, covariance);
+  SelfAdjointEigenSolver<Matrix3f> eigen_solver(covariance, ComputeEigenvectors);
+  Matrix3f eigDx = eigen_solver.eigenvectors();
+  eigDx.col(2) = eigDx.col(0).cross(eigDx.col(1));
+  ROS_INFO_STREAM("eigDx = " << eigDx);
 
-  // map the points of the cloud to an Eigen matrix (shallow copy) (column major storage)
-  Matrix<float, 3, Dynamic> points(3, cloud_with_normals->size());
-  for (size_t i = 0; i < cloud_with_normals->size(); ++i)
-  {
-    if (i < 4)
-      ROS_INFO_STREAM("point i = " << i << " coords " << points.col(i));
-    points.col(i).x() = cloud_with_normals->at(i).x;
-    points.col(i).y() = cloud_with_normals->at(i).y;
-    points.col(i).z() = cloud_with_normals->at(i).z;
-  }
-  ROS_INFO_STREAM("points rows = " << points.rows() << " cols = " << points.cols());
+  // move a copy of the original point cloud to the calculated reference frame
+  Matrix4f p2w(Matrix4f::Identity());
+  p2w.block<3,3>(0,0) = eigDx.transpose();
+  p2w.block<3,1>(0,3) = -1.f * (p2w.block<3,3>(0,0) * centroid.head<3>());
+  Cloud used_for_bounding_box;
+  transformPointCloud(cloud, used_for_bounding_box, p2w);
 
-  // considering each point as a vector from origin to point
-  // find the projection of each vector on centroid vector
-  // and store the length of each projection
-  RowVectorXf lengths = centroid.transpose() * points;
-  ROS_INFO_STREAM("lengths rows = " << lengths.rows() << " cols = " << lengths.cols());
+  // calculate oriented bounded box
+  PointType min_pt, max_pt;
+  getMinMax3D(cloud, min_pt, max_pt);
+  const Vector3f mean_diag = 0.5f*(max_pt.getVector3fMap() + min_pt.getVector3fMap());
+  ROS_INFO_STREAM("min_pt = " << min_pt);
+  ROS_INFO_STREAM("max_pt = " << max_pt);
 
-  // and the projected vectors as columns in the projections matrix
-  Matrix<float, 3, Dynamic> projections = centroid * lengths;
-  ROS_INFO_STREAM("projections rows = " << projections.rows() << " cols = " << projections.cols());
+  // transform bounding box to the correct coordinates
+  const Quaternionf qfinal(eigDx);
+  const Vector3f tfinal = eigDx*mean_diag + centroid;
 
-  // find among projections length of longest vector
-  float max_length = lengths.maxCoeff();
-  ROS_INFO_STREAM("max_length = " << max_length);
+  Affine3f bounding_transform = Translation3f(tfinal)*qfinal;
+  Cloud cBoundingBox;
+  cBoundingBox.push_back(min_pt);
+  cBoundingBox.push_back(max_pt);
+  transformPointCloud(cBoundingBox, cBoundingBox, bounding_transform);
 
-  // distance for each point is the max length minus own length
-  RowVectorXf distance = max_length*RowVectorXf::Ones(lengths.size()) - lengths;
-  ROS_INFO_STREAM("distance rows = " << distance.rows() << " cols = " << distance.cols());
+//  calculate transformation based on point correspondences
 
-  // each mirrored point of the cloud is
-  // pm = p - 2*distance*unit_centroid
-  Matrix<float, 3, Dynamic> mps = points + 2*unit_centroid*distance;
-  ROS_INFO_STREAM("mps rows = " << mps.rows() << " cols = " << mps.cols());
+//  1----2
+//  |    |
+//  |    |
+//  |    |
+//  3----4
 
-  // finally add the mirrored points to the cloud
-  ROS_INFO_STREAM("cloud size before = " << cloud_with_normals->size());
-  cloud_with_normals->clear();
-  for (size_t i = 0; i < mps.cols(); ++i)
-  {
-    if (i < 4)
-      ROS_INFO_STREAM("point i = " << i << " coords " << mps.col(i));
-    PointNormal point;
-    point.x = mps.col(i).x();
-    point.y = mps.col(i).y();
-    point.z = mps.col(i).z();
-    cloud_with_normals->push_back(point);
-  }
-  ROS_INFO_STREAM("cloud size after = " << cloud_with_normals->size());
+//  correspondences will be 1 - 2  and  3 - 4
+//  one of these points is max_pt and the other 3 will be constructed by adding x and from
 
-  compute3DCentroid(*cloud_with_normals, centroid4);
-  centroid = centroid4.head(3);
-  ROS_INFO_STREAM("centroid = " << centroid);
+  Vector3f one(max_pt.x, max_pt.y, max_pt.z),
+           two(min_pt.x, max_pt.y, max_pt.z),
+           thr(max_pt.x, min_pt.y, max_pt.z),
+           fou(min_pt.x, min_pt.y, max_pt.z);
+  ROS_INFO_STREAM("one = " << one);
+  ROS_INFO_STREAM("two = " << two);
+  ROS_INFO_STREAM("thr = " << thr);
+  ROS_INFO_STREAM("fou = " << fou);
+
+  TransformationFromCorrespondences transformer;
+  transformer.add(one, two);
+  transformer.add(thr, fou);
+  Affine3f transformationMatrix = transformer.getTransformation();
+
+  Cloud mirrored_cloud;
+  transformPointCloud(mirrored_cloud, mirrored_cloud, transformationMatrix);
+  cloud += mirrored_cloud;
 }
 
 

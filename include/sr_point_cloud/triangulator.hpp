@@ -54,9 +54,6 @@ protected:
   boost::shared_ptr<sr_grasp_msgs::TriangulateFeedback> feedback_tri_;
   boost::shared_ptr<sr_grasp_msgs::TriangulateResult> result_tri_;
 
-  // Auto start the action server?
-  static const bool auto_start_;
-
 public:
   Triangulator();
   ~Triangulator();
@@ -72,10 +69,9 @@ protected:
 
   void triangulate(const Cloud::ConstPtr &cloud,
                    pcl_msgs::PolygonMesh &pclMesh,
-                   shape_msgs::Mesh &shapeMesh,
-                   bool perform_mesh_mirroring = false);
+                   shape_msgs::Mesh &shapeMesh);
 
-  void mirror_mesh_(pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals);
+  void mirror_mesh_(Cloud &cloud);
 
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
