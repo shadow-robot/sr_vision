@@ -1,6 +1,8 @@
 #include "sr_point_cloud/triangulator.hpp"
-#include <pcl/common/pca.h>
+#include <pcl/common/transforms.h>
 #include <pcl/common/transformation_from_correspondences.h>
+#include <cmath>
+
 
 //-------------------------------------------------------------------------------
 
@@ -256,67 +258,45 @@ void Triangulator::mirror_mesh_(Cloud &cloud)
   Vector4f centroid4;
   compute3DCentroid(cloud, centroid4);
   const Vector3f centroid = centroid4.head(3);
-  ROS_INFO_STREAM("centroid = " << centroid);
-
-  // compute principal directions
-  Matrix3f covariance;
-  computeCovarianceMatrixNormalized(cloud, centroid4, covariance);
-  SelfAdjointEigenSolver<Matrix3f> eigen_solver(covariance, ComputeEigenvectors);
-  Matrix3f eigDx = eigen_solver.eigenvectors();
-  eigDx.col(2) = eigDx.col(0).cross(eigDx.col(1));
-  ROS_INFO_STREAM("eigDx = " << eigDx);
-
-  // move a copy of the original point cloud to the calculated reference frame
-  Matrix4f p2w(Matrix4f::Identity());
-  p2w.block<3,3>(0,0) = eigDx.transpose();
-  p2w.block<3,1>(0,3) = -1.f * (p2w.block<3,3>(0,0) * centroid.head<3>());
-  Cloud used_for_bounding_box;
-  transformPointCloud(cloud, used_for_bounding_box, p2w);
 
   // calculate oriented bounded box
   PointType min_pt, max_pt;
   getMinMax3D(cloud, min_pt, max_pt);
-  const Vector3f mean_diag = 0.5f*(max_pt.getVector3fMap() + min_pt.getVector3fMap());
-  ROS_INFO_STREAM("min_pt = " << min_pt);
-  ROS_INFO_STREAM("max_pt = " << max_pt);
 
-  // transform bounding box to the correct coordinates
-  const Quaternionf qfinal(eigDx);
-  const Vector3f tfinal = eigDx*mean_diag + centroid;
+  //  calculate transformation based on point correspondences
 
-  Affine3f bounding_transform = Translation3f(tfinal)*qfinal;
-  Cloud cBoundingBox;
-  cBoundingBox.push_back(min_pt);
-  cBoundingBox.push_back(max_pt);
-  transformPointCloud(cBoundingBox, cBoundingBox, bounding_transform);
+  //  0---1
+  //  |   |
+  //  |   |
+  //  2---3
 
-//  calculate transformation based on point correspondences
+  //  correspondences will be 0 - 1  and  2 - 3
+  //  one of these points is max_pt and the other 3 will be constructed by adding x and y from min_pt
+  Vector3f points[] = {Vector3f(min_pt.x, max_pt.y, max_pt.z),
+                       Vector3f(max_pt.x, max_pt.y, max_pt.z),
+                       Vector3f(min_pt.x, min_pt.y, max_pt.z),
+                       Vector3f(max_pt.x, min_pt.y, max_pt.z)};
 
-//  1----2
-//  |    |
-//  |    |
-//  |    |
-//  3----4
-
-//  correspondences will be 1 - 2  and  3 - 4
-//  one of these points is max_pt and the other 3 will be constructed by adding x and from
-
-  Vector3f one(max_pt.x, max_pt.y, max_pt.z),
-           two(min_pt.x, max_pt.y, max_pt.z),
-           thr(max_pt.x, min_pt.y, max_pt.z),
-           fou(min_pt.x, min_pt.y, max_pt.z);
-  ROS_INFO_STREAM("one = " << one);
-  ROS_INFO_STREAM("two = " << two);
-  ROS_INFO_STREAM("thr = " << thr);
-  ROS_INFO_STREAM("fou = " << fou);
-
+  // get transformation according to back side of bounding box
+  // If the point cloud includes outlier points the bounding box will be much bigger than it should
+  // No filtering is done here for that case and another getting a new point cloud is recommended
   TransformationFromCorrespondences transformer;
-  transformer.add(one, two);
-  transformer.add(thr, fou);
+  transformer.add(points[0], points[1]);
+  transformer.add(points[1], points[0]);
+  transformer.add(points[2], points[3]);
+  transformer.add(points[3], points[2]);
   Affine3f transformationMatrix = transformer.getTransformation();
 
+  // When the object is offset from the center of the field of view
+  // The point cloud will be rotated and the bounding box will be deeper
+  // So the mirror mesh appears farther than it should
+  // This translation is meant to fix that
+  float x2z = fabs(centroid.x()/centroid.z());
+  transformationMatrix *= Translation3f(0, 0, 0.25*x2z*(max_pt.x - min_pt.x));
+
+  // Construct the mirrored point cloud and append its points to the original
   Cloud mirrored_cloud;
-  transformPointCloud(mirrored_cloud, mirrored_cloud, transformationMatrix);
+  transformPointCloud(cloud, mirrored_cloud, transformationMatrix);
   cloud += mirrored_cloud;
 }
 
