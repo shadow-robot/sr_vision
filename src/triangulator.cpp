@@ -204,10 +204,6 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   gp3.setSearchMethod (tree2);
   gp3.reconstruct (triangles);
 
-  // Additional vertex information
-  //std::vector<int> parts = gp3.getPartIDs();
-  //std::vector<int> states = gp3.getPointStates();
-
   // Convert to ROS type
   pcl_conversions::fromPCL(triangles, pclMesh);
 
