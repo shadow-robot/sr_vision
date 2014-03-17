@@ -136,8 +136,8 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   pcl::PointCloud<pcl::PointNormal>::Ptr cloud_with_normals;
   if (!resample_)
   {
-//     Follow "Fast triangulation of unordered point clouds" @
-//     http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
+    // Follow "Fast triangulation of unordered point clouds" @
+    // http://www.pointclouds.org/documentation/tutorials/greedy_projection.php
 
     // Normal estimation
     pcl::NormalEstimation<PointType, pcl::Normal> n;
