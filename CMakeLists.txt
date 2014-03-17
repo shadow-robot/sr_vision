@@ -138,6 +138,7 @@ add_executable(tracker
 add_dependencies(tracker
   ${PROJECT_NAME}_gencfg
   ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
 )
 
 ## Specify libraries to link a library or executable target against
@@ -165,6 +166,7 @@ add_executable(triangulator
 add_dependencies(triangulator
   ${PROJECT_NAME}_gencfg
   sr_grasp_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
 )
 
 target_link_libraries(triangulator
@@ -177,7 +179,7 @@ target_link_libraries(triangulator
 
 add_executable(cluster_segmentor src/cluster_segmentor_node.cpp)
 
-add_dependencies(cluster_segmentor ${PROJECT_NAME}_gencfg)
+add_dependencies(cluster_segmentor ${PROJECT_NAME}_gencfg ${catkin_EXPORTED_TARGETS})
 
 target_link_libraries(cluster_segmentor
   ${catkin_LIBRARIES}
