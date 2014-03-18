@@ -1,4 +1,6 @@
 <launch>
   <!-- start a robot self filter to remove robot from point cloud -->
-  <include file="$(find sr_moveit_config)/launch/moveit_planning_and_execution.launch" />
+  <include file="$(find sr_moveit_config)/launch/moveit_planning_and_execution.launch">
+    <arg name="gsc_hand" value="true" />
+  </include>
 </launch>
