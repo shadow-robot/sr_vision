@@ -9,10 +9,13 @@
       </include>
     </group>
 
+    <!-- start some filters on the point cloud -->
+    <include file="$(find sr_point_cloud)/launch/filters.launch" />
+
     <!-- Tracker using NI camera feed as input cloud -->
     <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
         <!-- <remap from="~input/points" to="/camera/depth/points" /> -->
-        <remap from="~input/points" to="/camera/depth_registered/points" />
+        <remap from="~input/points" to="/filtered" />
     </node>
 
     <node name="point_cloud_triangulator" pkg="sr_point_cloud" type="triangulator" output="screen">
