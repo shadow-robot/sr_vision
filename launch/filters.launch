@@ -1,6 +1,7 @@
 <launch>
   <!-- start a robot self filter to remove robot from point cloud -->
   <include file="$(find sr_moveit_config)/launch/moveit_planning_and_execution.launch">
-    <arg name="gsc_hand" value="true" />
+    <arg name="hand_urdf" default="$(find sr_description)/robots/shadowhand_motor_th_ff_rf_ellipsoid.urdf.xacro" />
+    <arg name="hand_srdf" default="$(find sr_moveit_config)/config/shadowhand_motor_th_ff_rf_ellipsoid.srdf" />
   </include>
 </launch>
