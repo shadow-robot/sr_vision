@@ -1,6 +1,7 @@
 <launch>
     <!-- set to false if you don't want to start the kinect -->
     <arg name="kinect" default="true"/>
+    <arg name="filtered" default="true"/>
 
     <!-- Start the OpenNI camera -->
     <group if="$(arg kinect)">
@@ -10,12 +11,14 @@
     </group>
 
     <!-- start some filters on the point cloud -->
-    <include file="$(find sr_point_cloud)/launch/filters.launch" />
+    <group if="$(arg filtered)">
+      <include file="$(find sr_point_cloud)/launch/filters.launch" />
+    </group>
 
     <!-- Tracker using NI camera feed as input cloud -->
     <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
-        <!-- <remap from="~input/points" to="/camera/depth/points" /> -->
-        <remap from="~input/points" to="/filtered" />
+        <remap from="~input/points" to="/filtered" if="$(arg filtered)" /> 
+      	<remap from="~input/points" to="/camera/depth_registered/points" unless="$(arg filtered)" />
     </node>
 
     <node name="point_cloud_triangulator" pkg="sr_point_cloud" type="triangulator" output="screen">
