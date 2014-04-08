@@ -1,7 +1,7 @@
 <launch>
     <!-- set to false if you don't want to start the kinect -->
     <arg name="kinect" default="true"/>
-    <arg name="filtered" default="true"/>
+    <arg name="filtered" default="false"/>
 
     <!-- Start the OpenNI camera -->
     <group if="$(arg kinect)">
