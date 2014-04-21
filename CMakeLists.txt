@@ -187,6 +187,22 @@ target_link_libraries(cluster_segmentor
   ${boost_LIBRARIES}
 )
 
+# cloud transformer #
+#######################
+
+add_executable(cloud_transformer
+  src/point_cloud_transformer_node.cpp
+)
+
+add_dependencies(cloud_transformer
+  sr_grasp_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(cloud_transformer
+  ${catkin_LIBRARIES}
+  ${boost_LIBRARIES}
+)
 
 #############
 ## Install ##
