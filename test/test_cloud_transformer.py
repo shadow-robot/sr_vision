@@ -4,7 +4,7 @@ PKG='sr_point_cloud'
 
 import os, unittest;
 import rospy, actionlib;
-from sr_grasp_msgs.srv import PCL_Transform
+from sr_grasp_msgs.srv import PclTransform
 from sensor_msgs.msg import PointCloud2
 
 class TestCloudTransformer(unittest.TestCase):
@@ -46,7 +46,7 @@ class TestCloudTransformer(unittest.TestCase):
         
         self.assertTrue(service_available, "Server not found")
         
-        transform_cloud = rospy.ServiceProxy('/cloud_transformer/transform_cloud', PCL_Transform)
+        transform_cloud = rospy.ServiceProxy('/cloud_transformer/transform_cloud', PclTransform)
         resp = None
         # Set the timestamp to now for the transform lookup to work
         self.lastMsg().header.stamp = rospy.Time.now()

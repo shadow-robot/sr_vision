@@ -14,7 +14,7 @@
 #include <kdl/frames.hpp>
 
 #include "sr_point_cloud/cluster_segmentor.h"
-#include "sr_grasp_msgs/PCL_Filter.h"
+#include "sr_grasp_msgs/PclFilter.h"
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
@@ -377,7 +377,7 @@ protected:
     }
 
     bool
-    filter_cloud_(sr_grasp_msgs::PCL_Filter::Request  &req, sr_grasp_msgs::PCL_Filter::Response &res)
+    filter_cloud_(sr_grasp_msgs::PclFilter::Request  &req, sr_grasp_msgs::PclFilter::Response &res)
     {
       Cloud downsampled_cloud;
       CloudPtr input_cloud (new Cloud);

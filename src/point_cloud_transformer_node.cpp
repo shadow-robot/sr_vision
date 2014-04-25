@@ -21,7 +21,7 @@
 #include <pcl_ros/transforms.h>
 
 #include <sensor_msgs/PointCloud2.h>
-#include "sr_grasp_msgs/PCL_Transform.h"
+#include "sr_grasp_msgs/PclTransform.h"
 
 namespace sr_point_cloud {
 
@@ -55,7 +55,7 @@ protected:
     tf::TransformListener tf_listener_;
 
 
-    bool transform_cloud_(sr_grasp_msgs::PCL_Transform::Request  &req, sr_grasp_msgs::PCL_Transform::Response &res)
+    bool transform_cloud_(sr_grasp_msgs::PclTransform::Request  &req, sr_grasp_msgs::PclTransform::Response &res)
     {
       // If an output frame has been specified, we convert the cloud to that frame
       if (!req.output_frame_id.empty())
