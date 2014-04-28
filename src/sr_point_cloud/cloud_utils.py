@@ -8,7 +8,6 @@
 # ####################################################################
 
 import rospy
-#from sensor_msgs.msg import PointCloud2
 from geometry_msgs.msg import PoseWithCovarianceStamped
 import sensor_msgs.point_cloud2
 
