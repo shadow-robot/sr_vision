@@ -190,16 +190,16 @@ target_link_libraries(cluster_segmentor
 # cloud transformer #
 #######################
 
-add_executable(cloud_transformer
-  src/point_cloud_transformer_node.cpp
+add_executable(cloud_services
+  src/point_cloud_services_node.cpp
 )
 
-add_dependencies(cloud_transformer
+add_dependencies(cloud_services
   sr_grasp_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
 
-target_link_libraries(cloud_transformer
+target_link_libraries(cloud_services
   ${catkin_LIBRARIES}
   ${boost_LIBRARIES}
 )
@@ -259,7 +259,7 @@ add_dependencies(test_triangulator
 
 add_rostest(test/cloud_tracker.test)
 add_rostest(test/cluster_segmentor.test)
-add_rostest(test/cloud_transformer.test)
+add_rostest(test/cloud_services.test)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

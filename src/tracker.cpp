@@ -14,7 +14,6 @@
 #include <kdl/frames.hpp>
 
 #include "sr_point_cloud/cluster_segmentor.h"
-#include "sr_grasp_msgs/PclFilter.h"
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
@@ -93,9 +92,6 @@ public:
         // Start tracking an empty cloud
         CloudPtr ref_cloud(new Cloud);
         trackCloud(ref_cloud);
-
-        //This is a service that will allow to filter a single point cloud message (apply VoxelGrid for the time being)
-        cloud_filter_server_ = nh_home_.advertiseService("filter_cloud", &Tracker::filter_cloud_, this);
     }
 
     void run () { ros::spin(); }
@@ -376,27 +372,11 @@ protected:
                 );
     }
 
-    bool
-    filter_cloud_(sr_grasp_msgs::PclFilter::Request  &req, sr_grasp_msgs::PclFilter::Response &res)
-    {
-      Cloud downsampled_cloud;
-      CloudPtr input_cloud (new Cloud);
-
-      pcl::fromROSMsg(req.point_cloud, *input_cloud);
-
-      gridSample(input_cloud, downsampled_cloud, req.downsampling_grid_size);
-
-      pcl::toROSMsg(downsampled_cloud, res.point_cloud);
-
-      return true;
-    }
-
     ros::NodeHandle nh_, nh_home_;
     std::string frame_id_;
     dynamic_reconfigure::Server<TrackerConfig> config_server_;
     ros::Subscriber input_sub_;
     ros::Publisher output_downsampled_pub_, particle_cloud_pub_, result_cloud_pub_, result_pose_pub_;
-    ros::ServiceServer cloud_filter_server_;
     TrackServer track_server_;
     CloudConstPtr input_;
 
