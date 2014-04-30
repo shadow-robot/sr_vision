@@ -17,9 +17,11 @@
 
 #include <dynamic_reconfigure/server.h>
 #include "sr_point_cloud/ClusterSegmentorConfig.h"
+#include <tf/transform_listener.h>
 
 #include <pcl_conversions/pcl_conversions.h>
 #include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
+#include <pcl_ros/transforms.h>
 #include <pcl/filters/filter.h>
 #include <pcl/common/centroid.h>
 
@@ -52,6 +54,7 @@ public:
     {
         config_server_.setCallback( boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2) );
         input_cloud_sub_ = nh_.subscribe("input/points", 1, &ClusterSegmentorNode::cloud_cb_, this);
+        nh_.param<std::string>("output_frame", output_frame_, "");
 
         // @todo - would be nice to add a streaming option to the node that
         // constantly streams out the found clusters when on. Will need some
@@ -80,6 +83,8 @@ protected:
     ros::Subscriber input_cloud_sub_;
     ros::Publisher output_objects_pub_;
     RecognitionServer recognize_objects_as_;
+    std::string output_frame_;
+    tf::TransformListener tf_listener_;
 
     void config_cb_(sr_point_cloud::ClusterSegmentorConfig &config, uint32_t level)
     {
@@ -130,9 +135,25 @@ protected:
       ROS_INFO("... found %i clusters", (int)clusters.size());
 
       std_msgs::Header head = pcl_conversions::fromPCL(input_cloud_->header);
+      if (!output_frame_.empty())
+      {
+        head.frame_id = output_frame_;
+      }
+
       for (vector<Cloud::Ptr>::const_iterator it = clusters.begin(); it != clusters.end(); ++it)
       {
         Cloud::Ptr cluster_cloud = *it;
+
+        // If an output frame has been specified, we convert each one of the clusters to that frame
+        if (!output_frame_.empty())
+        {
+          cluster_cloud->header = input_cloud_->header;
+          Cloud::Ptr transformed_cluster_cloud (new Cloud);
+
+          pcl_ros::transformPointCloud(output_frame_, *cluster_cloud, *transformed_cluster_cloud, tf_listener_);
+          cluster_cloud = transformed_cluster_cloud;
+        }
+
         sensor_msgs::PointCloud2 pc2;
         pcl::toROSMsg(*cluster_cloud, pc2);
         pc2.header = head;

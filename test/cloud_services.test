@@ -1,0 +1,13 @@
+<launch>
+    <!-- Kinect to world -->
+    <node pkg="tf" type="static_transform_publisher" name="fixed_frame_kinect" args="-2.4 0.0 0.5 0 0 0 world camera_rgb_optical_frame 100" />
+
+    <!-- Loop a bag that looks enough like a OpenNI camera -->
+    <node name="camera_bag" pkg="rosbag" type="play" args="--loop $(find sr_point_cloud)/test/camera-points.bag" />
+
+    <!-- Cloud services node -->
+    <node name="cloud_services" pkg="sr_point_cloud" type="cloud_services" output="screen">
+    </node>
+
+    <test test-name="cloud_transformer_test" pkg="sr_point_cloud" type="test_cloud_services.py" />
+</launch>

@@ -16,6 +16,7 @@ find_package(catkin REQUIRED COMPONENTS
   pcl_ros
   roscpp
   sensor_msgs
+  tf
 )
 
 ## System dependencies are found with CMake's conventions
@@ -26,7 +27,7 @@ find_package(orocos_kdl REQUIRED)
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
 ## See http://ros.org/doc/api/catkin/html/user_guide/setup_dot_py.html
-# catkin_python_setup()
+catkin_python_setup()
 
 ################################################
 ## Declare ROS messages, services and actions ##
@@ -186,6 +187,22 @@ target_link_libraries(cluster_segmentor
   ${boost_LIBRARIES}
 )
 
+# cloud transformer #
+#######################
+
+add_executable(cloud_services
+  src/point_cloud_services_node.cpp
+)
+
+add_dependencies(cloud_services
+  sr_grasp_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
+
+target_link_libraries(cloud_services
+  ${catkin_LIBRARIES}
+  ${boost_LIBRARIES}
+)
 
 #############
 ## Install ##
@@ -242,6 +259,7 @@ add_dependencies(test_triangulator
 
 add_rostest(test/cloud_tracker.test)
 add_rostest(test/cluster_segmentor.test)
+add_rostest(test/cloud_services.test)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
