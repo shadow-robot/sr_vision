@@ -1,7 +1,9 @@
 <launch>
     <!-- set to false if you don't want to start the kinect -->
     <arg name="kinect" default="true"/>
-    <arg name="filtered" default="true"/>
+
+    <!-- This is a GSC specific config. Set to true to remove the hand from the point cloud, but that will only happen when the full GSC system is running. Set it to false as default and have the GSC launch make it true.-->
+    <arg name="filtered" default="false"/>
 
     <!-- Start the OpenNI camera -->
     <group if="$(arg kinect)">
@@ -17,7 +19,7 @@
 
     <!-- Tracker using NI camera feed as input cloud -->
     <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
-        <remap from="~input/points" to="/filtered" if="$(arg filtered)" /> 
+        <remap from="~input/points" to="/filtered" if="$(arg filtered)" />
       	<remap from="~input/points" to="/camera/depth_registered/points" unless="$(arg filtered)" />
     </node>
 
