@@ -18,7 +18,7 @@
     </group>
 
     <!-- Tracker using NI camera feed as input cloud -->
-    <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker" output="screen">
+    <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker_rgb" output="screen">
         <remap from="~input/points" to="/filtered" if="$(arg filtered)" />
       	<remap from="~input/points" to="/camera/depth_registered/points" unless="$(arg filtered)" />
     </node>

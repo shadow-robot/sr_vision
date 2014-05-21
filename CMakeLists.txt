@@ -133,6 +133,9 @@ include_directories(
 add_executable(tracker
   src/tracker.cpp
 )
+add_executable(tracker_rgb
+  src/tracker_rgb.cpp
+)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
@@ -141,9 +144,19 @@ add_dependencies(tracker
   ${PROJECT_NAME}_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
+add_dependencies(tracker_rgb
+  ${PROJECT_NAME}_gencfg
+  ${PROJECT_NAME}_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(tracker
+  ${catkin_LIBRARIES}
+  ${boost_LIBRARIES}
+  ${orocos_kdl_LIBRARIES}
+)
+target_link_libraries(tracker_rgb
   ${catkin_LIBRARIES}
   ${boost_LIBRARIES}
   ${orocos_kdl_LIBRARIES}
