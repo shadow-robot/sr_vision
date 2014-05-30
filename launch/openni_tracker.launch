@@ -4,11 +4,39 @@
     <!-- This is a GSC specific config. Set to true to remove the hand from the point cloud, but that will only happen when the full GSC system is running. Set it to false as default and have the GSC launch make it true.-->
     <arg name="filtered" default="false"/>
 
+    <arg name="preprocess" default="false"/>
+    <arg name="manager" default="nodelet_manager" />
+
     <!-- Start the OpenNI camera -->
     <group if="$(arg kinect)">
       <include file="$(find openni_launch)/launch/openni.launch">
         <arg name="depth_registration" value="true" />
+        <remap from="~depth_registered/points" to="~depth_registered/unfiltered_points" if="$(arg preprocess)" />
       </include>
+    </group>
+
+    <!-- The output of the preprocess section is published to the /camera/depth_registered/points, so that any subsequent node will work with the preprocessed cloud -->
+    <group if="$(arg preprocess)">
+        <!-- Start a nodelet manager to run our constellation -->        
+        <node pkg="nodelet" type="nodelet" name="$(arg manager)" args="manager" output="screen" />
+
+        <!-- VoxGrid, downsample the initial cloud for faster processing -->
+        <!-- Transform cloud to side of glass -->
+        <!-- Expects output_frame and leaf_size to be set -->
+        <node name="voxel_grid" pkg="nodelet" type="nodelet" args="load pcl/VoxelGrid $(arg manager)">
+            <remap from="~input" to="/camera/depth_registered/unfiltered_points" />
+            <remap from="~output" to="/camera/depth_registered/points" />
+            <rosparam>
+                # How much to downsample the incoming raw cloud
+                leaf_size: 0.01
+                # TF frame of glass, x,y along the glass, z away from glass. The
+                # surface to track hands near. When not set camera frame is used.
+                output_frame: camera_on_table_tf
+                filter_field_name: ""
+                filter_limit_min: 0.0
+                filter_limit_max: 10.0
+            </rosparam>
+        </node>
     </group>
 
     <!-- start some filters on the point cloud -->
