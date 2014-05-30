@@ -24,6 +24,7 @@
 #include <pcl_ros/transforms.h>
 #include <pcl/filters/filter.h>
 #include <pcl/common/centroid.h>
+#include <pcl/filters/passthrough.h>
 
 #include <sensor_msgs/PointCloud2.h>
 #include <object_recognition_msgs/RecognizedObject.h>
@@ -118,18 +119,55 @@ protected:
     {
       ObjectRecognitionResult res;
       RecognizedObjectArray objs;
-      extract_(objs);
+      extract_(objs, goal->use_roi, goal->filter_limits);
       res.recognized_objects = objs;
       recognize_objects_as_.setSucceeded(res);
     }
 
-    void extract_(RecognizedObjectArray &out)
+    void extract_(RecognizedObjectArray &out, bool use_roi, const std::vector<float> & filter_limits)
     {
       if (input_cloud_->points.empty())
         return;
 
       vector<Cloud::Ptr> clusters;
-      cluster_segmentor_.setInputCloud(input_cloud_);
+
+      if (use_roi)
+      {
+        ROS_ASSERT(filter_limits.size() == 6);
+
+        Cloud::Ptr cloud_pass_x;
+        Cloud::Ptr cloud_pass_y;
+        Cloud::Ptr cloud_pass_z;
+
+        cloud_pass_x.reset (new Cloud);
+        cloud_pass_y.reset (new Cloud);
+        cloud_pass_z.reset (new Cloud);
+
+        pcl::PassThrough<PointType> pass;
+
+        pass.setFilterFieldName ("x");
+        pass.setFilterLimits (filter_limits[0], filter_limits[1]);
+        pass.setKeepOrganized (false);
+        pass.setInputCloud (input_cloud_);
+        pass.filter (*cloud_pass_x);
+
+        pass.setFilterFieldName ("y");
+        pass.setFilterLimits (filter_limits[2], filter_limits[3]);
+        pass.setKeepOrganized (false);
+        pass.setInputCloud (cloud_pass_x);
+        pass.filter (*cloud_pass_y);
+
+        pass.setFilterFieldName ("z");
+        pass.setFilterLimits (filter_limits[4], filter_limits[5]);
+        pass.setKeepOrganized (false);
+        pass.setInputCloud (cloud_pass_y);
+        pass.filter (*cloud_pass_z);
+
+        cluster_segmentor_.setInputCloud(cloud_pass_z);
+      }
+      else
+        cluster_segmentor_.setInputCloud(input_cloud_);
+
       ROS_INFO("Segmenting cloud...");
       cluster_segmentor_.extract(clusters);
       ROS_INFO("... found %i clusters", (int)clusters.size());
