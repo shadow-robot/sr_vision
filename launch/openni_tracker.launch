@@ -48,6 +48,8 @@
     <node name="point_cloud_tracker" pkg="sr_point_cloud" type="tracker_rgb" output="screen">
         <remap from="~input/points" to="/filtered" if="$(arg filtered)" />
       	<remap from="~input/points" to="/camera/depth_registered/points" unless="$(arg filtered)" />
+        <param name="downsample" value="false" if="$(arg preprocess)"/>
+        <param name="downsample" value="true" unless="$(arg preprocess)"/>
     </node>
 
     <node name="point_cloud_triangulator" pkg="sr_point_cloud" type="triangulator" output="screen">

@@ -76,6 +76,7 @@ public:
     , downsampling_grid_size_(0.01)
     , filter_z_min_(0.0)
     , filter_z_max_(10.0)
+    , downsample_(true)
   {
     // Setup ROS topics and services
     config_server_.setCallback( boost::bind(&Tracker::config_cb, this, _1, _2) );
@@ -86,6 +87,9 @@ public:
     particle_cloud_pub_ = nh_home_.advertise<Cloud>("particle/points", 1);
     result_cloud_pub_ = nh_home_.advertise<Cloud>("result/points", 1);
     result_pose_pub_ = nh_home_.advertise<geometry_msgs::PoseStamped>("result/pose", 1);
+
+    if (nh_home_.hasParam("downsample"))
+      nh_home_.getParam("downsample", downsample_);
 
     track_server_.registerGoalCallback(boost::bind(&Tracker::track_goal_cb, this));
     track_server_.registerPreemptCallback(boost::bind(&Tracker::track_preempt_cb, this));
@@ -189,9 +193,17 @@ protected:
     pass.setInputCloud (cloud);
     pass.filter (*cloud_pass_);
 
-    // TODO: param toggle use of approx downsampling
-    // gridSampleApprox (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
-    gridSample (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
+    if (downsample_)
+    {
+      // TODO: param toggle use of approx downsampling
+      // gridSampleApprox (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
+      gridSample (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
+    }
+    else
+    {
+      // We do this, as tracking() is using the cloud_pass_downsampled_
+      cloud_pass_downsampled_ = cloud_pass_;
+    }
 
     if (reference_->points.size() > 0)
       tracking ();
@@ -381,6 +393,8 @@ protected:
   CloudPtr reference_;
   double downsampling_grid_size_;
   double filter_z_min_, filter_z_max_;
+
+  bool downsample_;
 
   tf::TransformBroadcaster target_broadcaster_;
   tf::Transform target_transform_;
