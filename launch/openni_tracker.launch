@@ -11,7 +11,7 @@
     <group if="$(arg kinect)">
       <include file="$(find openni_launch)/launch/openni.launch">
         <arg name="depth_registration" value="true" />
-        <remap from="~depth_registered/points" to="~depth_registered/unfiltered_points" if="$(arg preprocess)" />
+        <arg if="$(arg preprocess)" name="depth_registered" value="depth_registered_unfiltered" />
       </include>
     </group>
 
@@ -24,7 +24,7 @@
         <!-- Transform cloud to side of glass -->
         <!-- Expects output_frame and leaf_size to be set -->
         <node name="voxel_grid" pkg="nodelet" type="nodelet" args="load pcl/VoxelGrid $(arg manager)">
-            <remap from="~input" to="/camera/depth_registered/unfiltered_points" />
+            <remap from="~input" to="/camera/depth_registered_unfiltered/points" />
             <remap from="~output" to="/camera/depth_registered/points" />
             <rosparam>
                 # How much to downsample the incoming raw cloud
