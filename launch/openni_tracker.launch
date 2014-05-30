@@ -29,9 +29,7 @@
             <rosparam>
                 # How much to downsample the incoming raw cloud
                 leaf_size: 0.01
-                # TF frame of glass, x,y along the glass, z away from glass. The
-                # surface to track hands near. When not set camera frame is used.
-                output_frame: camera_on_table_tf
+                #output_frame: camera_on_table_tf
                 filter_field_name: ""
                 filter_limit_min: 0.0
                 filter_limit_max: 10.0
