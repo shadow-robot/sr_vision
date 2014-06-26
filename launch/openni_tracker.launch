@@ -4,7 +4,12 @@
     <!-- This is a GSC specific config. Set to true to remove the hand from the point cloud, but that will only happen when the full GSC system is running. Set it to false as default and have the GSC launch make it true.-->
     <arg name="filtered" default="false"/>
 
+    <!-- Pre-process the raw cloud with a voxel grid -->
     <arg name="preprocess" default="false"/>
+    <!-- When pre-processing how much to downsample. More is faster but less accurate. -->
+    <arg name="leaf_size" default="0.01"/>
+    <!-- When pre-processing transform into this frame -->
+    <arg name="output_frame" default=""/>
     <arg name="manager" default="nodelet_manager" />
 
     <!-- Start the OpenNI camera -->
@@ -26,10 +31,10 @@
         <node name="voxel_grid" pkg="nodelet" type="nodelet" args="load pcl/VoxelGrid $(arg manager)">
             <remap from="~input" to="/camera/depth_registered_unfiltered/points" />
             <remap from="~output" to="/camera/depth_registered/points" />
+            <param name="leaf_size" value="$(arg leaf_size)" />
+            <param name="output_frame" value="$(arg output_frame)" />
             <rosparam>
                 # How much to downsample the incoming raw cloud
-                leaf_size: 0.01
-                output_frame: camera_on_table_tf
                 filter_field_name: ""
                 filter_limit_min: 0.0
                 filter_limit_max: 10.0
