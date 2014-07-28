@@ -1,0 +1,10 @@
+<!-- Attempt to find tf for the camera based on finding a marker -->
+<launch>
+  <include file="$(find ar_track_alvar)/launch/pr2_indiv_no_kinect.launch">
+      <arg name="cam_image_topic" value="/camera/rgb/image_color" />
+      <arg name="cam_info_topic" value="/camera/rgb/camera_info" />
+      <arg name="output_frame" value="camera_link" />
+      <arg name="marker_size" value="9.0" />
+  </include>
+</launch>
+

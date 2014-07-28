@@ -1,0 +1,55 @@
+#!/usr/bin/env python
+
+import rospy
+from tf2_ros import TransformListener, Buffer, LookupException, ConnectivityException, ExtrapolationException
+
+class CameraTransformConfig(object):
+    """Wrapper to hold config, will convert to dynamic config."""
+    def __init__(self):
+        self.ar_marker_frame = rospy.get_param("~ar_marker_frame", "ar_marker_6")
+        self.camera_frame    = rospy.get_param("~camera_frame", "camera_link")
+        self.rate            = rospy.get_param("~rate", 1.0)
+
+class CameraTransformNode(object):
+    def __init__(self):
+        self.config     = CameraTransformConfig()
+        self.tf2_buffer = Buffer()
+        self.tf2_listen = TransformListener(self.tf2_buffer)
+        self.camera_tf  = None
+
+    def spin(self):
+        self.rate = rospy.Rate(self.config.rate)
+        while not rospy.is_shutdown():
+            if not self.spin_once():
+                return
+            self.rate.sleep()
+
+    def spin_once(self):
+        if self.camera_tf is None:
+            rospy.loginfo("Looking for ar marker %s"%self.config.ar_marker_frame)
+            try:
+                self.camera_tf = self.tf2_buffer.lookup_transform(
+                    self.config.ar_marker_frame, self.config.camera_frame, rospy.Time(0))
+            except LookupException: # not found
+                return True # Keep spinning
+            except (ConnectivityException, ExtrapolationException) as e:
+                rospy.logerr("TF error: %s"%e)
+            rospy.loginfo("Found ar marker %s"%self.config.ar_marker_frame)
+
+        rospy.loginfo("TF=%s"%self.camera_tf)
+        tfargs = "{trans.x:-f} {trans.y:-f} {trans.z:-f} {rot.x:-f} {rot.y:-f} {rot.z:-f} {rot.w:-f}".format(
+                trans = self.camera_tf.transform.translation,
+                rot   = self.camera_tf.transform.rotation
+                )
+        print("TF Args: %s"%tfargs)
+        return False # stop spinning
+
+
+
+if __name__ == "__main__":
+    try:
+        rospy.init_node("camera_transform")
+        node = CameraTransformNode()
+        node.spin()
+    except rospy.ROSInterruptException:
+        pass
