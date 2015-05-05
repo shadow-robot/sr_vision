@@ -7,34 +7,35 @@ from sensor_msgs.msg import Image
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import SimpleCV as s_cv
-#from matplotlib import pyplot as plt
 
 class image_converter:
 
   def __init__(self):
     self.image_pub = rospy.Publisher("image_topic_2",Image,queue_size=1)
     self.bridge=CvBridge()
-    #cv2.namedWindow("Image window", 1)
 
     self.image_sub = rospy.Subscriber("/camera/rgb/image_raw",Image,self.callback)
 
   def callback(self,data):
     try:
-      cv_image = self.bridge.imgmsg_to_cv2(data,desired_encoding='rgb8')
+      cv_image = self.bridge.imgmsg_to_cv2(data,desired_encoding='bgr8')
     except CvBridgeError, e:
       print e
 
     ###### Color segmentation ######
 
+    # define the list of boundaries with this order: red,blue,yellow,gray
+    h=10 #threshold
     boundaries = [
-      ([17, 15, 100], [50, 56, 200]),
-      ([86, 31, 4], [220, 88, 50]),
-      ([25, 146, 190], [62, 174, 250]),
-      ([103, 86, 65], [145, 133, 128])
+	([17-h, 15-h, 100-h], [50+h, 56+h, 200+h]),
+	([86-h, 31-h, 4-h], [220+h, 88+h, 50+h]),
+	([25-h, 146-h, 190-h], [62+h, 174+h, 250+h]),
+	([103-h, 86-h, 65-h], [145+h, 133+h, 128+h])
     ]
+
     cv_image=cv2.resize(cv_image,(cv_image.shape[1]/2,cv_image.shape[0]/2))
     compare=[]  
-
+    
     # loop over the boundaries
     for (lower, upper) in boundaries:
       # create NumPy arrays from the boundaries
@@ -52,17 +53,6 @@ class image_converter:
     cv2.imshow("images", np.vstack(compare))
     cv2.waitKey(3)
 
-    
-
-    #Draw circle
-    '''
-    (rows,cols) = cv_image.shape
-    if cols > 60 and rows > 60 :
-      cv2.circle(cv_image, (int(rows/2),int(cols/2)), 100, 255,thickness=10)
-    '''
-
-    #cv2.imshow("Image window", cv_image)
-    #cv2.waitKey(3)
 
 
     try:
@@ -70,34 +60,10 @@ class image_converter:
     except CvBridgeError, e:
       print e
 
-'''
-class segmentation:
-
-  def __init__(self):
-    k=s_cv.Kinect()
-    self.image=k.getImage()
-
-  def callback(self):
-    ### Object segmentation ###
-    features=self.image.findHaarFeatures('face.xml')
-    if features:
-      #Get the largest one
-      features=features.sortArea()
-      bigFeatures=features[-1]
-      #Draw a green box around 
-      bigFeatures.draw()
-    print type(self.image)
-    #cv2.imshow("Image window", self.image)
-    #cv2.waitKey(3)
-    self.image.show()
-
-'''
 
 
 def main(args):
   ic = image_converter()
-  #seg=segmentation()
-  #seg.callback()
   rospy.init_node('image_converter', anonymous=True)
   try:
     rospy.spin()
