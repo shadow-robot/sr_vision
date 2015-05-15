@@ -24,7 +24,8 @@ class BlobsSegmentation(SrObjectSegmentation):
         
         bin_img=img.binarize()
         inv_img=img.invert()
-        blobs=inv_img.findBlobs() #better with binnarize or inverted image
+        blobs=img.findBlobs() #better with binnarize or inverted image
+
 
         if blobs:
                 blobs.draw()

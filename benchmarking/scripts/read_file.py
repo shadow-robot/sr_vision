@@ -44,12 +44,15 @@ def read_seg_file(name,berkeley=False):
             for line in lines:
                 if line[0]==i:
                     coordinates.append((line[1],line[2]))
-                    dic[i]=coordinates
+                    
                 else:
-                    dic[i]=coordinates
+                    #dic[i]=coordinates
                     i=line[0]
                     coordinates.append((line[1],line[2]))
-                    dic[i]=coordinates
+                    #dic[i]=coordinates
+                dic[i]=coordinates
+            for i in range(len(dic)):
+                print 'len dic 1',len(dic[i])
 
         #Sort by descending size of segments
         seg_by_length=sorted(dic.values(),key=len,reverse=True)
@@ -57,6 +60,8 @@ def read_seg_file(name,berkeley=False):
             dic[i]=seg_by_length[i]
 
         ref.points=dic
+        for i in range(len(dic)):
+            print 'len dic 2',len(dic[i])
         ref.nb_segments=len(dic.values())
 
     return ref 

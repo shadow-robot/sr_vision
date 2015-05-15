@@ -6,8 +6,8 @@ class ImagesTest:
 
     def __init__(self):
         self.img = np.zeros((640,480,3), np.uint8)
-        self.draw_basic_test()
-        self.draw_noise_test()
+        self.basic_test=self.draw_basic_test()
+        self.noise_test=self.draw_noise_test()
 
     def draw_basic_test(self):
 
@@ -16,19 +16,18 @@ class ImagesTest:
         ref_segments=[]
         dic={}
         
-        # Draw a big blue rectangle : test1_1
-        [cv2.rectangle(images[i],(100,200),(300,500),(255,0,0),-1) for i in range(nb_test)]        
+        # Draw a blue rectangle : test1_1
+        [cv2.rectangle(images[i],(100,200),(300,500),(255,0,0),thickness=-1) for i in range(nb_test)]        
         
         # Draw red circles with a radius of 20px inner and outer of the rectangle : test1_2 & test1_3
         [cv2.circle(images[i],(x,y),40,(0,0,255),-1) for i,x,y in [(1,150,100),(2,200,350)]]
 
         # Draw a yellow polygon : test 1_3
-        pts = np.array([[50,50],[410,50],[50,100],[120,170]], np.int32)
+        pts = np.array([[50,50],[100,100],[200,100],[20,170]], np.int32)
         pts = pts.reshape((-1,1,2))
         cv2.fillPoly(images[3],[pts],(0,255,255))
         
-
-        self.basic_test=images
+        return images
 
 
     def draw_noise_test(self):
@@ -41,7 +40,7 @@ class ImagesTest:
         [cv2.circle(images[i],(150,100),r,(0,0,255),-1) for i,r in [(0,40),(1,20),(2,1)]]
         [cv2.circle(images[i],(400,450),r,(0,255,255),-1) for i,r in [(0,40),(1,20),(2,1)]]
  
-        self.noise_test=images
+        return images
 
 
     def get_pixels_coord(self):
@@ -55,13 +54,13 @@ class ImagesTest:
                 blue_coord=[]
                 red_coord=[]
                 yellow_coord=[]
-                for x in range(img.shape[1]):
-                    for y in range(img.shape[0]):
-                        if list(img[y][x]) == [255,0,0]: #blue stuffs
+                for y in range(img.shape[1]):
+                    for x in range(img.shape[0]):
+                        if list(img[x][y]) == [255,0,0]: #blue stuffs
                             blue_coord.append((x,y))
-                        elif list(img[y][x]) == [0,0,255]: #red stuffs
+                        elif list(img[x][y]) == [0,0,255]: #red stuffs
                             red_coord.append((x,y))
-                        elif list(img[y][x]) == [0,255,255]: #yellow stuffs
+                        elif list(img[x][y]) == [0,255,255]: #yellow stuffs
                             yellow_coord.append((x,y))
 
                 if blue_coord:
@@ -80,7 +79,8 @@ class ImagesTest:
                 self.ref_basic=ref_segments
             elif i==1:
                 self.ref_noise=ref_segments
-                        
+
+      
         
     def write_ref_file(self):
 
@@ -107,13 +107,13 @@ class ImagesTest:
       
             
 
+
+imgs=ImagesTest()
+imgs.get_pixels_coord()
+imgs.write_ref_file()
+
+
 '''
-images=ImagesTest()
-#images.get_pixels_coord()
-#images.write_ref_file()
-
-
-
 # Show the images
 cv2.imshow('img',images.basic_test[0])
 cv2.waitKey(0)
