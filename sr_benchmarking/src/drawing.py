@@ -164,7 +164,7 @@ class ImagesTest:
 
 def PIL2array(PIL_images):
     images=[]
-    for i,img in enumerate(PIL_images):
+    for img in PIL_images:
         img=img.rotate(270)
         images.append(np.array(img.getdata(),np.uint8).reshape(img.size[1], img.size[0], 3))
     return images

@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 
-import random
 import unittest 
-import cv2
-import numpy as np
+from math import sqrt
 
 import segmentation
-import read_file
-from math import sqrt
 import drawing
+
 
 
 
@@ -30,7 +27,6 @@ class TestObjectSegmentation(unittest.TestCase):
         self.algo=algo
         
         #Get the theorical segmentation
-        print 'Reading segmentation file'
         self.ref=segmentation.SrObjectSegmentation(img,ref_seg,len(ref_seg))
 
     def test_number(self):
@@ -105,7 +101,7 @@ if __name__ == '__main__':
     algo=['blob','color'] #ColorSegmentation algorithm needs some corrections..
     
     type_test=['basic','noise','3096']
-    images=drawing2.ImagesTest()
+    images=drawing.ImagesTest()
     images.get_pixels_coord()
     ref_seg=images.ref_basic
     
