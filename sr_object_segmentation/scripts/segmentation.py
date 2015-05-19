@@ -31,7 +31,8 @@ class BlobsSegmentation(SrObjectSegmentation):
             #Return the whole of points from each blob as a dictionnary 
             blobs=blobs.sortArea()[::-1]
             dic={}
-                
+            k=0
+    
             for blob in blobs:
                 points=[]
                 xmin,ymin=blob.minX(),blob.minY()
@@ -40,8 +41,8 @@ class BlobsSegmentation(SrObjectSegmentation):
                     for y in range(ymin,ymax):
                         if blob.contains((x,y)):
                             points.append((x,y))
-                dic[id]=points
-                id+=1
+                dic[k]=points
+                k+=1
 
             #Sort by descending size of segments
             seg_by_length=sorted(dic.values(),key=len,reverse=True)
