@@ -30,8 +30,8 @@ class TestObjectSegmentation(unittest.TestCase):
         self.ref=segmentation.SrObjectSegmentation(img,ref_seg,len(ref_seg))
 
     def test_number(self):
-        print 'NUMBER OF SEGMENTS TEST ...'
         ''' Verify that number of segments is correct '''
+        print 'NUMBER OF SEGMENTS TEST ...'
         res=abs(self.algo.nb_segments-self.ref.nb_segments)
         print 'Segments found by the algorithm :',self.algo.nb_segments,'Theorical number of segments :',self.ref.nb_segments,'\n'
         return 10*res
