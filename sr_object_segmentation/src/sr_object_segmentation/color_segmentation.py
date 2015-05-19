@@ -10,18 +10,20 @@ class ColorSegmentation(SrObjectSegmentation):
     Segmentation based upon a color segmentation
     """
 
-    def __init__(self,image,points={}):
+    def __init__(self,image,color):
         """
         Initialize the color segmentation object with the color chosen to segmente as parameter
         @param image - image to be segmented (numpy format)
         @param points - dictionnary with segments as keys and coordinates of the corresponding points as values (optionnal)
         """
-        SrObjectSegmentation.__init__(self,image,points={})
-        self.points=self.segmentation()
+        SrObjectSegmentation.__init__(self,image,{})
+        self.color=color
+        self.points=self.segmentation(color)
         self.nb_segments=len(self.points)
+       
 
 
-    def segmentation(self,color):
+    def segmentation(self):
         """
         Segmente the image according to the color given as parameter
         @param color - name of the color (string) chosen to segmente the image

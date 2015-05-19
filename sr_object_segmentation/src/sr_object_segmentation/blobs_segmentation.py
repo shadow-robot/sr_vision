@@ -10,13 +10,13 @@ class BlobsSegmentation(SrObjectSegmentation):
     Segmentation based upon the search of blobs, with a SimpleCV algorithm
     """
 
-    def __init__(self,image,points={}):
+    def __init__(self,image):
         """
         Initialize the blob segmentation object
         @param image - image to be segmented (numpy format)
         @param points - dictionnary with segments as keys and coordinates of the corresponding points as values (optionnal)
         """
-        SrObjectSegmentation.__init__(self,image,points={})
+        SrObjectSegmentation.__init__(self,image,{})
         self.points=self.segmentation()
         self.nb_segments=len(self.points)
 
@@ -27,7 +27,7 @@ class BlobsSegmentation(SrObjectSegmentation):
         """
 
         img=sCV.Image(self.img)
-
+        inv_img=img.invert()
         blobs=img.findBlobs() 
 
         if blobs:

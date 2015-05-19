@@ -17,13 +17,16 @@ class TestObjectSegmentation():
     def __init__(self,img,algo,ref_seg,color=None):
         """
         Initialize benchmarking comparison object
-        @param img - image on which the benchmarking will be realized. Can come from the dataset (Berkeley's) or drawn by the drawing script (several tests : basic and noise)
+        @param img - image on which the benchmarking will be realized. Can come from the dataset (Berkeley's) or drawn by the drawing script
         @param algo - name of the class algorithm to be tested
         @param color - color to be found by the Color segmentation (optional)     
         @param ref_seg - dictionnary containing the referencee segments as keys and coordinates of the points as values
         """
         print 'SEGMENTATION ...'
-        self.algo=algo(img)
+        if color:
+            self.algo=algo(img,color)
+        else:
+            self.algo=algo(img)
 
         #Get the theorical segmentation
         self.ref=SrObjectSegmentation(img,ref_seg)

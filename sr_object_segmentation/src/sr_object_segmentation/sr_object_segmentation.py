@@ -5,7 +5,7 @@ class SrObjectSegmentation:
     """
     Base class for object segmentation
     """
-    def __init__(self,image,points={}):  
+    def __init__(self,image,points):  
         """
         Initialize the segmentation object
         @param image - image to be segmented
