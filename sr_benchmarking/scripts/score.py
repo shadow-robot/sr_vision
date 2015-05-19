@@ -1,36 +1,39 @@
 #!/usr/bin/env python
 
-import unittest 
 from math import sqrt
 
-import segmentation
+from segmentation import *
 import drawing
 
 
+class TestObjectSegmentation():
+    """
+    Test class for object segmentation algorithms
+    """
 
-
-class TestObjectSegmentation(unittest.TestCase):
-    
-    ''' Test class for object segmentation algorithms - Level 1'''
-
-    def __init__(self,algo,img,ref_seg):
-        ''' Initialization '''
+    def __init__(self,algo,img,ref_seg,color=None,):
+        """
+        Initialize benchmarking comparison object
+        @param algo - name of the class algorithm to be tested
+        @param color - color to be found by the Color segmentation (optional)
+        @param img - image on which the benchmarking will be realized. Can come from the dataset (Berkeley's) or drawn by the drawing script (several tests : basic and noise)
+        @param ref_seg - dictionnary containing the referencee segments as keys and coordinates of the points as values
+        """
 
         print 'SEGMENTATION ...'
-        if 'blob' in algo:
-            algo=segmentation.BlobsSegmentation(img,{},0)
-            algo.segmentation()
-        elif 'color' in algo:
-            algo=segmentation.ColorSegmentation(img,{},0)
-            algo.segmentation('blue')
 
-        self.algo=algo
+        self.algo=algo(img,{},0)
+        self.algo.segmentation()
         
         #Get the theorical segmentation
         self.ref=segmentation.SrObjectSegmentation(img,ref_seg,len(ref_seg))
 
     def test_number(self):
-        ''' Verify that number of segments is correct '''
+        """ 
+        Verify that number of segments is correct
+        @return - a score corresponding to the difference between numer of segments found by the algorithm and the theorical, increase tenfold (arbitratry)
+        """
+
         print 'NUMBER OF SEGMENTS TEST ...'
         res=abs(self.algo.nb_segments-self.ref.nb_segments)
         print 'Segments found by the algorithm :',self.algo.nb_segments,'Theorical number of segments :',self.ref.nb_segments,'\n'
@@ -38,7 +41,10 @@ class TestObjectSegmentation(unittest.TestCase):
 
 
     def test_distance(self):
-
+        """ 
+        If segments are not perfectly the same, this test measures the magnitude of the difference
+        @return - a score corresponding to the minimal distance between a wrong point and the theorical, divided by 5 (arbitrary)
+        """
         print 'DISTANCE TEST ...'
         min_seg=self.algo.points
         max_seg=self.ref.points
@@ -89,6 +95,10 @@ class TestObjectSegmentation(unittest.TestCase):
 
 
     def score(self):
+        """
+        Calulate the final score
+        @return - the sum of the two scores calculated by test_number and _test_distance methods
+        """
         r=self.test_number()
         d=self.test_distance()
         return r+d
@@ -98,18 +108,16 @@ class TestObjectSegmentation(unittest.TestCase):
 
 if __name__ == '__main__':
 
-    algo=['blob','color'] #ColorSegmentation algorithm needs some corrections..
+    algo=[BlobsSegmentation(),ColorSegmentation()] #ColorSegmentation algorithm needs some corrections..
+    color=['blue','red','yellow','gray']
+
+    test=BasicTest()
     
-    type_test=['basic','noise','3096']
-    images=drawing.ImagesTest()
-    images.get_pixels_coord()
-    ref_seg=images.ref_basic
-    
-    for i,img in enumerate(images.basic_images):
-        s=str(type_test[0])+str(i+1)
+    for i,img in enumerate(test.np_img):
+        s=test.name+str(i+1)
         print '\n\n'
         print '##### Test ',s,'#####\n'
-        test=TestObjectSegmentation(algo[0],img,ref_seg[i])
+        test=TestObjectSegmentation(algo[0],img,test.ref_seg[i])
         score=test.score()
         print '\n'
         print 'TOTAL SCORE :',score
