@@ -55,7 +55,6 @@ class TestObjectSegmentation():
         if self.ref.nb_segments<self.algo.nb_segments:
             min_seg=self.ref.points
             max_seg=self.algo.points
-        print 'Number of wrong pixels : ',abs(len(min_seg[0])-len(max_seg[0]))
 
         #Correspondance between segments from ref and algo based upon number of pixels in common (seems cool, need more tests..)
         match={}

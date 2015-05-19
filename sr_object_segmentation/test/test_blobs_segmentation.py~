@@ -1,0 +1,63 @@
+#!/usr/bin/env python
+"""
+See README.md
+"""
+
+import rospy
+import numpy
+import actionlib
+import autopic_msgs.msg
+from unittest import TestCase
+from autopic_calibration.transformation_manager import TransformationManager
+
+PKG = "autopic_servoing"
+
+
+class TestStaticMarkerServoing(TestCase):
+    """
+    Test class for static position of the marker and servoing node
+    """
+
+    def setUp(self):
+        rospy.init_node("test_tip_servoing_marker", anonymous=True)
+        self._action_server_client = actionlib.SimpleActionClient("servoing_marker_server",
+                                                                  autopic_msgs.msg.ServoingMarkerAction)
+        self._action_server_client.wait_for_server()
+
+        self._marker_frame = rospy.get_param("/marker_frame")
+        self._gripper_frame = rospy.get_param("/servoing_marker_server/gripper_frame")
+        self._absolute_error = 0.005
+        self._goal = autopic_msgs.msg.ServoingMarkerGoal(marker_frame=self._marker_frame)
+
+    def test_static_marker(self):
+        self._action_server_client.send_goal(self._goal)
+        rospy.sleep(rospy.Duration(5))
+        self._action_server_client.cancel_goal()
+
+        tf_manager = TransformationManager()
+        tf = tf_manager.get_recent_filtered_transformation(self._gripper_frame, self._marker_frame)
+
+        distance_error = numpy.array(
+            [tf.transform.translation.x,
+             tf.transform.translation.y,
+             tf.transform.translation.z])
+        self.assertTrue(numpy.allclose(distance_error, numpy.zeros_like(distance_error), atol=self._absolute_error),
+                        msg="Distance error is not close to zero\n" + str(distance_error))
+
+    def test_node_feedback(self):
+        self._distance_error = [100.0, 100.0, 100.0]
+        self._action_server_client.send_goal(self._goal, feedback_cb=self._visual_servoing_feedback_check)
+        rospy.sleep(rospy.Duration(5))
+        self._action_server_client.cancel_goal()
+
+        self.assertTrue(numpy.allclose(self._distance_error, numpy.zeros_like(self._distance_error),
+                                       atol=self._absolute_error),
+                        msg="Distance error is not close to zero\n" + str(self._distance_error))
+
+    def _visual_servoing_feedback_check(self, msg):
+        self._distance_error = numpy.array([msg.x, msg.y, msg.z])
+
+
+if __name__ == "__main__":
+    import rostest
+    rostest.rosrun(PKG, "test_static_marker_servoing", TestStaticMarkerServoing)

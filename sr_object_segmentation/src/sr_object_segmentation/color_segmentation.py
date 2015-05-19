@@ -29,7 +29,6 @@ class ColorSegmentation(SrObjectSegmentation):
         @param color - name of the color (string) chosen to segmente the image
         @return - dictionnary of segments found with points coordinates
         """
-        self.color=color
         img=cv2.imread(self.img)
 
         # define the list of boundaries with this order: red,blue,yellow,gray
