@@ -7,24 +7,27 @@ from sr_object_segmentation import *
 
 class ColorSegmentation(SrObjectSegmentation):
     """
-    Segmentation based upo a color segmentation
+    Segmentation based upon a color segmentation
     """
 
-    def __init__(self,color):
+    def __init__(self,image,points={}):
         """
         Initialize the color segmentation object with the color chosen to segmente as parameter
+        @param image - image to be segmented (numpy format)
+        @param points - dictionnary with segments as keys and coordinates of the corresponding points as values (optionnal)
+        """
+        SrObjectSegmentation.__init__(self,image,points={})
+        self.points=self.segmentation()
+        self.nb_segments=len(self.points)
+
+
+    def segmentation(self,color):
+        """
+        Segmente the image according to the color given as parameter
         @param color - name of the color (string) chosen to segmente the image
-        """
-        self.color=color
-        sr_object_segmentation.__init__(self)
-
-
-    def segmentation(self):
-        """
-        Segmente the image according to the color attribute
         @return - dictionnary of segments found with points coordinates
         """
-
+        self.color=color
         img=cv2.imread(self.img)
 
         # define the list of boundaries with this order: red,blue,yellow,gray

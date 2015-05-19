@@ -2,8 +2,11 @@
 
 from math import sqrt
 
-from segmentation import *
-import drawing
+from sr_object_segmentation.sr_object_segmentation import SrObjectSegmentation
+from sr_object_segmentation.blobs_segmentation import BlobsSegmentation
+from sr_object_segmentation.color_segmentation import ColorSegmentation
+from sr_benchmarking.drawing import BasicTest 
+from sr_benchmarking.drawing import NoiseTest 
 
 
 class TestObjectSegmentation():
@@ -11,22 +14,19 @@ class TestObjectSegmentation():
     Test class for object segmentation algorithms
     """
 
-    def __init__(self,algo,img,ref_seg,color=None,):
+    def __init__(self,img,algo,ref_seg,color=None):
         """
         Initialize benchmarking comparison object
-        @param algo - name of the class algorithm to be tested
-        @param color - color to be found by the Color segmentation (optional)
         @param img - image on which the benchmarking will be realized. Can come from the dataset (Berkeley's) or drawn by the drawing script (several tests : basic and noise)
+        @param algo - name of the class algorithm to be tested
+        @param color - color to be found by the Color segmentation (optional)     
         @param ref_seg - dictionnary containing the referencee segments as keys and coordinates of the points as values
         """
-
         print 'SEGMENTATION ...'
+        self.algo=algo(img)
 
-        self.algo=algo(img,{},0)
-        self.algo.segmentation()
-        
         #Get the theorical segmentation
-        self.ref=segmentation.SrObjectSegmentation(img,ref_seg,len(ref_seg))
+        self.ref=SrObjectSegmentation(img,ref_seg)
 
     def test_number(self):
         """ 
@@ -46,12 +46,14 @@ class TestObjectSegmentation():
         @return - a score corresponding to the minimal distance between a wrong point and the theorical, divided by 5 (arbitrary)
         """
         print 'DISTANCE TEST ...'
+        
         min_seg=self.algo.points
         max_seg=self.ref.points
         if self.ref.nb_segments<self.algo.nb_segments:
             min_seg=self.ref.points
             max_seg=self.algo.points
-        
+        print 'Number of wrong pixels : ',abs(len(min_seg[0])-len(max_seg[0]))
+
         #Correspondance between segments from ref and algo based upon number of pixels in common (seems cool, need more tests..)
         match={}
         corresp={}
@@ -108,16 +110,17 @@ class TestObjectSegmentation():
 
 if __name__ == '__main__':
 
-    algo=[BlobsSegmentation(),ColorSegmentation()] #ColorSegmentation algorithm needs some corrections..
-    color=['blue','red','yellow','gray']
+    algos=[BlobsSegmentation,ColorSegmentation]
+    color=['red','blue','yellow','gray']
 
-    test=BasicTest()
-    
-    for i,img in enumerate(test.np_img):
-        s=test.name+str(i+1)
+    dataset=[BasicTest(),NoiseTest()]
+    data=dataset[0]
+
+    for i,img in enumerate(data.np_img):
+        s=data.name+str(i+1)
         print '\n\n'
         print '##### Test ',s,'#####\n'
-        test=TestObjectSegmentation(algo[0],img,test.ref_seg[i])
+        test=TestObjectSegmentation(img,algos[0],data.ref_seg[i])
         score=test.score()
         print '\n'
         print 'TOTAL SCORE :',score
