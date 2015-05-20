@@ -1,72 +1,74 @@
 #!/usr/bin/env python
-import cv2
-import numpy as np
-#import SimpleCV as sCV
+
+import Image
 
 from sr_object_segmentation import *
+
 
 class ColorSegmentation(SrObjectSegmentation):
     """
     Segmentation based upon a color segmentation
     """
 
-    def __init__(self,image,color):
+    def __init__(self, image, color):
         """
         Initialize the color segmentation object with the color chosen to segmente as parameter
         @param image - image to be segmented (numpy format)
-        @param points - dictionnary with segments as keys and coordinates of the corresponding points as values (optionnal)
+        @param color - name of the color (string) chosen to segmente the image
         """
-        SrObjectSegmentation.__init__(self,image,{})
-        self.color=color
-        self.points=self.segmentation(color)
-        self.nb_segments=len(self.points)
-       
-
+        SrObjectSegmentation.__init__(self, image, {})
+        self.color = color
+        self.points = self.segmentation()
+        self.nb_segments = len(self.points)
 
     def segmentation(self):
         """
         Segmente the image according to the color given as parameter
-        @param color - name of the color (string) chosen to segmente the image
         @return - dictionnary of segments found with points coordinates
         """
-        img=cv2.imread(self.img)
+        img = self.img
 
+        '''
         # define the list of boundaries with this order: red,blue,yellow,gray
         boundaries = {
-            'red':([17, 15, 100], [50, 56, 200]),
-            'blue':([86, 31, 4], [220, 88, 50]),
-            'yellow':([25, 146, 190], [62, 174, 250]),
-            'gray':([103, 86, 65], [145, 133, 128])
+            'red': ([17, 15, 100], [50, 56, 200]),
+            'blue': ([86, 31, 4], [220, 88, 50]),
+            'yellow': ([25, 146, 190], [62, 174, 250]),
+            'gray': ([103, 86, 65], [145, 133, 128]),
+            'B': ([0, 0, 250], [0, 0, 255])
         }
+        '''
 
-        pts=[]
-        dic={}
-        k=0
+        width = img.shape[0]
+        height = img.shape[1]
 
-        # create NumPy arrays from the boundaries
-        lower = np.array(boundaries[color][0], dtype = "uint8")
-        upper = np.array(boundaries[color][1], dtype = "uint8")
+        dic = {}
+        dic_fin = {}
 
-        # find the colors within the specified boundaries and apply
-        # the mask
-        mask = cv2.inRange(img, lower, upper)
-        #output = cv2.bitwise_and(img,img, mask = mask)
+        main_colors = get_main_color(self.img, 4)
+        for i, color in enumerate(main_colors):
+            pts = []
+            for x in range(width):
+                for y in range(height):
 
-        # return a dictionnary with segment id and the coordinates of the points corresponding
-        for y in range(len(mask)):
-            x_seq=np.nonzero(mask[y])[0]
-            while len(x_seq)!=0:
-                for x in x_seq:
-                    pts.append((x,y))
-                break
-            dic[k]=pts
-            k+=1
+                    if list(img[(x, y)]) == list(color):
+                        pts.append((x, y))
+            dic[i] = pts
 
-        #Sort by descending size of segments
-        seg_by_length=sorted(dic.values(),key=len,reverse=True)
-        for i in range(len(dic)):
-            dic[i]=seg_by_length[i][0]
+        # Sort by descending size of segments
+        seg_by_length = sorted(dic.values(), key=len, reverse=True)[1:]  # Remove the background (basic and noise test)
+        for i in range(len(seg_by_length)):
+            dic_fin[i] = seg_by_length[i]
 
-        return dic
+        return dic_fin
 
 
+def get_main_color(np_img, max_nb_col):
+    pil_img = Image.fromarray(np_img)
+    colors = pil_img.getcolors(256)
+    sorted_colors = sorted(colors, key=lambda col: col[0:], reverse=True)
+    if len(sorted_colors) < max_nb_col:
+        nb_col = len(sorted_colors)
+    else:
+        nb_col = max_nb_col
+    return [sorted_colors[:][i][1] for i in range(nb_col)]
