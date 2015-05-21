@@ -134,9 +134,8 @@ def run_test(algo, dataset, writing=False):
 
 
 if __name__ == '__main__':
-    algos = [BlobsSegmentation, ColorSegmentation]
-    color = ['red', 'blue', 'yellow', 'gray']
 
+    algos = [BlobsSegmentation, ColorSegmentation]
     tests = [BasicTest(), NoiseTest()]
 
     run_test(algos[0], tests[0])
