@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import Image
+from PIL import Image
 
 from sr_object_segmentation import SrObjectSegmentation
 

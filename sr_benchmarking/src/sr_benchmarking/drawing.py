@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+
 import numpy as np
-import Image
-import ImageDraw
+from PIL import Image
+from PIL import ImageDraw
 
 
 class ImagesTest(object):

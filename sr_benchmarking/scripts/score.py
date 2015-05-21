@@ -19,24 +19,24 @@ class TestObjectSegmentation(object):
         Initialize benchmarking comparison object
         @param image - image on which the benchmarking will be realized.
         @param algo - name of the class algorithm to be tested
-        @param ref_seg - dictionnary containing the referencee segments as keys and coordinates of the points as values
+        @param ref_seg - dictionary containing the reference segments as keys and coordinates of the points as values
         """
         print 'SEGMENTATION ...'
         self.algo = algo(image)
 
-        # Get the theorical segmentation
+        # Get the theoretic segmentation
         self.ref = SrObjectSegmentation(image, ref_seg)
 
     def test_number(self):
         """ 
         Verify that number of segments is correct
         @return - a score corresponding to the difference between number of segments found by the algorithm and the
-        theorical, increase tenfold (arbitratry)
+        theoretical, increase tenfold (arbitrary)
         """
 
         print 'NUMBER OF SEGMENTS TEST ...'
         res = abs(self.algo.nb_segments - self.ref.nb_segments)
-        print 'Algorithm segments :', self.algo.nb_segments, 'Theorical segments :', self.ref.nb_segments, '\n'
+        print 'Algorithm segments :', self.algo.nb_segments, 'Theoretical segments :', self.ref.nb_segments, '\n'
         return 10 * res
 
     @property
@@ -139,4 +139,4 @@ if __name__ == '__main__':
 
     tests = [BasicTest(), NoiseTest()]
 
-    run_test(algos[0], tests[0])
+    run_test(algos[1], tests[0])
