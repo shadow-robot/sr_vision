@@ -3,7 +3,7 @@ import Image
 import ImageDraw
 
 
-class ImagesTest:
+class ImagesTest(object):
     def __init__(self):
         """
         Initialize a test dataset images for benchmarking
@@ -14,15 +14,15 @@ class ImagesTest:
         """
 
         self.name = None
-        self.ref_seg = self.get_pixels_coord()
-        self.nb_seg = len(self.ref_seg)
+        self.ref_seg = []
+        self.nb_seg = []
         self.pil_img = []
-        self.np_img = pil_to_array(self.pil_img)
+        self.np_img = []
 
     def get_pixels_coord(self):
         """
         Get the coordinates of the points in which segments
-        @return - list of the dictionnaries corresponding to the segments (id as key and coordinates as values) for
+        @return - list of the dictionaries corresponding to the segments (id as key and coordinates as values) for
         each image of the dataset
         """
 
@@ -37,11 +37,11 @@ class ImagesTest:
             for y in range(height):
                 for x in range(width):
                     if img.getpixel((x, y)) == (0, 0, 255):  # blue stuffs
-                        blue_coord.append((x, y))
+                        blue_coord.append((y, x))
                     elif img.getpixel((x, y)) == (255, 0, 0):  # red stuffs
-                        red_coord.append((x, y))
+                        red_coord.append((y, x))
                     elif img.getpixel((x, y)) == (255, 255, 0):  # yellow stuffs
-                        yellow_coord.append((x, y))
+                        yellow_coord.append((y, x))
 
             if blue_coord:
                 dic[0] = blue_coord
@@ -54,6 +54,7 @@ class ImagesTest:
                     dic[2] = yellow_coord
 
             ref_segments.append(dic)
+
         return ref_segments
 
     def write_ref_file(self):
@@ -99,23 +100,24 @@ class BasicTest(ImagesTest):
         """ 
         Initialize the Basic dataset object
         """
+        ImagesTest.__init__(self)
         self.name = 'basic'
         self.pil_img = self.draw_basic_test()
-        ImagesTest.__init__(self)
+        self.np_img = pil_to_array(self.pil_img)
+        self.ref_seg = self.get_pixels_coord()
+        self.nb_seg = len(self.ref_seg)
 
-    @staticmethod
-    def draw_basic_test():
+    def draw_basic_test(self):
         """
         Draw the images for the basic dataset
         @return - list of the images, with a PIL format
         """
         images = []
-        pass
 
         # Draw a blue rectangle : test1_1
         images.append(Image.new("RGB", (640, 480), "black"))
         draw = ImageDraw.Draw(images[0])
-        draw.rectangle([(500, 300), (200, 200)], fill=(0, 0, 255))
+        draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
 
         # Draw red circles with a radius of 30px outer of the rectangle : test1_2
         r = 30
@@ -148,18 +150,19 @@ class NoiseTest(ImagesTest):
     """
 
     def __init__(self):
+        ImagesTest.__init__(self)
         self.name = 'noise'
         self.pil_img = self.draw_noise_test()
-        ImagesTest.__init__(self)
+        self.np_img = pil_to_array(self.pil_img)
+        self.ref_seg = self.get_pixels_coord()
+        self.nb_seg = len(self.ref_seg)
 
-    @staticmethod
-    def draw_noise_test():
+    def draw_noise_test(self):
         """
         Draw the images for the noise dataset
         @return - list of the images, with a PIL format
         """
         images = []
-        pass
 
         # Draw a blue rectangle and 2 red circles with a radius smaller and smaller (40,20,1 px)
         # Image 1
@@ -199,11 +202,6 @@ def pil_to_array(pil_images):
     """
     images = []
     for img in pil_images:
-        img = img.rotate(270)
-        images.append(np.array(img.getdata(), np.uint8).reshape(img.size[1], img.size[0], 3))
+        images.append(np.array(img))
+
     return images
-
-
-imgs = BasicTest()
-# imgs.get_pixels_coord()
-# imgs.write_ref_file()

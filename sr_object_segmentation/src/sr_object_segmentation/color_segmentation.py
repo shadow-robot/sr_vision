@@ -2,7 +2,7 @@
 
 import Image
 
-from sr_object_segmentation import *
+from sr_object_segmentation import SrObjectSegmentation
 
 
 class ColorSegmentation(SrObjectSegmentation):
@@ -10,14 +10,12 @@ class ColorSegmentation(SrObjectSegmentation):
     Segmentation based upon a color segmentation
     """
 
-    def __init__(self, image, color):
+    def __init__(self, image):
         """
         Initialize the color segmentation object with the color chosen to segmente as parameter
         @param image - image to be segmented (numpy format)
-        @param color - name of the color (string) chosen to segmente the image
         """
         SrObjectSegmentation.__init__(self, image, {})
-        self.color = color
         self.points = self.segmentation()
         self.nb_segments = len(self.points)
 
@@ -27,17 +25,6 @@ class ColorSegmentation(SrObjectSegmentation):
         @return - dictionnary of segments found with points coordinates
         """
         img = self.img
-
-        '''
-        # define the list of boundaries with this order: red,blue,yellow,gray
-        boundaries = {
-            'red': ([17, 15, 100], [50, 56, 200]),
-            'blue': ([86, 31, 4], [220, 88, 50]),
-            'yellow': ([25, 146, 190], [62, 174, 250]),
-            'gray': ([103, 86, 65], [145, 133, 128]),
-            'B': ([0, 0, 250], [0, 0, 255])
-        }
-        '''
 
         width = img.shape[0]
         height = img.shape[1]
@@ -50,7 +37,6 @@ class ColorSegmentation(SrObjectSegmentation):
             pts = []
             for x in range(width):
                 for y in range(height):
-
                     if list(img[(x, y)]) == list(color):
                         pts.append((x, y))
             dic[i] = pts
@@ -64,6 +50,13 @@ class ColorSegmentation(SrObjectSegmentation):
 
 
 def get_main_color(np_img, max_nb_col):
+    """
+    Get the main colors present in an image
+    @param np_img: numpy image
+    @param max_nb_col: number of maximum colors to be returned
+    @return: a list of the main colors present in the image (RGB format)
+    """
+
     pil_img = Image.fromarray(np_img)
     colors = pil_img.getcolors(256)
     sorted_colors = sorted(colors, key=lambda col: col[0:], reverse=True)

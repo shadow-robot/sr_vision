@@ -9,24 +9,20 @@ from sr_benchmarking.drawing import BasicTest
 from sr_benchmarking.drawing import NoiseTest
 
 
-class TestObjectSegmentation:
+class TestObjectSegmentation(object):
     """
     Test class for object segmentation algorithms
     """
 
-    def __init__(self, image, algo, ref_seg, col=None):
+    def __init__(self, image, algo, ref_seg):
         """
         Initialize benchmarking comparison object
         @param image - image on which the benchmarking will be realized.
         @param algo - name of the class algorithm to be tested
         @param ref_seg - dictionnary containing the referencee segments as keys and coordinates of the points as values
-        @param col - color to be found by the Color segmentation (optional)
         """
         print 'SEGMENTATION ...'
-        if col:
-            self.algo = algo(image, col)
-        else:
-            self.algo = algo(image)
+        self.algo = algo(image)
 
         # Get the theorical segmentation
         self.ref = SrObjectSegmentation(image, ref_seg)
@@ -66,15 +62,10 @@ class TestObjectSegmentation:
             m = {}
             for id_max_seg in range(len(max_seg)):
                 m[id_max_seg] = len(set(min_seg[id_min_seg]) & set(max_seg[id_max_seg]))
-                print len(min_seg[id_min_seg]), len(max_seg[id_max_seg])
             match[id_min_seg] = m
-            print 'm', m
             inv_m = dict(zip(m.values(), m.keys()))
-            print 'inv_m', inv_m
             maxi = sorted(m.values(), reverse=True)
-            print 'maxi', maxi
             for k in range(len(m)):
-                print 'inv_m[maxi]', inv_m[maxi[-k]]
                 if inv_m[maxi[-k]] not in corresp.values():
                     corresp[id_min_seg] = inv_m[maxi[-k]]
                     break
@@ -82,9 +73,7 @@ class TestObjectSegmentation:
                     corresp[id_min_seg] = inv_m[maxi[-(k + id_min_seg)]]
                     break
         dist_seg = []
-        print corresp
         for seg in range(len(min_seg.values())):
-            print seg
             seg1 = min_seg[seg]
             seg2 = max_seg[corresp[seg]]
             print 'Number of wrong pixels : ', abs(len(seg1) - len(seg2))
@@ -115,19 +104,39 @@ class TestObjectSegmentation:
         return r + d
 
 
-if __name__ == '__main__':
+def run_test(algo, dataset, writing=False):
+    """
+    Run the test for the algo given as parameter, on the dataset also given
+    @param algo - Algorithm to be tested, from the "algos" list
+    @param dataset - Dataset on which the algorithm will be tested, from the "tests" list
+    @param writing - Boolean optional parameter, writing or not a resume text file of the scores
+    """
+    if writing:
+        f = open(dataset.name + '.txt', 'w')
 
-    algos = [BlobsSegmentation, ColorSegmentation]
-    color = ['red', 'blue', 'yellow', 'gray']
-
-    dataset = [BasicTest(), NoiseTest()]
-    data = dataset[0]
-
-    for i, img in enumerate(data.np_img):
-        s = data.name + str(i + 1)
+    for i, img in enumerate(dataset.np_img):
+        s = dataset.name + str(i + 1)
         print '\n\n'
         print '##### Test ', s, '#####\n'
-        test = TestObjectSegmentation(img, algos[1], data.ref_seg[i], color[1])
+        if writing:
+            f.write('\n\n')
+            f.write('##### Test ' + s + '#####\n')
+        test = TestObjectSegmentation(img, algo, dataset.ref_seg[i])
         score = test.score()
         print '\n'
         print 'TOTAL SCORE :', score
+        if writing:
+            f.write('\n')
+            f.write('TOTAL SCORE :' + str(score))
+
+    if writing:
+        f.close()
+
+
+if __name__ == '__main__':
+    algos = [BlobsSegmentation, ColorSegmentation]
+    color = ['red', 'blue', 'yellow', 'gray']
+
+    tests = [BasicTest(), NoiseTest()]
+
+    run_test(algos[0], tests[0])

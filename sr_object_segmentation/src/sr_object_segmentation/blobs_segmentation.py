@@ -2,7 +2,7 @@
 
 import SimpleCV as sCV
 
-from sr_object_segmentation.sr_object_segmentation import SrObjectSegmentation
+from sr_object_segmentation import SrObjectSegmentation
 
 
 class BlobsSegmentation(SrObjectSegmentation):
@@ -26,16 +26,15 @@ class BlobsSegmentation(SrObjectSegmentation):
         """
 
         img = sCV.Image(self.img)
-        inv_img = img.invert()
         blobs = img.findBlobs()
 
         if blobs:
             blobs.draw()
             blobs.show(width=2)
-            img.addDrawingLayer(inv_img.dl())
+            img.addDrawingLayer(img.dl())
             img.show()
 
-            # Return the whole of points from each blob as a dictionnary
+            # Return the whole of points from each blob as a dictionary
             blobs = blobs.sortArea()[::-1]
             dic = {}
             k = 0

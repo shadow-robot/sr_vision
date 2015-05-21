@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 
-class SrObjectSegmentation:
+class SrObjectSegmentation(object):
     """
     Base class for object segmentation
     """
@@ -10,7 +10,7 @@ class SrObjectSegmentation:
         """
         Initialize the segmentation object
         @param image - image to be segmented
-        @param points - dictionnary with segments and corresponding points (optionnal)
+        @param points - dictionary with segments and corresponding points (optional)
         @attribute nb_segments - number of segments found in the image
         """
         self.img = image
