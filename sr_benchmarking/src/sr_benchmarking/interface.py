@@ -50,7 +50,6 @@ class MainApplication(tk.Frame):
         Function called by the "Launch button"
         Save the choices and quit the interface
         """
-
         global algo_choice
         global data_choice
         algo_choice = [self.algo_var[0].get(), self.algo_var[1].get()]
