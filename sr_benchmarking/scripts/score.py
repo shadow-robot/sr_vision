@@ -54,40 +54,8 @@ class TestObjectSegmentation(object):
             min_seg = self.ref.points
             max_seg = self.algo.points
 
-        # Correspondance between segments from ref and algo based upon number of pixels in common
-        match = {}
-        corresp = {}
-
-        for id_min_seg in range(len(min_seg)):
-            m = {}
-            for id_max_seg in range(len(max_seg)):
-                m[id_max_seg] = len(set(min_seg[id_min_seg]) & set(max_seg[id_max_seg]))
-            match[id_min_seg] = m
-            inv_m = dict(zip(m.values(), m.keys()))
-            maxi = sorted(m.values(), reverse=True)
-            for k in range(len(m)):
-                if inv_m[maxi[-k]] not in corresp.values():
-                    corresp[id_min_seg] = inv_m[maxi[-k]]
-                    break
-                else:
-                    corresp[id_min_seg] = inv_m[maxi[-(k + id_min_seg)]]
-                    break
-        dist_seg = []
-        for seg in range(len(min_seg.values())):
-            seg1 = min_seg[seg]
-            seg2 = max_seg[corresp[seg]]
-            print 'Number of wrong pixels : ', abs(len(seg1) - len(seg2))
-            if seg1 == seg2 or seg1 == sorted(seg2) or seg2 == sorted(seg1):
-                break
-            else:
-                for point1 in seg1:
-                    if point1 not in seg2:
-                        dist = 0
-                        for point2 in seg2:
-                            d = sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
-                            if d > dist:
-                                dist = d
-                        dist_seg.append(dist)
+        corresp = get_corresp_seg(min_seg, max_seg)
+        dist_seg = get_dist_seg(min_seg, max_seg, corresp)
 
         if len(dist_seg) == 0:
             return 0
@@ -102,6 +70,58 @@ class TestObjectSegmentation(object):
         r = self.test_number()
         d = self.test_distance
         return r + d
+
+
+def get_corresp_seg(min_seg, max_seg):
+    """
+    Correspondence between segments from ref and algo based upon number of pixels in common
+    @param min_seg - smallest segment
+    @param max_seg - biggest segment
+    @return - Dictionary with min_seg id as keys and the correspondent max_seg id as values
+    """
+    corresp = {}
+    for id_min_seg in range(len(min_seg)):
+        m = {}
+        for id_max_seg in range(len(max_seg)):
+            m[id_max_seg] = len(set(min_seg[id_min_seg]) & set(max_seg[id_max_seg]))
+        # match[id_min_seg] = m
+        inv_m = dict(zip(m.values(), m.keys()))
+        maxi = sorted(m.values(), reverse=True)
+        for k in range(len(m)):
+            if inv_m[maxi[-k]] not in corresp.values():
+                corresp[id_min_seg] = inv_m[maxi[-k]]
+                break
+            else:
+                corresp[id_min_seg] = inv_m[maxi[-(k + id_min_seg)]]
+                break
+    return corresp
+
+
+def get_dist_seg(min_seg, max_seg, corresp):
+    """
+    For the points misplaced, calculate the distance to the nearest point from the theoretical right segment.
+    @param min_seg - smallest segment
+    @param max_seg - biggest segment
+    @param corresp - correspondence dictionary between the reference and the found segments
+    @return - list of the minimal distances, for each misplaced point
+    """
+    dist_seg = []
+    for seg in range(len(min_seg.values())):
+        seg1 = min_seg[seg]
+        seg2 = max_seg[corresp[seg]]
+        print 'Number of wrong pixels : ', abs(len(seg1) - len(seg2))
+        if seg1 == seg2 or seg1 == sorted(seg2) or seg2 == sorted(seg1):
+            break
+        else:
+            for point1 in seg1:
+                if point1 not in seg2:
+                    dist = 0
+                    for point2 in seg2:
+                        d = sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
+                        if d > dist:
+                            dist = d
+                    dist_seg.append(dist)
+    return dist_seg
 
 
 def run_test(algo, dataset, writing=False):
