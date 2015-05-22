@@ -146,7 +146,7 @@ def run_test(algo, dataset, writing=False):
         results += r
 
     if writing:
-        f.open(dataset.name + '.txt', 'w')
+        f = open(dataset.name + '.txt', 'w')
         f.write(results)
         f.close()
 
