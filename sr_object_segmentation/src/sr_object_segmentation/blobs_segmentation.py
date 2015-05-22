@@ -16,6 +16,7 @@ class BlobsSegmentation(SrObjectSegmentation):
         @param image - image to be segmented (numpy format)
         """
         SrObjectSegmentation.__init__(self, image, {})
+        self.name = 'Finding blobs segmentation algorithm'
         self.points = self.segmentation()
         self.nb_segments = len(self.points)
 

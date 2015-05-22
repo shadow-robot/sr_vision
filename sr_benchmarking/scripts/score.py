@@ -7,6 +7,8 @@ from sr_object_segmentation.blobs_segmentation import BlobsSegmentation
 from sr_object_segmentation.color_segmentation import ColorSegmentation
 from sr_benchmarking.drawing import BasicTest
 from sr_benchmarking.drawing import NoiseTest
+from sr_benchmarking.interface import run_interface
+from sr_benchmarking.interface import show_results
 
 
 class TestObjectSegmentation(object):
@@ -130,33 +132,46 @@ def run_test(algo, dataset, writing=False):
     @param algo - Algorithm to be tested, from the "algos" list
     @param dataset - Dataset on which the algorithm will be tested, from the "tests" list
     @param writing - Boolean optional parameter, writing or not a resume text file of the scores
+    @return - Results (string)
     """
-    if writing:
-        f = open(dataset.name + '.txt', 'w')
-
+    results = ''
     for i, img in enumerate(dataset.np_img):
-        s = dataset.name + str(i + 1)
-        print '\n\n'
-        print '##### Test ', s, '#####\n'
-        if writing:
-            f.write('\n\n')
-            f.write('##### Test ' + s + '#####\n')
+        r = '\n\n' + str(algo) + '\n\n ##### Test ' + dataset.name + str(i + 1) + '#####\n'
+        print r
+        results += r
         test = TestObjectSegmentation(img, algo, dataset.ref_seg[i])
         score = test.score()
-        print '\n'
-        print 'TOTAL SCORE :', score
-        if writing:
-            f.write('\n')
-            f.write('TOTAL SCORE :' + str(score))
+        r = '\nTOTAL SCORE :' + str(score)
+        print r
+        results += r
 
     if writing:
+        f.open(dataset.name + '.txt', 'w')
+        f.write(results)
         f.close()
+
+    return results
 
 
 if __name__ == '__main__':
+
+    # Graphical user interface
+    (algo_choice, data_choice) = run_interface()
+
+    # Algorithms and datasets available
     algos = [BlobsSegmentation, ColorSegmentation]
-    color = ['red', 'blue', 'yellow', 'gray']
+    datasets = [BasicTest(), NoiseTest()]
 
-    tests = [BasicTest(), NoiseTest()]
+    # Get back the choices from the user
+    algo_id = [i for (i, e) in enumerate(algo_choice) if e != 0]
+    data_id = [i for (i, e) in enumerate(data_choice) if e != 0]
 
-    run_test(algos[1], tests[0])
+    res = '\n\n\n ##### RESULTS #####\n\n'
+    # Run the benchmarking for these
+    for i in algo_id:
+        algo = algos[i]
+        for j in data_id:
+            dataset = datasets[j]
+            res += run_test(algo, dataset)
+
+    show_results(res)
