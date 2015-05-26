@@ -3,9 +3,9 @@
 
 import Tkinter as tk
 
+global_choice = []
+algo_choice = []
 
-global_choice=[]
-algo_choice=[]
 
 class MainApplication(tk.Frame):
     """
@@ -19,8 +19,6 @@ class MainApplication(tk.Frame):
         """
         tk.Frame.__init__(self, parent)
         self.parent = parent
-
-
 
         # frame 1
         self.Frame1 = tk.Frame(self.parent, borderwidth=2, relief=tk.GROOVE)
