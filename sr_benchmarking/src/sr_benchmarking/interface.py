@@ -4,6 +4,9 @@
 import Tkinter as tk
 
 
+global_choice=[]
+algo_choice=[]
+
 class MainApplication(tk.Frame):
     """
     Graphical user interface for algorithm(s) and dataset(s) choosing
@@ -16,6 +19,8 @@ class MainApplication(tk.Frame):
         """
         tk.Frame.__init__(self, parent)
         self.parent = parent
+
+
 
         # frame 1
         self.Frame1 = tk.Frame(self.parent, borderwidth=2, relief=tk.GROOVE)
@@ -83,6 +88,7 @@ def run_interface():
     Run the main interface to chose and launch the benchmarking
     @return - User choices as tuples : 0=NO and 1=YES
     """
+
     root = tk.Tk()
     MainApplication(root)
     root.mainloop()
