@@ -2,6 +2,26 @@
 This package contains a base class that gets the data, etc... and implementation specific classes with the different segmentation algorithms.
 The BlobsSegmentation algorithm is based upon SimpleCV (see below for the installation instuctions).
 
+######################################################
+
+#                Pillow INSTALLATION              
+
+######################################################
+
+See the instructions on the website :
+http://pillow.readthedocs.org/en/latest/installation.html
+
+
+The easiest way to install Pillow is with pip :
+$ sudo pip install Pillow
+
+Can also be installed with easy-install :
+$ easy_install Pillow
+
+Or directy with the source :
+download and extract the compressed archive from PyPI (https://pypi.python.org/pypi/Pillow) and inside it run:
+$ python setup.py install
+
 
 
 ######################################################

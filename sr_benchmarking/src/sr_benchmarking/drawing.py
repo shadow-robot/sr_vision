@@ -1,6 +1,8 @@
+#!/usr/bin/env python
+
 import numpy as np
-import Image
-import ImageDraw
+from PIL import Image
+from PIL import ImageDraw
 
 
 class ImagesTest(object):
@@ -15,7 +17,6 @@ class ImagesTest(object):
 
         self.name = None
         self.ref_seg = []
-        self.nb_seg = []
         self.pil_img = []
         self.np_img = []
 
@@ -105,7 +106,6 @@ class BasicTest(ImagesTest):
         self.pil_img = self.draw_basic_test()
         self.np_img = pil_to_array(self.pil_img)
         self.ref_seg = self.get_pixels_coord()
-        self.nb_seg = len(self.ref_seg)
 
     def draw_basic_test(self):
         """
@@ -155,7 +155,6 @@ class NoiseTest(ImagesTest):
         self.pil_img = self.draw_noise_test()
         self.np_img = pil_to_array(self.pil_img)
         self.ref_seg = self.get_pixels_coord()
-        self.nb_seg = len(self.ref_seg)
 
     def draw_noise_test(self):
         """

@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-import Image
+from PIL import Image
 
 from sr_object_segmentation import SrObjectSegmentation
 
@@ -12,10 +12,11 @@ class ColorSegmentation(SrObjectSegmentation):
 
     def __init__(self, image):
         """
-        Initialize the color segmentation object with the color chosen to segmente as parameter
+        Initialize the color segmentation object with the color chosen to segment as parameter
         @param image - image to be segmented (numpy format)
         """
         SrObjectSegmentation.__init__(self, image, {})
+        self.name = 'Color segmentation algorithm'
         self.points = self.segmentation()
         self.nb_segments = len(self.points)
 
