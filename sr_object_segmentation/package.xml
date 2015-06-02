@@ -19,6 +19,7 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rosunit</build_depend>
   <build_depend>python-opencv</build_depend>
   <build_depend>python-numpy</build_depend>
   <build_depend>cv_bridge</build_depend>
