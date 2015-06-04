@@ -18,7 +18,7 @@ class TestColorSegmentation(unittest.TestCase):
         """
         self.datasets = [BasicTest(), NoiseTest()]
         self.algo = ColorSegmentation
-        
+
         for dataset in self.datasets:
             images = dataset.np_img
             for img in images:
