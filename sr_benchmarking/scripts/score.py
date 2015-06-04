@@ -154,7 +154,6 @@ def run_test(algo, dataset, writing=False):
 
 
 if __name__ == '__main__':
-
     # Graphical user interface
     (algo_choice, data_choice) = run_interface()
 
@@ -173,5 +172,4 @@ if __name__ == '__main__':
         for j in data_id:
             dataset = datasets[j]
             res += run_test(algo, dataset)
-
     show_results(res)

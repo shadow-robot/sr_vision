@@ -138,7 +138,7 @@ class BasicTest(ImagesTest):
         # Draw a yellow polygon outer of the rectangle : test 1_4
         images.append(Image.new("RGB", (640, 480), "black"))
         draw = ImageDraw.Draw(images[3])
-        draw.rectangle([(500, 300), (200, 200)], fill=(0, 0, 255))
+        draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
         draw.polygon([(50, 50), (100, 100), (200, 100), (20, 170)], fill=(255, 255, 0))
 
         return images
@@ -169,25 +169,25 @@ class NoiseTest(ImagesTest):
         draw = ImageDraw.Draw(images[0])
         draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
         r = 30
-        for x, y in [(100, 150), (400, 200)]:
+        for x, y in [(100, 150), (450, 400)]:
             draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
             draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
 
         # Image 2
         images.append(Image.new("RGB", (640, 480), "black"))
         draw = ImageDraw.Draw(images[1])
-        draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
-        r = 20
-        for x, y in [(100, 150), (400, 200)]:
+        draw.rectangle([(400, 250), (300, 150)], fill=(0, 0, 255))
+        r = 10
+        for x, y in [(100, 150), (450, 400)]:
             draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
             draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
 
         # Image 3
         images.append(Image.new("RGB", (640, 480), "black"))
         draw = ImageDraw.Draw(images[2])
-        draw.rectangle([(500, 300), (200, 200)], fill=(0, 0, 255))
+        draw.rectangle([(320, 180), (350, 220)], fill=(0, 0, 255))
         r = 1
-        for x, y in [(100, 150), (400, 200)]:
+        for x, y in [(100, 150), (450, 400)]:
             draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
             draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
 
