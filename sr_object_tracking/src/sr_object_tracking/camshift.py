@@ -2,6 +2,7 @@
 
 import cv2
 import numpy as np
+import rospy
 
 from sr_object_tracking import SrObjectTracking
 
@@ -18,15 +19,34 @@ class CamshiftTracking(SrObjectTracking):
         self.name = 'Camshift'
         SrObjectTracking.__init__(self, self.name)
 
+        # The minimum saturation of the tracked color in HSV space,
+        # as well as the min and max value (the V in HSV) and a
+        # threshold on the backprojection probability image.
+        self.smin = rospy.get_param("~smin", 85)
+        self.vmin = rospy.get_param("~vmin", 50)
+        self.vmax = rospy.get_param("~vmax", 254)
+        self.threshold = rospy.get_param("~threshold", 50)
+
     def tracking(self):
         """
         Track the RegionOfInterest and return the track box updating the attribute
         """
+        cv2.namedWindow("Parameters", cv2.CV_WINDOW_AUTOSIZE)
+        cv2.moveWindow("Parameters", 700, 325)
+        # Create the slider controls for saturation, value and threshold
+        cv2.createTrackbar("Saturation", "Parameters", self.smin, 130, self.set_smin)
+        cv2.createTrackbar("Min Value", "Parameters", self.vmin, 100, self.set_vmin)
+        cv2.createTrackbar("Max Value", "Parameters", self.vmax, 255, self.set_vmax)
+        cv2.createTrackbar("Threshold", "Parameters", self.threshold, 255, self.set_threshold)
+
         self.vis = self.frame.copy()
+        # self.vis = cv2.blur(self.vis, (5,5))
         hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, np.array((0., 60., 32.)), np.array((180., 255., 255.)))
+        mask = cv2.inRange(hsv, np.array((0., self.smin, self.vmin)), np.array((180., 255., self.vmax)))
+
         if self.selection:
             x0, y0, x1, y1 = self.selection
+            # self.track_window = (max(0,x0), max(0,y0), max(0,x1 - x0), max(0,y1 - y0))
             self.track_window = (x0, y0, x1 - x0, y1 - y0)
             hsv_roi = hsv[y0:y1, x0:x1]
             mask_roi = mask[y0:y1, x0:x1]
@@ -44,7 +64,9 @@ class CamshiftTracking(SrObjectTracking):
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
             prob &= mask
             term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
-            self.track_box, self.track_window = cv2.CamShift(prob, self.track_window, term_crit)
+            nb_iter = cv2.meanShift(prob, self.track_window, term_crit)[0]
+            if nb_iter != 0:
+                self.track_box, self.track_window = cv2.CamShift(prob, self.track_window, term_crit)
             try:
                 cv2.ellipse(self.vis, self.track_box, (0, 0, 255), 2)
             except:
@@ -62,4 +84,18 @@ class CamshiftTracking(SrObjectTracking):
             cv2.rectangle(img, (i * bin_w + 2, 255), ((i + 1) * bin_w - 2, 255 - h),
                           (int(180.0 * i / bin_count), 255, 255), -1)
         img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
-        cv2.imshow('histogram', img)
+        cv2.imshow('Histogram', img)
+
+    # These are the callbacks for the slider controls
+    def set_smin(self, pos):
+        self.smin = pos
+
+    def set_vmin(self, pos):
+        self.vmin = pos
+
+    def set_vmax(self, pos):
+        if pos > 50:
+            self.vmax = pos
+
+    def set_threshold(self, pos):
+        self.threshold = pos

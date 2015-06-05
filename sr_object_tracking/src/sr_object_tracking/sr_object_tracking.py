@@ -50,7 +50,8 @@ class SrObjectTracking(object):
         # Create the main display window and the histogram one
         self.cv_window_name = self.node_name
         cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
-        cv2.namedWindow('histogram', cv2.CV_WINDOW_AUTOSIZE)
+        cv2.namedWindow('Histogram', cv2.CV_WINDOW_AUTOSIZE)
+        cv2.moveWindow("Histogram", 700, 20)
 
         # Store the frame width and height in a pair of global variables
         if self.frame_width is None:
@@ -163,4 +164,4 @@ def run(algo):
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down tracking node."
-        cv.DestroyAllWindows()
+        cv2.destroyAllWindows()
