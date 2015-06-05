@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-
-import cv
 import cv2
 from sensor_msgs.msg import Image, RegionOfInterest
 from cv_bridge import CvBridge, CvBridgeError
@@ -51,8 +49,8 @@ class SrObjectTracking(object):
 
         # Create the main display window and the histogram one
         self.cv_window_name = self.node_name
-        cv.NamedWindow(self.cv_window_name, cv.CV_WINDOW_AUTOSIZE)
-        cv.NamedWindow('histogram', cv.CV_WINDOW_AUTOSIZE)
+        cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
+        cv2.namedWindow('histogram', cv2.CV_WINDOW_AUTOSIZE)
 
         # Store the frame width and height in a pair of global variables
         if self.frame_width is None:
@@ -60,7 +58,7 @@ class SrObjectTracking(object):
             self.frame_width, self.frame_height = self.frame_size
 
         # Set a call back on mouse clicks on the image window
-        cv.SetMouseCallback(self.node_name, self.on_mouse_click, None)
+        cv2.setMouseCallback(self.node_name, self.on_mouse_click, None)
 
         # Process the tracking initializing the algorithm
         self.tracking()
@@ -99,7 +97,6 @@ class SrObjectTracking(object):
         """
         try:
             cv_image = self.bridge.imgmsg_to_cv2(ros_image, "bgr8")
-            # cv_image = self.bridge.imgmsg_to_cv2(data, desired_encoding='passthrough')
             return np.array(cv_image, dtype=np.uint8)
         except CvBridgeError, e:
             print e
