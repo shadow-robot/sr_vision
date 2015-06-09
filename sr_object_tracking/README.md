@@ -1,4 +1,4 @@
-#sr_object_tracking
+##sr_object_tracking
 
 This package contains a base class that init the tracking node, let the user select a region of interest (drag&drop) and launch the tracking. The implementation specific classes contain the different tracking algorithms (only Camshit for now).
 
@@ -8,47 +8,56 @@ Furthermore, Camshift is based upon OpenCV (see below for the installation instu
 
 
 
-### OpenCV INSTALLATION              
+#### OpenCV INSTALLATION 
 
-#### Ubuntu 12.04
+To install OpenCV 2.4.9 on the Ubuntu 14.04 operating system, first install a developer environment to build OpenCV.
 
-To install OpenCV 2.4.2 or 2.4.3 on the Ubuntu 12.04 operating system, first install a developer environment to build OpenCV.
-`sudo apt-get -y install build-essential cmake pkg-config`
-Install Image I/O libraries
-`sudo apt-get -y install libjpeg62-dev`
-`sudo apt-get -y install libtiff4-dev libjasper-dev`
-Install the GTK dev library
-`sudo apt-get -y install  libgtk2.0-dev`
-Install Video I/O libraries
-`sudo apt-get -y install libavcodec-dev libavformat-dev libswscale-dev libv4l-dev`
+##### Installation
 
-Optional - install support for Firewire video cameras
-`sudo apt-get -y install libdc1394-22-dev`
-Optional - install video streaming libraries
-`sudo apt-get -y install libxine-dev libgstreamer0.10-dev libgstreamer-plugins-base0.10-dev` 
-Optional - install the Python development environment and the Python Numerical library
-`sudo apt-get -y install python-dev python-numpy`
-Optional - install the parallel code processing library (the Intel tbb library)
-`sudo apt-get -y install libtbb-dev`
-Optional - install the Qt dev library
-`sudo apt-get -y install libqt4-dev`
+Install dependencies(support for reading and writing image files, drawing on the screen, some needed tools, other libraries, etc…)
 
-Now download OpenCV 2.4 to wherever you want to compile the source.
-`mkdir xxx`
-`cd xxx` 
-`wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.2/Op...`
-or 
-`wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.3/Op...`
-`tar -xvf OpenCV-2.4.*.tar.bz2`
-Create and build directory and onfigure OpenCV with cmake. Don't forget the .. part at the end of cmake cmd 
-`cd OpenCV-2.4.*`
-`mkdir build`
-`cd build`
-`cmake -D CMAKE_BUILD_TYPE=RELEASE -D CMAKE_INSTALL_PREFIX=/usr/local`
-`-D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON` 
-`-D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON `
-`-D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON ..`
-Now compile it
-`make`
-And finally install OpenCV
-`sudo make install`
+```sudo apt-get install build-essential libgtk2.0-dev libjpeg-dev libtiff4-dev libjasper-dev libopenexr-dev cmake python-dev python-numpy python-tk libtbb-dev libeigen3-dev yasm libfaac-dev libopencore-amrnb-dev libopencore-amrwb-dev libtheora-dev libvorbis-dev libxvidcore-dev libx264-dev libqt4-dev libqt4-opengl-dev sphinx-common texlive-latex-extra libv4l-dev libdc1394-22-dev libavcodec-dev libavformat-dev libswscale-dev default-jdk ant libvtk5-qt4-dev```
+
+Get the OpenCV 2.4.9 source code:
+
+```wget http://sourceforge.net/projects/opencvlibrary/files/opencv-unix/2.4.9/opencv-2.4.9.zip
+unzip opencv-2.4.9.zip
+cd opencv-2.4.9```
+
+Generate the Makefile by using cmake:
+
+```mkdir build
+cd build
+cmake -D WITH_TBB=ON -D BUILD_NEW_PYTHON_SUPPORT=ON -D WITH_V4L=ON -D INSTALL_C_EXAMPLES=ON -D INSTALL_PYTHON_EXAMPLES=ON -D BUILD_EXAMPLES=ON -D WITH_QT=ON -D WITH_OPENGL=ON -D WITH_VTK=ON ..```
+
+Compile and install OpenCV 2.4.9:
+```make
+sudo make install```
+
+
+##### Configuration
+
+OpenCV has to be configured. First, open the opencv.conf file with the following code:
+
+`sudo gedit /etc/ld.so.conf.d/opencv.conf`
+
+Add the following line at the end of the file(it may be an empty file, that is ok) and then save it:
+
+`/usr/local/lib`
+
+Run the following code to configure the library:
+
+`sudo ldconfig`
+
+Open another file:
+
+`sudo gedit /etc/bash.bashrc`
+
+Add these two lines at the end of the file and save it:
+
+```PKG_CONFIG_PATH=$PKG_CONFIG_PATH:/usr/local/lib/pkgconfig
+export PKG_CONFIG_PATH```
+
+Finally, close the console and open a new one, restart the computer or logout and then login again. OpenCV will not work correctly until doing this.
+
+
