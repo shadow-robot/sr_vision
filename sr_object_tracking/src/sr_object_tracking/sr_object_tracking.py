@@ -2,9 +2,12 @@
 
 import rospy
 import cv2
-from sensor_msgs.msg import Image, RegionOfInterest
+from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
+
+
+import sensor_msgs.point_cloud2 as pc2
 
 
 class SrObjectTracking(object):
@@ -18,12 +21,15 @@ class SrObjectTracking(object):
         # Create the cv_bridge object
         self.bridge = CvBridge()
 
-        # Initialize the Region of Interest and its publisher
-        self.ROI = RegionOfInterest()
+        # Initialize the Region of Interest and its publishers
+        #self.roi = RegionOfInterest()
+        #self.roi_pc = PointCloud2()
         self.roi_pub = rospy.Publisher("/roi", RegionOfInterest, queue_size=1)
+        self.roi_pc_pub = rospy.Publisher("/roi_pc", PointCloud2, queue_size=1)
 
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
+        self.point_cloud = rospy.Subscriber("/camera/depth_registered/points", PointCloud2, self.pc_callback)
 
         # Initialize a number of global variables
         self.cv_window_name = None
@@ -38,6 +44,10 @@ class SrObjectTracking(object):
         self.frame_height = None
         self.frame_size = None
         self.vis = None
+
+        # We need cv_bridge to convert the ROS depth image to an OpenCV array
+        self.cv_bridge = CvBridge()
+        self.depth_array = None
 
     def image_callback(self, data):
         """
@@ -63,7 +73,6 @@ class SrObjectTracking(object):
 
         # Process the tracking initializing the algorithm
         self.tracking()
-        # self.publish_roi()
 
         cv2.imshow(self.cv_window_name, self.vis)
         cv2.waitKey(5)
@@ -102,9 +111,9 @@ class SrObjectTracking(object):
         except CvBridgeError, e:
             print e
 
-    def publish_roi(self):
+    def pc_callback(self,data):
         """
-        Publish the region of interest
+        Publish the region of interest (2D box and 3D PointCloud)
         """
         if not self.drag_start:
             if self.track_box is not None:
@@ -120,6 +129,7 @@ class SrObjectTracking(object):
         roi_box[0] = max(0, roi_box[0])
         roi_box[1] = max(0, roi_box[1])
 
+        # Publish the ROI as a box (2D)
         try:
             roi = RegionOfInterest()
             roi.x_offset = int(roi_box[0])
@@ -129,6 +139,21 @@ class SrObjectTracking(object):
             self.roi_pub.publish(roi)
         except:
             rospy.loginfo("Publishing ROI failed")
+
+        # Publish the ROI as a PointCloud (3D)
+        roi_pts = []
+        for x in xrange(roi.x_offset, roi.x_offset+roi.width):
+            for y in xrange(roi.y_offset, roi.y_offset+roi.height):
+                gen = pc2.read_points(data, skip_nans=True, uvs=[(x,y)])
+                try:
+                    int_data = list(gen)
+                    for pt in int_data:
+                        roi_pts.append(pt)
+                except:
+                    pass
+
+        roi_pc = pc2.create_cloud(data.header, data.fields, roi_pts)
+        self.roi_pc_pub.publish(roi_pc)
 
 
 def box_to_rect(roi):
