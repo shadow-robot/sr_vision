@@ -18,7 +18,7 @@ class TestBlobsSegmentation(unittest.TestCase):
         """
         self.datasets = [BasicTest(), NoiseTest()]
         self.algo = BlobsSegmentation
-        
+
         for dataset in self.datasets:
             images = dataset.np_img
             for img in images:
