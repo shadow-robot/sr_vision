@@ -7,8 +7,6 @@ project(sr_object_tracking)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   rospy
-  sensor_msgs
-  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -83,7 +81,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES object_tracking
-#  CATKIN_DEPENDS cv_bridge freenect opencv3 rospy sensor_msgs std_msgs
+#  CATKIN_DEPENDS cv_bridge rospy 
 #  DEPENDS system_lib
 )
 

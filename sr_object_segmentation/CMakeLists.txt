@@ -5,12 +5,12 @@ project(sr_object_segmentation)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 
-find_package(catkin REQUIRED COMPONENTS cv_bridge dynamic_reconfigure message_generation image_transport)
+find_package(catkin REQUIRED COMPONENTS rosunit)
 
-find_package(OpenCV REQUIRED)
-if (OpenCV_VERSION VERSION_EQUAL "3")
-  add_definitions("-DOPENCV3=1")
-endif()
+#find_package(OpenCV REQUIRED)
+#if (OpenCV_VERSION VERSION_EQUAL "3")
+#  add_definitions("-DOPENCV3=1")
+#endif()
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -84,7 +84,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES object_segmentation
-#  CATKIN_DEPENDS freenect
+#  CATKIN_DEPENDS rosunit
 #  DEPENDS system_lib
 )
 

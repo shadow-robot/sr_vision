@@ -4,11 +4,8 @@ project(sr_benchmarking)
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  rospy
-  sensor_msgs
-  std_msgs
-)
+#find_package(catkin REQUIRED COMPONENTS
+#)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -82,7 +79,7 @@ catkin_python_setup()
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES benchmarking
-#  CATKIN_DEPENDS cv_bridge freenect opencv3 rospy sensor_msgs std_msgs
+#  CATKIN_DEPENDS 
 #  DEPENDS system_lib
 )
 

@@ -8,7 +8,13 @@ Furthermore, Camshift is based upon OpenCV (see below for the installation instu
 
 
 
-#### OpenCV INSTALLATION 
+### OpenCV INSTALLATION 
+
+#### Default version from the repository
+
+`sudo apt-get install libopencv-dev python-opencv`
+
+#### From source
 
 To install OpenCV 2.4.9 on the Ubuntu 14.04 operating system, first install a developer environment to build OpenCV.
 
