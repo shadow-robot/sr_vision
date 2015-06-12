@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>sr_displaying</name>
+  <name>sr_gui_servoing</name>
   <version>0.0.1</version>
-  <description>The sr_displaying package</description>
+  <description>The sr_gui_servoing package</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
   <license>Private</license>
   <author email="marine.charnet@gmail.com">Marine Charnet</author>
