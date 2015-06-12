@@ -6,7 +6,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest
 
-from sr_visualization.visualization import DisplayImage
+from sr_displaying.displaying import DisplayImage
 from sr_object_tracking.camshift import CamshiftTracking
 
 
