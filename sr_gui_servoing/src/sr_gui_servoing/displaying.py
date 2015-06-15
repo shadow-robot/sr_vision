@@ -1,15 +1,31 @@
 #!/usr/bin/env python
 
+import sys
 import cv2
 import numpy as np
+import rospy
+
+from sensor_msgs.msg import RegionOfInterest, Image
+from cv_bridge import CvBridge, CvBridgeError
+from sr_gui_servoing.msg import tracking_parameters
 
 
 class DisplayImage(object):
     """
     Visualization class (using OpenCV tools)
     """
-    def __init__(self):
+    def __init__(self, node_name):
+
+        rospy.init_node(node_name)
         self.cv_window_name = 'Video'
+
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
+        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
+
+        self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
+        self.param_pub = rospy.Publisher('/roi/parameters', tracking_parameters, queue_size=1)
+
+        self.bridge = CvBridge()
 
         self.hist = None
         self.drag_start = None
@@ -25,11 +41,10 @@ class DisplayImage(object):
         self.smin = 85
         self.threshold = 50
 
-    def display(self, algo):
+    def display(self, data):
         """
         Display the main window as well as the parameters choice window and the histogram one (Camshift backrpojection).
-        Draw an ellipse around the tracking box
-        @param algo - Tracking algorithm (Camshift for now)
+        Draw a rectangle around the tracking box
         """
         # Create the main display window and the histogram one
         cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
@@ -45,24 +60,77 @@ class DisplayImage(object):
         cv2.createTrackbar("Saturation", "Parameters", self.smin, 150, self.set_smin)
         cv2.createTrackbar("Threshold", "Parameters", self.threshold, 255, self.set_threshold)
 
-        # Update the variables according to the tracking
-        self.frame = algo.vis
-        self.frame_size = (self.frame.shape[1], self.frame.shape[0])
-        self.frame_width, self.frame_height = self.frame_size
-        self.track_box = algo.track_box
-        self.hist = algo.hist
-        if self.hist is not None:
-            self.show_hist()
+        # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
+        self.frame = self.convert_image(data, "bgr8")
+        self.vis = self.frame.copy()
 
-        # Draw the ellipse if possible
         try:
-            cv2.ellipse(self.frame, self.track_box, (0, 0, 255), 2)
+            # Seems better with a blur
+            self.vis = cv2.blur(self.vis, (5, 5))
+            hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
+
+            mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
+            if self.selection != (0, 0, 0, 0):
+                x0, y0, x1, y1 = self.selection
+                self.track_window = (x0, y0, x1 - x0, y1 - y0)
+                hsv_roi = hsv[y0:y1, x0:x1]
+                mask_roi = mask[y0:y1, x0:x1]
+                hist = cv2.calcHist([hsv_roi], [0], mask_roi, [16], [0, 180])
+                cv2.normalize(hist, hist, 0, 255, cv2.NORM_MINMAX)
+                self.hist = hist.reshape(-1)
+                self.show_hist()
+
+                vis_roi = self.vis[y0:y1, x0:x1]
+                cv2.bitwise_not(vis_roi, vis_roi)
+                self.vis[mask == 0] = 0
+        except:
+            pass
+
+        self.publish_parameters()
+        self.publish_selectbox()
+
+        # Draw the tracking box, if possible
+        try:
+            cv2.rectangle(self.vis, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
         except:
             pass
 
         # Display the main window
-        cv2.imshow(self.cv_window_name, self.frame)
+        cv2.imshow(self.cv_window_name, self.vis)
         cv2.waitKey(1)
+
+    def roi_callback(self, data):
+
+        pt1 = (data.x_offset, data.y_offset)
+        pt2 = (data.x_offset + data.width, data.y_offset + data.height)
+        self.track_box = (pt1, pt2)
+
+    def publish_selectbox(self):
+        """
+        Publish the region of interest as a RegionOfInterest message (2D box)
+        """
+        roi_box = box_to_rect(self.selection)
+
+        # Watch out for negative offsets
+        roi_box[0] = max(0, roi_box[0])
+        roi_box[1] = max(0, roi_box[1])
+
+        try:
+            roi = RegionOfInterest()
+            roi.x_offset = int(roi_box[0])
+            roi.y_offset = int(roi_box[1])
+            roi.width = int(roi_box[2])
+            roi.height = int(roi_box[3])
+            self.selection_pub.publish(roi)
+        except:
+            rospy.loginfo("Publishing ROI failed")
+
+    def publish_parameters(self):
+        param = tracking_parameters()
+        param.smin = self.smin
+        param.threshold = self.threshold
+        param.tracking_state = self.tracking_state
+        self.param_pub.publish(param)
 
     def on_mouse_click(self, event, x, y, flags, param):
         """
@@ -88,6 +156,17 @@ class DisplayImage(object):
                     self.tracking_state = 1
                     self.selection = None
 
+    def convert_image(self, ros_image, encode):
+        """
+        Use cv_bridge() to convert the ROS image to OpenCV format
+        @param ros_image - image in ROS format, to be converted in OpenCV format
+        """
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(ros_image, encode)
+            return cv_image
+        except CvBridgeError, e:
+            print e
+
     def show_hist(self):
         """
         Show the color histogram of the selected region
@@ -108,3 +187,35 @@ class DisplayImage(object):
 
     def set_threshold(self, pos):
         self.threshold = pos
+
+
+def box_to_rect(roi):
+    """
+    Convert a region of interest as box format into a rect format
+    @param roi - region of interest (box format)
+    @return - region of interest (rect format)
+    """
+    try:
+        if len(roi) == 3:
+            (center, size, angle) = roi
+            pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
+            pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
+            rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
+        else:
+            rect = list(roi)
+    except:
+        return [0, 0, 0, 0]
+    return rect
+
+
+def main(args):
+    try:
+        DisplayImage("sr_gui_servoing")
+        rospy.spin()
+    except KeyboardInterrupt:
+        print "Shutting down sr_gui_servoing node."
+        cv2.destroyAllWindows()
+
+
+if __name__ == '__main__':
+    main(sys.argv)

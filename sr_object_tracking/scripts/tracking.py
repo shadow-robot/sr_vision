@@ -3,10 +3,8 @@ import sys
 import rospy
 import cv2
 from cv_bridge import CvBridge, CvBridgeError
-import numpy as np
-from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest
 
-from sr_gui_servoing.displaying import DisplayImage
+from sensor_msgs.msg import Image, PointCloud, RegionOfInterest
 from sr_object_tracking.camshift import CamshiftTracking
 
 
@@ -16,55 +14,43 @@ class VisionProcess(object):
     Segment it, track an object of interest and finally display the result.
     """
 
-    def __init__(self, node_name, display=True):
-        """
-        Initialize the node
-        @param display - Boolean controlling the display or not of the image
-        """
+    def __init__(self, node_name):
         rospy.init_node(node_name)
-        self.display = display
 
         # Create the cv_bridge object
         self.bridge = CvBridge()
 
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
+        self.selection_sub = rospy.Subscriber("/roi/selection", RegionOfInterest, self.selection_callback)
 
         # Initialize the Region of Interest publishers
-        self.roi_pub = rospy.Publisher("/roi", RegionOfInterest, queue_size=1)
-        # self.roi_pc_pub = rospy.Publisher("/roi_pc", PointCloud2, queue_size=1)
+        self.roi_pub = rospy.Publisher("/roi/track_box", RegionOfInterest, queue_size=1)
 
         # Initialize a number of global parameters
         self.selection = None
         self.tracking_state = 0
         self.frame = None
-
-        # Initialize the visualization object
-        if self.display:
-            self.display_window = DisplayImage()
-            self.smin = self.display_window.smin
-            self.threshold = self.display_window.threshold
-        else:
-            self.smin = 85
-            self.threshold = 50
+        self.depth_image = None
 
         # Initialize the tracking object
         self.track_algo = CamshiftTracking()
 
     def image_callback(self, data):
         """
-        Launch the segmentation and the tracking, as well as the visualization if required.
+        Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
         """
-        # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
-        self.frame = self.convert_image(data)
+        self.frame = self.convert_image(data, "bgr8")
 
+    def selection_callback(self, data):
+        """
+        Get the ROI box (selected or segmented) and process the tracking
+        """
         # Process the tracking
-        self.track_algo.tracking(self.frame, self.selection, self.tracking_state, self.smin, self.threshold)
-
-        if self.display:
-            self.show()
+        self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
 
         try:
+            self.track_algo.tracking(self.frame, self.selection)
             self.publish_roi()
         except:
             pass
@@ -89,27 +75,14 @@ class VisionProcess(object):
         except:
             rospy.loginfo("Publishing ROI failed")
 
-    def show(self):
-        """
-        In the case of display required, update the different variables needed for the tracking and display the window
-        """
-        # Update the variables
-        self.selection = self.display_window.selection
-        self.smin = self.display_window.smin
-        self.threshold = self.display_window.threshold
-        self.tracking_state = self.display_window.tracking_state
-
-        # Show
-        self.display_window.display(self.track_algo)
-
-    def convert_image(self, ros_image):
+    def convert_image(self, ros_image, encode):
         """
         Use cv_bridge() to convert the ROS image to OpenCV format
         @param ros_image - image in ROS format, to be converted in OpenCV format
         """
         try:
-            cv_image = self.bridge.imgmsg_to_cv2(ros_image, "bgr8")
-            return np.array(cv_image, dtype=np.uint8)
+            cv_image = self.bridge.imgmsg_to_cv2(ros_image, encode)
+            return cv_image
         except CvBridgeError, e:
             print e
 
