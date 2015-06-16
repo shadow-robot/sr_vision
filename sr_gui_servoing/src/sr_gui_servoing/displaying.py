@@ -4,16 +4,17 @@ import sys
 import cv2
 import numpy as np
 import rospy
+from cv_bridge import CvBridge, CvBridgeError
 
 from sensor_msgs.msg import RegionOfInterest, Image
-from cv_bridge import CvBridge, CvBridgeError
-from sr_gui_servoing.msg import tracking_parameters
+from sr_vision_msgs.msg import tracking_parameters
 
 
 class DisplayImage(object):
     """
     Visualization class (using OpenCV tools)
     """
+
     def __init__(self, node_name):
 
         rospy.init_node(node_name)
@@ -31,11 +32,13 @@ class DisplayImage(object):
         self.drag_start = None
         self.track_box = None
         self.tracking_state = 0
+        self.track_window = None
         self.selection = None
         self.frame = None
         self.frame_width = None
         self.frame_height = None
         self.frame_size = None
+        self.vis = None
 
         # Minimum saturation of the tracked color in HSV space, and a threshold on the backprojection probability image
         self.smin = 85
