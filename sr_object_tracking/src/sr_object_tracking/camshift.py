@@ -2,11 +2,10 @@
 
 import cv2
 import numpy as np
-import rospy
-from sr_gui_servoing.msg import tracking_parameters
+from sr_object_tracking import SrObjectTracking
 
 
-class CamshiftTracking(object):
+class CamshiftTracking(SrObjectTracking):
     """
     Tracking based upon the CamShift algorithm, from the OpenCV library
     """
@@ -15,7 +14,9 @@ class CamshiftTracking(object):
         """
         Initialize the CamShift segmentation object
         """
-        self.name = 'Camshift'
+
+        SrObjectTracking.__init__(self)
+        '''
 
         # Initialize a number of global variables
         self.smin = 85
@@ -31,14 +32,7 @@ class CamshiftTracking(object):
         self.track_box = None
         self.track_window = None
         self.hist = None
-
-    def param_callback(self, data):
-        """
-        Update several algorithm parameters that could be changed by the user
-        """
-        self.smin = data.smin
-        self.threshold = data.threshold
-        self.tracking_state = data.tracking_state
+        '''
 
     def tracking(self, frame, selection):
         """
@@ -46,7 +40,6 @@ class CamshiftTracking(object):
         @param frame - Image in a numpy format
         @param selection - region of interest box selected by the user
         """
-
         self.selection = selection
         self.frame = frame
         self.vis = self.frame.copy()
@@ -75,3 +68,5 @@ class CamshiftTracking(object):
             nb_iter = cv2.meanShift(prob, self.track_window, term_crit)[0]
             if nb_iter != 0:
                 self.track_box, self.track_window = cv2.CamShift(prob, self.track_window, term_crit)
+
+        self.publish_roi()
