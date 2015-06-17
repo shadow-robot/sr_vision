@@ -4,10 +4,10 @@ import sys
 import cv2
 import numpy as np
 import rospy
+from cv_bridge import CvBridge, CvBridgeError
 
 from sensor_msgs.msg import RegionOfInterest, Image
-from cv_bridge import CvBridge, CvBridgeError
-from sr_gui_servoing.msg import tracking_parameters
+from sr_vision_msgs.msg import tracking_parameters
 
 
 class DisplayImage(object):

@@ -1,0 +1,12 @@
+# Goal
+sensor_msgs/PointCloud2 point_cloud
+bool mirror_mesh
+---
+# Result
+# Not defined in the documentation. Nice to have.
+pcl_msgs/PolygonMesh pcl_mesh
+# Officially defined in the documentation.
+shape_msgs/Mesh shape_mesh
+---
+# Feedback
+# Nothing

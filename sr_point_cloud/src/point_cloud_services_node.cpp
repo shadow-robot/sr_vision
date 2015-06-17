@@ -22,8 +22,8 @@
 #include <pcl/filters/voxel_grid.h>
 
 #include <sensor_msgs/PointCloud2.h>
-#include "sr_grasp_msgs/PclTransform.h"
-#include "sr_grasp_msgs/PclFilter.h"
+#include "sr_vision_msgs/PclTransform.h"
+#include "sr_vision_msgs/PclFilter.h"
 
 namespace sr_point_cloud {
 
@@ -63,7 +63,7 @@ protected:
 
 
     bool
-    transform_cloud_(sr_grasp_msgs::PclTransform::Request  &req, sr_grasp_msgs::PclTransform::Response &res)
+    transform_cloud_(sr_vision_msgs::PclTransform::Request  &req, sr_vision_msgs::PclTransform::Response &res)
     {
       // If an output frame has been specified, we convert the cloud to that frame
       if (!req.output_frame_id.empty())
@@ -86,7 +86,7 @@ protected:
     }
 
     bool
-    filter_cloud_(sr_grasp_msgs::PclFilter::Request  &req, sr_grasp_msgs::PclFilter::Response &res)
+    filter_cloud_(sr_vision_msgs::PclFilter::Request  &req, sr_vision_msgs::PclFilter::Response &res)
     {
       Cloud downsampled_cloud;
       CloudPtr input_cloud (new Cloud);

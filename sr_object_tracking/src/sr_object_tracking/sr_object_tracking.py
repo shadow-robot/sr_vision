@@ -49,9 +49,6 @@ class SrObjectTracking(object):
         """
         self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
 
-    def camera_cloud_callback(self, data):
-        self.camera_cloud = data
-
     def param_callback(self, data):
         """
         Update several algorithm parameters that could be changed by the user
