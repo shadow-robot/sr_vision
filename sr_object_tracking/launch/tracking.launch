@@ -1,5 +1,6 @@
 <launch>
-<include file="$(find freenect_launch)/launch/freenect.launch"/>
-<node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
-<node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
+  <include file="$(find freenect_launch)/launch/freenect.launch"/>
+  <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
+  <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
+  <node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  />
 </launch>
