@@ -16,23 +16,6 @@ class CamshiftTracking(SrObjectTracking):
         """
 
         SrObjectTracking.__init__(self)
-        '''
-
-        # Initialize a number of global variables
-        self.smin = 85
-        self.threshold = 50
-        self.tracking_state = 0
-
-        # Subscribe to the parameters topic, from gui_servoing
-        self.param_sub = rospy.Subscriber("/roi/parameters", tracking_parameters, self.param_callback)
-
-        self.selection = None
-        self.frame = None
-        self.vis = None
-        self.track_box = None
-        self.track_window = None
-        self.hist = None
-        '''
 
     def tracking(self, frame, selection):
         """
