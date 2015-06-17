@@ -1,135 +1,75 @@
 #!/usr/bin/env python
-
 import rospy
-import cv2
-from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest
+
 from cv_bridge import CvBridge, CvBridgeError
-import numpy as np
 
-
-import sensor_msgs.point_cloud2 as pc2
+from sr_gui_servoing.msg import tracking_parameters
+from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest, PointField
 
 
 class SrObjectTracking(object):
     """
-    Track a RegionOfInterest (ROI), selected with mouse, from video camera.
+    Base class for the tracking.
     """
 
-    def __init__(self, node_name):
-        self.node_name = node_name
+    def __init__(self):
 
         # Create the cv_bridge object
         self.bridge = CvBridge()
 
-        # Initialize the Region of Interest and its publishers
-        #self.roi = RegionOfInterest()
-        #self.roi_pc = PointCloud2()
-        self.roi_pub = rospy.Publisher("/roi", RegionOfInterest, queue_size=1)
-        self.roi_pc_pub = rospy.Publisher("/roi_pc", PointCloud2, queue_size=1)
-
-        # Subscribe to the image topic and set the appropriate callback
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
-        self.point_cloud = rospy.Subscriber("/camera/depth_registered/points", PointCloud2, self.pc_callback)
-
         # Initialize a number of global variables
-        self.cv_window_name = None
-        self.hist = None
-        self.selection = None
-        self.drag_start = None
+        self.smin = 85
+        self.threshold = 50
         self.track_box = None
         self.track_window = None
         self.tracking_state = 0
+        self.selection = None
         self.frame = None
-        self.frame_width = None
-        self.frame_height = None
-        self.frame_size = None
+        self.depth_image = None
         self.vis = None
+        self.hist = None
 
-        # We need cv_bridge to convert the ROS depth image to an OpenCV array
-        self.cv_bridge = CvBridge()
-        self.depth_array = None
+        # Subscribe to the image topic and set the appropriate callback
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
+        self.selection_sub = rospy.Subscriber("/roi/selection", RegionOfInterest, self.selection_callback)
+        self.param_sub = rospy.Subscriber("/roi/parameters", tracking_parameters, self.param_callback)
+
+        # Initialize the Region of Interest publishers
+        self.roi_pub = rospy.Publisher("/roi/track_box", RegionOfInterest, queue_size=1)
 
     def image_callback(self, data):
         """
-        Process the image from video camera (Freenect topic) in order to track a ROI, and show it.
+        Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
         """
+        self.frame = self.convert_image(data, "bgr8")
 
-        # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
-        self.frame = self.convert_image(data)
-
-        # Create the main display window and the histogram one
-        self.cv_window_name = self.node_name
-        cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
-        cv2.namedWindow('Histogram', cv2.CV_WINDOW_AUTOSIZE)
-        cv2.moveWindow("Histogram", 700, 20)
-
-        # Store the frame width and height in a pair of global variables
-        if self.frame_width is None:
-            self.frame_size = (self.frame.shape[1], self.frame.shape[0])
-            self.frame_width, self.frame_height = self.frame_size
-
-        # Set a call back on mouse clicks on the image window
-        cv2.setMouseCallback(self.node_name, self.on_mouse_click, None)
-
-        # Process the tracking initializing the algorithm
-        self.tracking()
-
-        cv2.imshow(self.cv_window_name, self.vis)
-        cv2.waitKey(5)
-
-    def on_mouse_click(self, event, x, y, flags, param):
+    def selection_callback(self, data):
         """
-        Select a ROI using the dragging
+        Get the ROI box (selected or segmented)
         """
-        x, y = np.int16([x, y])
-        if event == cv2.EVENT_LBUTTONDOWN:
-            self.drag_start = (x, y)
-            self.tracking_state = 0
-        if self.drag_start:
-            if flags & cv2.EVENT_FLAG_LBUTTON:
-                h, w = self.frame.shape[:2]
-                xo, yo = self.drag_start
-                x0, y0 = np.maximum(0, np.minimum([xo, yo], [x, y]))
-                x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
-                self.selection = None
-                if x1 - x0 > 0 and y1 - y0 > 0:
-                    self.selection = (x0, y0, x1, y1)
+        self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
 
-            else:
-                self.drag_start = None
-                if self.selection is not None:
-                    self.tracking_state = 1
+    def camera_cloud_callback(self, data):
+        self.camera_cloud = data
 
-    def convert_image(self, ros_image):
+    def param_callback(self, data):
         """
-        Use cv_bridge() to convert the ROS image to OpenCV format
-        @param ros_image - image in ROS format, to be converted in OpenCV format
+        Update several algorithm parameters that could be changed by the user
         """
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(ros_image, "bgr8")
-            return np.array(cv_image, dtype=np.uint8)
-        except CvBridgeError, e:
-            print e
+        self.smin = data.smin
+        self.threshold = data.threshold
+        self.tracking_state = data.tracking_state
 
-    def pc_callback(self,data):
+    def publish_roi(self):
         """
-        Publish the region of interest (2D box and 3D PointCloud)
+        Publish the region of interest as a RegionOfInterest message (2D box)
         """
-        if not self.drag_start:
-            if self.track_box is not None:
-                roi_box = self.track_box
-            else:
-                return
-        try:
-            roi_box = box_to_rect(roi_box)
-        except:
-            return
+        roi_box = box_to_rect(self.track_box)
 
         # Watch out for negative offsets
         roi_box[0] = max(0, roi_box[0])
         roi_box[1] = max(0, roi_box[1])
 
-        # Publish the ROI as a box (2D)
         try:
             roi = RegionOfInterest()
             roi.x_offset = int(roi_box[0])
@@ -140,20 +80,16 @@ class SrObjectTracking(object):
         except:
             rospy.loginfo("Publishing ROI failed")
 
-        # Publish the ROI as a PointCloud (3D)
-        roi_pts = []
-        for x in xrange(roi.x_offset, roi.x_offset+roi.width):
-            for y in xrange(roi.y_offset, roi.y_offset+roi.height):
-                gen = pc2.read_points(data, skip_nans=True, uvs=[(x,y)])
-                try:
-                    int_data = list(gen)
-                    for pt in int_data:
-                        roi_pts.append(pt)
-                except:
-                    pass
-
-        roi_pc = pc2.create_cloud(data.header, data.fields, roi_pts)
-        self.roi_pc_pub.publish(roi_pc)
+    def convert_image(self, ros_image, encode):
+        """
+        Use cv_bridge() to convert the ROS image to OpenCV format
+        @param ros_image - image in ROS format, to be converted in OpenCV format
+        """
+        try:
+            cv_image = self.bridge.imgmsg_to_cv2(ros_image, encode)
+            return cv_image
+        except CvBridgeError, e:
+            print e
 
 
 def box_to_rect(roi):
@@ -174,19 +110,3 @@ def box_to_rect(roi):
         return [0, 0, 0, 0]
 
     return rect
-
-
-def run(algo):
-    """
-    Initialize the tracking node and process the tracking
-    @param algo - Algorithm to be used for tracking
-    """
-    try:
-        node_name = "tracking"
-        rospy.init_node(node_name)
-        rospy.loginfo("Starting node " + str(node_name))
-        algo()
-        rospy.spin()
-    except KeyboardInterrupt:
-        print "Shutting down tracking node."
-        cv2.destroyAllWindows()

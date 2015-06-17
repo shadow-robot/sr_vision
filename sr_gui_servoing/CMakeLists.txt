@@ -1,14 +1,11 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sr_object_tracking)
+project(sr_gui_servoing)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
-find_package(catkin REQUIRED COMPONENTS
-  cv_bridge
-  rospy
-)
-
+find_package(catkin REQUIRED OpenCV std_msgs message_generation)
+#find_package(OpenCV REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -44,11 +41,10 @@ catkin_python_setup()
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-# add_message_files(
-#   FILES
-#   Message1.msg
-#   Message2.msg
-# )
+add_message_files(
+  FILES
+  tracking_parameters.msg
+)
 
 ## Generate services in the 'srv' folder
 # add_service_files(
@@ -65,10 +61,10 @@ catkin_python_setup()
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   sensor_msgs#   std_msgs
-# )
+generate_messages(
+  DEPENDENCIES
+  std_msgs  # Or other packages containing msgs
+)
 
 ###################################
 ## catkin specific configuration ##
@@ -81,8 +77,8 @@ catkin_python_setup()
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES object_tracking
-#  CATKIN_DEPENDS cv_bridge rospy 
+#  LIBRARIES sr_gui_servoing
+#  CATKIN_DEPENDS other_catkin_pkg message_runtime
 #  DEPENDS system_lib
 )
 
@@ -93,24 +89,21 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-#include_directories(
-#  ${catkin_INCLUDE_DIRS}
-#)
 
 ## Declare a cpp library
-# add_library(object_tracking
-#   src/${PROJECT_NAME}/object_tracking.cpp
+# add_library(sr_gui_servoing
+#   src/${PROJECT_NAME}/sr_gui_servoing.cpp
 # )
 
 ## Declare a cpp executable
-# add_executable(object_tracking_node src/object_tracking_node.cpp)
+# add_executable(sr_gui_servoing_node src/sr_gui_servoing_node.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(object_tracking_node object_tracking_generate_messages_cpp)
+# add_dependencies(sr_gui_servoing_node sr_gui_servoing_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(object_tracking_node
+# target_link_libraries(sr_gui_servoing_node
 #   ${catkin_LIBRARIES}
 # )
 
@@ -124,12 +117,12 @@ catkin_package(
 ## Mark executable scripts (Python etc.) for installation
 ## in contrast to setup.py, you can choose the destination
 # install(PROGRAMS
-#   scripts/tracking
+#   scripts/my_python_script
 #   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS object_tracking object_tracking_node
+# install(TARGETS sr_gui_servoing sr_gui_servoing_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -143,17 +136,18 @@ catkin_package(
 # )
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
-install(FILES
-  tracking.launch
-  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
-)
+# install(FILES
+#   # myfile1
+#   # myfile2
+#   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
+# )
 
 #############
 ## Testing ##
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_object_tracking.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_sr_gui_servoing.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

@@ -1,11 +1,12 @@
 <?xml version="1.0"?>
 <package>
-  <name>sr_object_tracking</name>
+  <name>sr_gui_servoing</name>
   <version>0.0.1</version>
-  <description>The object_tracking package</description>
+  <description>The sr_gui_servoing package</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
   <license>Private</license>
   <author email="marine.charnet@gmail.com">Marine Charnet</author>
+
 
   <!-- The *_depend tags are used to specify dependencies -->
   <!-- Dependencies can be catkin packages or system dependencies -->
@@ -19,14 +20,10 @@
   <!-- Use test_depend for packages you need only for testing: -->
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
-
-  <build_depend>cv_bridge</build_depend>
-  <build_depend>rospy</build_depend>
-
-  <run_depend>cv_bridge</run_depend>
-  <run_depend>rospy</run_depend>
-
-
+  <build_depend>opencv2</build_depend>
+  <build_depend>message_generation</build_depend>
+  <run_depend>opencv2</run_depend>
+  <run_depend>message_runtime</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

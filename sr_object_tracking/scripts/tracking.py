@@ -1,19 +1,23 @@
 #!/usr/bin/env python
 import sys
+import rospy
 
-from sr_object_tracking.sr_object_tracking import run
 from sr_object_tracking.camshift import CamshiftTracking
 
 
 def main(args):
-    """
-    Process the tracing with one of the available algorithms
-    """
     try:
-        algos = [CamshiftTracking]
-        run(algos[0])
-    except KeyboardInterrupt:
-        print "Shutting down tracking node."
+        rospy.init_node('sr_object_tracking')
+        node = CamshiftTracking()
+        while not rospy.is_shutdown():
+            try:
+                node.tracking(node.frame, node.selection)
+            except:
+                pass
+        rospy.spin()
+
+    except rospy.ROSInterruptException:
+        pass
 
 
 if __name__ == '__main__':
