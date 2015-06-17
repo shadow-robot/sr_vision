@@ -1,0 +1,4 @@
+sensor_msgs/PointCloud2 point_cloud
+string output_frame_id
+---
+sensor_msgs/PointCloud2 point_cloud

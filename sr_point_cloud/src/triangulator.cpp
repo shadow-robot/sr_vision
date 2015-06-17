@@ -34,8 +34,8 @@ Triangulator::Triangulator()
   pcl_output_pub_ = nh_.advertise<pcl_msgs::PolygonMesh>("output/pcl/mesh", 1);
   shape_output_pub_ = nh_.advertise<shape_msgs::Mesh>("output/shape/mesh", 1);
 
-  feedback_tri_.reset(new sr_grasp_msgs::TriangulateFeedback);
-  result_tri_.reset(new sr_grasp_msgs::TriangulateResult);
+  feedback_tri_.reset(new sr_vision_msgs::TriangulateFeedback);
+  result_tri_.reset(new sr_vision_msgs::TriangulateResult);
 
   as_tri_.start();
   ROS_INFO_STREAM("Action server " << action_name_ << " just started.");
@@ -90,7 +90,7 @@ void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::goal_cb_(const sr_grasp_msgs::TriangulateGoalConstPtr &goal)
+void Triangulator::goal_cb_(const sr_vision_msgs::TriangulateGoalConstPtr &goal)
 {
   // http://wiki.ros.org/hydro/Migration#PCL
   pcl::PCLPointCloud2 pcl_pc2;

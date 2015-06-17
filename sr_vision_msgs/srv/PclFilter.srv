@@ -1,0 +1,5 @@
+sensor_msgs/PointCloud2 point_cloud
+float64 downsampling_grid_size
+---
+sensor_msgs/PointCloud2 point_cloud
+
