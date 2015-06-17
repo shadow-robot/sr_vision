@@ -21,7 +21,11 @@
   <!--   <test_depend>gtest</test_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>opencv2</build_depend>
+  <build_depend>sr_vision_msgs</build_depend>
+  <build_depend>cv_bridge</build_depend>
   <run_depend>opencv2</run_depend>
+  <run_depend>sr_vision_msgs</run_depend>
+  <run_depend>cv_bridge</run_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->
