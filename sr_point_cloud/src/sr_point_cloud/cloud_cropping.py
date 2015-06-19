@@ -38,6 +38,12 @@ class PointCloudCropping(object):
             self.track_box = data
             self.tracking_state = 1
 
+        # Process the cropping if the track_box is initialized
+        try:
+            self.crop()
+        except:
+            pass
+
     def camera_cloud_callback(self, data):
         self.camera_cloud = data
 
@@ -139,13 +145,6 @@ def main(args):
     try:
         rospy.init_node('cloud_cropping')
         node = PointCloudCropping()
-        while not rospy.is_shutdown():
-            if node.tracking_state == 1:
-                try:
-                    node.crop()
-                    node.tracking_state = 0
-                except:
-                    pass
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down vision node."
