@@ -1,26 +1,16 @@
 #!/usr/bin/env python
 
-import ctypes
-import struct
 import rospy
 import sys
 
-from sensor_msgs.msg import PointCloud2, PointField, RegionOfInterest
-
-_DATATYPES = {}
-_DATATYPES[PointField.INT8] = ('b', 1)
-_DATATYPES[PointField.UINT8] = ('B', 1)
-_DATATYPES[PointField.INT16] = ('h', 2)
-_DATATYPES[PointField.UINT16] = ('H', 2)
-_DATATYPES[PointField.INT32] = ('i', 4)
-_DATATYPES[PointField.UINT32] = ('I', 4)
-_DATATYPES[PointField.FLOAT32] = ('f', 4)
-_DATATYPES[PointField.FLOAT64] = ('d', 8)
+from sensor_msgs.msg import PointCloud2, RegionOfInterest
+from sensor_msgs import point_cloud2
 
 
 class PointCloudCropping(object):
     """
-    Getting the whole PointCloud from the camera and the tracking box from the tracking node, process a crop to publish the ROI as a sensor_msgs/PointCloud2
+    Getting the whole PointCloud from the camera and the tracking box from the tracking node, process a crop to
+    publish the ROI as a sensor_msgs/PointCloud2
     """
 
     def __init__(self):
@@ -56,15 +46,13 @@ class PointCloudCropping(object):
         pts = [(x, y) for x in range(pt1[0], pt2[0]) for y in range(pt1[1], pt2[1])]
 
         roi_pts = []
-
         try:
-            gen = read_points(self.camera_cloud, pts=pts)
+            gen = point_cloud2.read_points(self.camera_cloud, uvs=pts)
             try:
                 roi_pts = list(gen)
             except:
                 pass
-
-            roi_pc = create_cloud(self.camera_cloud.header, self.camera_cloud.fields, roi_pts)
+            roi_pc = point_cloud2.create_cloud(self.camera_cloud.header, self.camera_cloud.fields, roi_pts)
             self.publish_cloud(roi_pc)
         except:
             pass
@@ -76,75 +64,10 @@ class PointCloudCropping(object):
             print 'Publishing roi_cloud failed'
 
 
-def read_points(cloud, pts):
-    """
-    Read points from a sensor_msgs/PointCloud2 message.
-
-    @param cloud - The point cloud to read from.
-    @param pts - Coordinates of the points to be returned in the roi_cloud
-    @return - Generator which yields a list of values for each point.
-    """
-    fmt = _get_struct_fmt(cloud.is_bigendian, cloud.fields, None)
-    unpack_from = struct.Struct(fmt).unpack_from
-
-    for u, v in pts:
-        p = unpack_from(cloud.data, (cloud.row_step * v) + (cloud.point_step * u))
-        yield p
-
-
-def create_cloud(header, fields, points):
-    """
-    Create a sensor_msgs/PointCloud2 message.
-
-    @param header - The point cloud header.
-    @param fields - The point cloud fields.
-    @param points - The point cloud points.
-    @return - The point cloud.
-    """
-
-    cloud_struct = struct.Struct(_get_struct_fmt(False, fields))
-
-    buff = ctypes.create_string_buffer(cloud_struct.size * len(points))
-
-    point_step, pack_into = cloud_struct.size, cloud_struct.pack_into
-    offset = 0
-    for p in points:
-        pack_into(buff, offset, *p)
-        offset += point_step
-
-    return PointCloud2(header=header,
-                       height=1,
-                       width=len(points),
-                       is_dense=False,
-                       is_bigendian=False,
-                       fields=fields,
-                       point_step=cloud_struct.size,
-                       row_step=cloud_struct.size * len(points),
-                       data=buff.raw)
-
-
-def _get_struct_fmt(is_bigendian, fields, field_names=None):
-    fmt = '>' if is_bigendian else '<'
-
-    offset = 0
-    for field in (f for f in sorted(fields, key=lambda f: f.offset) if field_names is None or f.name in field_names):
-        if offset < field.offset:
-            fmt += 'x' * (field.offset - offset)
-            offset = field.offset
-        if field.datatype not in _DATATYPES:
-            print >> sys.stderr, 'Skipping unknown PointField datatype [%d]' % field.datatype
-        else:
-            datatype_fmt, datatype_length = _DATATYPES[field.datatype]
-            fmt += field.count * datatype_fmt
-            offset += field.count * datatype_length
-
-    return fmt
-
-
 def main(args):
     try:
         rospy.init_node('cloud_cropping')
-        node = PointCloudCropping()
+        PointCloudCropping()
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down vision node."
