@@ -44,6 +44,10 @@ class DisplayImage(object):
         self.smin = 85
         self.threshold = 50
 
+        (self.lower, self.upper)=([0, 165, 0], [255, 255, 250])
+        self.lower = np.array(self.lower, dtype = "uint8")
+        self.upper = np.array(self.upper, dtype = "uint8")
+
     def display(self, data):
         """
         Display the main window as well as the parameters choice window and the histogram one (Camshift backrpojection).
@@ -58,10 +62,19 @@ class DisplayImage(object):
         cv2.setMouseCallback(self.cv_window_name, self.on_mouse_click, None)
 
         # Create parameters window with the slider controls for saturation, value and threshold
-        cv2.namedWindow("Parameters", cv2.CV_WINDOW_AUTOSIZE)
-        cv2.moveWindow("Parameters", 700, 325)
-        cv2.createTrackbar("Saturation", "Parameters", self.smin, 150, self.set_smin)
-        cv2.createTrackbar("Threshold", "Parameters", self.threshold, 255, self.set_threshold)
+        cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
+        #cv2.moveWindow("Parameters", 700, 325)
+        cv2.createTrackbar("Saturation", "Control", self.smin, 150, self.set_smin)
+        cv2.createTrackbar("Threshold", "Control", self.threshold, 255, self.set_threshold)
+
+        cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
+        cv2.moveWindow("Control", 700, 600)
+        cv2.createTrackbar("LowH", "Control", self.lower[0], 240, self.set_lowh)
+        cv2.createTrackbar("HighH", "Control", self.upper[0], 255, self.set_highh)
+        cv2.createTrackbar("LowS", "Control", self.lower[1], 240, self.set_lows)
+        cv2.createTrackbar("HighS", "Control", self.upper[1], 255, self.set_highs)
+        #cv2.createTrackbar("LowV", "Control", self.lower[2], 240, self.set_lowv)
+        #cv2.createTrackbar("HighV", "Control", self.upper[2], 255, self.set_highv)
 
         # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
         self.frame = self.convert_image(data, "bgr8")
@@ -99,6 +112,9 @@ class DisplayImage(object):
             pass
 
         # Display the main window
+        imgHSV =  cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
+        imgThresh = cv2.inRange(imgHSV, self.lower, self.upper)
+        img = cv2.bitwise_and(self.vis, self.vis, mask = imgThresh)
         cv2.imshow(self.cv_window_name, self.vis)
         cv2.waitKey(1)
 
@@ -191,6 +207,23 @@ class DisplayImage(object):
     def set_threshold(self, pos):
         self.threshold = pos
 
+    def set_lowh(self, pos):
+        self.lower[0] = pos
+
+    def set_highh(self, pos):
+        self.upper[0] = pos
+
+    def set_lows(self, pos):
+        self.lower[1] = pos
+
+    def set_highs(self, pos):
+        self.upper[1] = pos
+
+    def set_lowv(self, pos):
+        self.lower[2] = pos
+
+    def set_highv(self, pos):
+        self.upper[2] = pos
 
 def box_to_rect(roi):
     """
