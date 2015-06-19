@@ -54,9 +54,7 @@ class PointCloudCropping(object):
         try:
             gen = read_points(self.camera_cloud, pts=pts)
             try:
-                int_data = list(gen)
-                for pt in int_data:
-                    roi_pts.append(pt)
+                roi_pts = list(gen)
             except:
                 pass
 
@@ -145,6 +143,7 @@ def main(args):
             if node.tracking_state == 1:
                 try:
                     node.crop()
+                    node.tracking_state = 0
                 except:
                     pass
         rospy.spin()
