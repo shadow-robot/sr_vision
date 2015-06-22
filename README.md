@@ -4,7 +4,7 @@ sr_vision
 ## Overview
 Contains our vision related algorithm (segmentation, tracking, recognition, etc...)
 
-  1. ![Tracking](sr_object_tracking/)
+  1. ![Tracking](sr_object_tracking/) 
 This package contains the tracker executable. The launch file starts the Kinect as well as the tracking node and the visualization one.
   2. ![Segmentation](sr_object_segmentation/)
 Segment the image from the camera in order to find the region of interest.
