@@ -78,7 +78,6 @@ class TestCloudCropping(unittest.TestCase):
         """
         Test the dimensions of the published cloud.
         """
-
         self.assertIsPublishing('/roi/track_cloud', PointCloud2)
 
         box = rospy.wait_for_message('/roi/track_box', RegionOfInterest, timeout=4)
