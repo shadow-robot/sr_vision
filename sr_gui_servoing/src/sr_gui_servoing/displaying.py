@@ -104,18 +104,20 @@ class DisplayImage(object):
 
         self.publish_parameters()
         self.publish_selectbox()
+        imgHSV =  cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
+        imgThresh = cv2.inRange(imgHSV, self.lower, self.upper)
+        img = cv2.bitwise_and(self.vis, self.vis, mask = imgThresh)
 
         # Draw the tracking box, if possible
         try:
             cv2.rectangle(self.vis, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
+            cv2.rectangle(img, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
         except:
             pass
 
         # Display the main window
-        imgHSV =  cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
-        imgThresh = cv2.inRange(imgHSV, self.lower, self.upper)
-        img = cv2.bitwise_and(self.vis, self.vis, mask = imgThresh)
-        cv2.imshow(self.cv_window_name, self.vis)
+        res = np.hstack((img,self.vis))
+        cv2.imshow(self.cv_window_name, res)
         cv2.waitKey(1)
 
     def roi_callback(self, data):

@@ -47,7 +47,7 @@ class HSVSegmentation(SrObjectSegmentation):
         ret, thresh = cv2.threshold(imgray, 100, 255, 0)
         contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
-        max_area = 0
+        max_area = size
         self.points = contours[0][0][0]
         self.nb_segments = len(hierarchy)
         if len(hierarchy) > 0:
@@ -55,6 +55,7 @@ class HSVSegmentation(SrObjectSegmentation):
                 area = cv2.contourArea(contours[i])
                 if area > max_area:
                     self.points = contours[i][0][0]
+                    size = area
 
         return (
             self.points[0] - size / 2, self.points[1] - size / 2, self.points[0] + size / 2, self.points[1] + size / 2)

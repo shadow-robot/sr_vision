@@ -55,7 +55,7 @@ class SrObjectTracking(object):
         """
         self.smin = data.smin
         self.threshold = data.threshold
-        self.tracking_state = data.tracking_state
+        #self.tracking_state = data.tracking_state
 
     def publish_roi(self):
         """

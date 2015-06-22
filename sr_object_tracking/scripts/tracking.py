@@ -15,8 +15,13 @@ def main(args):
         while not rospy.is_shutdown():
             while node.frame is not None:
                 try:
-                    segmented_box = seg.segmentation(node.frame)
-                    node.tracking_state = 1
+                    if seg.points == None:
+                        node.tracking_state = 0
+                        segmented_box = seg.segmentation(node.frame)
+                    else:
+                        if segmented_box is not None:
+                            node.tracking_state = 1
+                            segmented_box = None
                     node.tracking(node.frame, segmented_box)
                 except:
                     pass
