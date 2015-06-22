@@ -12,7 +12,6 @@ def main(args):
         while not rospy.is_shutdown():
             try:
                 node.tracking(node.frame, node.selection)
-                node.publish_roi()
             except:
                 pass
         rospy.spin()
