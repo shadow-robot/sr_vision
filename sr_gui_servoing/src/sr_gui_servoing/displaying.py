@@ -73,8 +73,8 @@ class DisplayImage(object):
             hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
 
             mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
-            if self.selection != (0, 0, 0, 0):
-                x0, y0, x1, y1 = self.selection
+            if self.selection != [0, 0, 0, 0]:
+                [x0, y0, x1, y1] = self.selection
                 self.track_window = (x0, y0, x1 - x0, y1 - y0)
                 hsv_roi = hsv[y0:y1, x0:x1]
                 mask_roi = mask[y0:y1, x0:x1]
@@ -112,13 +112,15 @@ class DisplayImage(object):
         """
         Publish the region of interest as a RegionOfInterest message (2D box)
         """
-        roi_box = box_to_rect(self.selection)
-
-        # Watch out for negative offsets
-        roi_box[0] = max(0, roi_box[0])
-        roi_box[1] = max(0, roi_box[1])
+        if self.selection == None:
+            roi_box = [0, 0, 0, 0]
+        else:
+            roi_box = self.selection
 
         try:
+            # Watch out for negative offsets
+            roi_box[0] = max(0, roi_box[0])
+            roi_box[1] = max(0, roi_box[1])
             roi = RegionOfInterest()
             roi.x_offset = int(roi_box[0])
             roi.y_offset = int(roi_box[1])
@@ -151,7 +153,7 @@ class DisplayImage(object):
                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
                 self.selection = None
                 if x1 - x0 > 0 and y1 - y0 > 0:
-                    self.selection = (x0, y0, x1, y1)
+                    self.selection = [x0, y0, x1, y1]
 
             else:
                 self.drag_start = None
@@ -190,25 +192,6 @@ class DisplayImage(object):
 
     def set_threshold(self, pos):
         self.threshold = pos
-
-
-def box_to_rect(roi):
-    """
-    Convert a region of interest as box format into a rect format
-    @param roi - region of interest (box format)
-    @return - region of interest (rect format)
-    """
-    try:
-        if len(roi) == 3:
-            (center, size, angle) = roi
-            pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-            pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-            rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
-        else:
-            rect = list(roi)
-    except:
-        return [0, 0, 0, 0]
-    return rect
 
 
 def main(args):
