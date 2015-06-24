@@ -3,7 +3,7 @@ import rospy
 
 from cv_bridge import CvBridge, CvBridgeError
 
-from sr_gui_servoing.msg import tracking_parameters
+from sr_vision_msgs.msg import tracking_parameters
 from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest, PointField
 
 
