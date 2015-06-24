@@ -1,6 +1,7 @@
 /* Copyright 2015 ShadowRobot */
 
-#ifndef SR_POINT_CLOUD_CLUSTER_SEGMENTOR_H 
+#ifndef SR_POINT_CLOUD_CLUSTER_SEGMENTOR_H
+#define SR_POINT_CLOUD_CLUSTER_SEGMENTOR_H
 
 #pragma once
 
@@ -23,8 +24,9 @@
 #include <pcl/surface/convex_hull.h>
 
 #include <vector>
+#include <algorithm>
 
-namespace sr_point_cloud 
+namespace sr_point_cloud
 {
 
 template<typename PointType>
@@ -238,7 +240,7 @@ class ClusterSegmentor
     }
 
     void
-    planeSegmentation ( pcl::ModelCoefficients &coefficients, pcl::PointIndices &inliers)
+    planeSegmentation (pcl::ModelCoefficients &coefficients, pcl::PointIndices &inliers)
     {
       pcl::SACSegmentation<PointType> seg;
       seg.setOptimizeCoefficients(true);
