@@ -8,7 +8,7 @@
 #include <sr_vision_msgs/TriangulateAction.h>
 
 // ROS PCL specific includes
-#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs/subs
+#include <pcl_ros/point_cloud.h>  // Allow use of PCL cloud types for pubs/subs
 #include <pcl_msgs/PolygonMesh.h>
 
 // PCL specific includes
@@ -21,9 +21,11 @@
 
 //-------------------------------------------------------------------------------
 
-namespace sr_point_cloud {
+namespace sr_point_cloud 
+{
 
-class Triangulator {
+class Triangulator 
+{
 
 protected:
   typedef pcl::PointXYZ PointType;
@@ -47,7 +49,7 @@ protected:
 
   ros::Subscriber input_sub_;
   ros::Publisher pcl_output_pub_;   // Not defined in the architecture.
-  ros::Publisher shape_output_pub_; // Officially defined in the architecture.
+  ros::Publisher shape_output_pub_;  // Officially defined in the architecture.
 
   std::string action_name_;
   actionlib::SimpleActionServer<sr_vision_msgs::TriangulateAction> as_tri_;
@@ -76,9 +78,8 @@ protected:
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
                             shape_msgs::Mesh &shapeMesh);
+};  // Triangulator
 
-}; // Triangulator
-
-} // End of namespace sr_point_cloud
+}  // End of namespace sr_point_cloud
 
 //-------------------------------------------------------------------------------
