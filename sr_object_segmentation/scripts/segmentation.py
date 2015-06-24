@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import sys
+
 import rospy
 
 from sr_object_segmentation.hsv_segmentation import HSVSegmentation
@@ -31,11 +31,11 @@ class Segmentation(object):
             self.seg.segmentation(self.frame)
             roi = self.utils.publish_box(self.seg.segmented_box)
             self.selection_pub.publish(roi)
-        except:
+        except rospy.ROSInterruptException:
             pass
 
 
-def main(args):
+def main():
     try:
         Segmentation()
         rospy.spin()
@@ -44,4 +44,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()

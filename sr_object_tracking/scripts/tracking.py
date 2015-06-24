@@ -1,18 +1,19 @@
 #!/usr/bin/env python
-import sys
+
 import rospy
+import cv2
 
 from sr_object_tracking.camshift import CamshiftTracking
 
 
-def main(args):
+def main():
     try:
         rospy.init_node('sr_object_tracking')
         node = CamshiftTracking()
         while not rospy.is_shutdown():
             try:
                 node.tracking()
-            except:
+            except (AttributeError, cv2.error, rospy.ROSInterruptException) :
                 pass
         rospy.spin()
 
@@ -21,4 +22,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()

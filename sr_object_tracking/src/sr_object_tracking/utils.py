@@ -1,12 +1,12 @@
 #!/usr/bin/env python
 
-import rospy
 from sensor_msgs.msg import RegionOfInterest
 from cv_bridge import CvBridge, CvBridgeError
 
 
 class Utils(object):
     def __init__(self):
+        # Create the cv_bridge object
         self.bridge = CvBridge()
 
     def convert_image(self, ros_image, encode):
@@ -30,15 +30,12 @@ class Utils(object):
         roi_box[0] = max(0, roi_box[0])
         roi_box[1] = max(0, roi_box[1])
 
-        try:
-            roi = RegionOfInterest()
-            roi.x_offset = int(roi_box[0])
-            roi.y_offset = int(roi_box[1])
-            roi.width = int(roi_box[2])
-            roi.height = int(roi_box[3])
-            return roi
-        except:
-            pass
+        roi = RegionOfInterest()
+        roi.x_offset = int(roi_box[0])
+        roi.y_offset = int(roi_box[1])
+        roi.width = int(roi_box[2])
+        roi.height = int(roi_box[3])
+        return roi
 
     def box_to_rect(self, roi):
         """
@@ -48,12 +45,12 @@ class Utils(object):
         """
         try:
             if len(roi) == 3:
-                (center, size, angle) = roi
+                (center, size, _) = roi
                 pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                 pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
             else:
                 rect = list(roi)
-        except:
+        except (IndexError, TypeError):
             return [0, 0, 0, 0]
         return rect

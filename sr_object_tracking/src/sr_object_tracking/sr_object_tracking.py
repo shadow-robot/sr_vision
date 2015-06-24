@@ -1,10 +1,8 @@
 #!/usr/bin/env python
 import rospy
 
-from cv_bridge import CvBridge, CvBridgeError
-
-from sr_gui_servoing.msg import tracking_parameters
-from sensor_msgs.msg import Image, PointCloud2, RegionOfInterest, PointField
+from sr_vision_msgs.msg import tracking_parameters
+from sensor_msgs.msg import Image, RegionOfInterest, PointField
 from utils import Utils
 
 
@@ -14,8 +12,7 @@ class SrObjectTracking(object):
     """
 
     def __init__(self):
-        # Create the cv_bridge object
-        self.bridge = CvBridge()
+
         self.utils = Utils()
 
         # Initialize a number of global variables
@@ -24,7 +21,7 @@ class SrObjectTracking(object):
         self.track_box = None
         self.track_window = None
         self.tracking_state = 0
-        self.selection = None
+        self.selection = [0,0,0,0]
         self.frame = None
         self.depth_image = None
         self.vis = None

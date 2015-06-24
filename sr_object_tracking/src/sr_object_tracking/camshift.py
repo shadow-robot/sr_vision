@@ -27,7 +27,7 @@ class CamshiftTracking(SrObjectTracking):
         hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
 
-        if self.selection != (0, 0, 0, 0):
+        if self.selection != [0, 0, 0, 0]:
             x0, y0, x1, y1 = self.selection
             self.track_window = (x0, y0, x1 - x0, y1 - y0)
             hsv_roi = hsv[y0:y1, x0:x1]

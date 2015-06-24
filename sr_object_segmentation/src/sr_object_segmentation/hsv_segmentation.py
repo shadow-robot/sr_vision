@@ -28,37 +28,49 @@ class HSVSegmentation(SrObjectSegmentation):
         """
         self.img = frame
 
-        boundaries = {
+        closing = hsv_transform(self.img, self.color)
+
+        labeled_array, num_features = label(closing)
+        objects = find_objects(labeled_array)
+        self.nb_segments = num_features
+
+        segments = []
+        for seg in objects:
+            seg_x = seg[1]
+            seg_y = seg[0]
+            segments.append((int(seg_x.start), int(seg_y.start), int(seg_x.stop - seg_x.start),
+                           int(seg_y.stop - seg_y.start)))
+
+        # Order the slices according to their size
+        segments.sort(key=lambda s: s[2] * s[3], reverse=True)
+
+        # Pick the biggest one
+        self.segmented_box = segments[0]
+
+def hsv_transform(img, color):
+    """
+    Convert an RGB image into an HSV unique color one
+    @param img - input image to be formatted
+    @param color - color wanted
+    @return - output image with black background and "color" segments highlighted
+    """
+
+    boundaries = {
             'red': ([145, 140, 0], [255, 255, 255]),
             'blue': ([100, 110, 0], [125, 255, 255]),
             'green': ([30, 115, 0], [65, 255, 255]),
             'yellow': ([10, 80, 150], [20, 255, 255])
         }
-        (lower, upper) = boundaries[self.color]
-        lower = np.array(lower, dtype="uint8")
-        upper = np.array(upper, dtype="uint8")
+    (lower, upper) = boundaries[color]
+    lower = np.array(lower, dtype="uint8")
+    upper = np.array(upper, dtype="uint8")
 
-        img_hsv = cv2.cvtColor(self.img, cv2.COLOR_BGR2HSV)
-        img_thresh = cv2.inRange(img_hsv, lower, upper)
-        img = cv2.bitwise_and(self.img, self.img, mask=img_thresh)
+    img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+    img_thresh = cv2.inRange(img_hsv, lower, upper)
+    img_col = cv2.bitwise_and(img, img, mask=img_thresh)
 
-        kernel = np.ones((5, 5), np.uint8)
-        opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
-        closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+    kernel = np.ones((5, 5), np.uint8)
+    opening = cv2.morphologyEx(img_col, cv2.MORPH_OPEN, kernel)
+    closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
 
-        labeled_array, num_features = label(closing)
-        segments = find_objects(labeled_array)
-        self.nb_segments = len(segments)
-
-        slices = []
-        for i, slice in enumerate(segments):
-            slice_x = slice[1]
-            slice_y = slice[0]
-            slices.append((int(slice_x.start), int(slice_y.start), int(slice_x.stop - slice_x.start),
-                           int(slice_y.stop - slice_y.start)))
-
-        # Order the slices according to their size
-        slices.sort(key=lambda s: s[2] * s[3], reverse=True)
-
-        # Pick the biggest one
-        self.segmented_box = slices[0]
+    return closing

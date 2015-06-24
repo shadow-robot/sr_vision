@@ -1,4 +1,5 @@
 #!/usr/bin/env python
+
 from sr_object_tracking.utils import Utils
 
 class SrObjectSegmentation(object):

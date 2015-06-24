@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 
-import sys
 import cv2
 import numpy as np
 import rospy
@@ -32,11 +31,11 @@ class DisplayImage(object):
         self.utils = Utils()
 
         self.hist = None
-        self.drag_start = None
+        self.drag_start = (-1,-1)
         self.track_box = None
         self.tracking_state = 0
         self.track_window = None
-        self.selection = None
+        self.selection = [0, 0, 0, 0]
         self.frame = None
         self.frame_width = None
         self.frame_height = None
@@ -64,7 +63,7 @@ class DisplayImage(object):
         """
         # Create the main display window and the histogram one
         cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
-        if self.hist:
+        if self.hist is not None:
             cv2.namedWindow('Histogram', cv2.CV_WINDOW_AUTOSIZE)
             cv2.moveWindow("Histogram", 700, 20)
 
@@ -108,12 +107,11 @@ class DisplayImage(object):
                 vis_roi = self.vis[y0:y1, x0:x1]
                 cv2.bitwise_not(vis_roi, vis_roi)
                 self.vis[mask == 0] = 0
-        except:
+        except cv2.error:
             pass
 
         self.publish_parameters()
-        roi = self.utils.publish_box(self.selection)
-        self.selection_pub.publish(roi)
+        self.selection_pub.publish(self.utils.publish_box(self.selection))
 
         img_hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
         img_thresh = cv2.inRange(img_hsv, self.lower, self.upper)
@@ -123,12 +121,11 @@ class DisplayImage(object):
         try:
             cv2.rectangle(self.vis, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
             cv2.rectangle(img, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
-        except:
+        except (cv2.error, TypeError):
             pass
 
         # Display the main window
-        res = np.hstack((self.vis, img))
-        cv2.imshow(self.cv_window_name, res)
+        cv2.imshow(self.cv_window_name, np.hstack((self.vis, img)))
         cv2.waitKey(1)
 
     def roi_callback(self, data):
@@ -149,7 +146,7 @@ class DisplayImage(object):
         param.tracking_state = self.tracking_state
         self.param_pub.publish(param)
 
-    def on_mouse_click(self, event, x, y, flags, param):
+    def on_mouse_click(self, event, x, y, flags,_):
         """
         Select a ROI using the dragging
         """
@@ -157,21 +154,21 @@ class DisplayImage(object):
         if event == cv2.EVENT_LBUTTONDOWN:
             self.drag_start = (x, y)
             self.tracking_state = 0
-        if self.drag_start:
+        if self.drag_start != (-1,-1):
             if flags & cv2.EVENT_FLAG_LBUTTON:
                 h, w = self.frame.shape[:2]
                 xo, yo = self.drag_start
                 x0, y0 = np.maximum(0, np.minimum([xo, yo], [x, y]))
                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
-                self.selection = None
+                self.selection = [0, 0, 0, 0]
                 if x1 - x0 > 0 and y1 - y0 > 0:
                     self.selection = [x0, y0, x1, y1]
 
             else:
                 self.drag_start = None
-                if self.selection is not None:
+                if self.selection != [0, 0, 0, 0]:
                     self.tracking_state = 1
-                    self.selection = None
+                    self.selection = [0, 0, 0, 0]
 
     def show_hist(self):
         """
@@ -213,7 +210,7 @@ class DisplayImage(object):
         self.upper[2] = pos
 
 
-def main(args):
+def main():
     try:
         DisplayImage("sr_gui_servoing")
         rospy.spin()
@@ -223,4 +220,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
