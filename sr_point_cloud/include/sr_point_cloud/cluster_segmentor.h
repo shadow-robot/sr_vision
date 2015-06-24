@@ -1,3 +1,7 @@
+/* Copyright 2015 ShadowRobot */
+
+#ifndef SR_POINT_CLOUD_CLUSTER_SEGMENTOR_H 
+
 #pragma once
 
 #include <pcl/point_cloud.h>
@@ -18,7 +22,10 @@
 
 #include <pcl/surface/convex_hull.h>
 
-namespace sr_point_cloud {
+#include <vector>
+
+namespace sr_point_cloud 
+{
 
 template<typename PointType>
 class ClusterSegmentor
@@ -35,7 +42,7 @@ class ClusterSegmentor
       */
     ClusterSegmentor()
       : use_convex_hull_(true)
-      , cluster_tolerance_(0.05) // 2cm
+      , cluster_tolerance_(0.05)  // 2cm
       , min_pts_per_cluster_(50)
       , max_pts_per_cluster_(25000)
     {}
@@ -55,7 +62,7 @@ class ClusterSegmentor
       * \param cloud the const boost shared pointer to a PointCloud message
       */
     virtual inline void
-    setInputCloud (const CloudConstPtr &cloud) { input_ = cloud; }
+    setInputCloud(const CloudConstPtr &cloud) { input_ = cloud; }
 
     /** \brief Get a pointer to the input point cloud dataset. */
     inline CloudConstPtr const
@@ -64,12 +71,12 @@ class ClusterSegmentor
     /** \brief Set the spatial cluster tolerance as a measure in the L2 Euclidean space
     * \param tolerance the spatial cluster tolerance as a measure in the L2 Euclidean space
     */
-    inline void setClusterTolerance (double tolerance) { cluster_tolerance_ = tolerance; }
+    inline void setClusterTolerance(double tolerance) { cluster_tolerance_ = tolerance; }
 
     /** \brief Use convex hull, that is extract planes before finding clusters.
     * \param use_hull
     */
-    inline void setUseConvexHull (bool use_hull) { use_convex_hull_ = use_hull; }
+    inline void setUseConvexHull(bool use_hull) { use_convex_hull_ = use_hull; }
 
     /** \brief Get the current use convex hull setting. */
     inline bool getUseConvexHull () { return (use_convex_hull_); }
@@ -80,7 +87,7 @@ class ClusterSegmentor
     /** \brief Set the minimum number of points that a cluster needs to contain in order to be considered valid.
     * \param min_cluster_size the minimum cluster size
     */
-    inline void setMinClusterSize (int min_cluster_size) { min_pts_per_cluster_ = min_cluster_size; }
+    inline void setMinClusterSize(int min_cluster_size) { min_pts_per_cluster_ = min_cluster_size; }
 
     /** \brief Get the minimum number of points that a cluster needs to contain in order to be considered valid. */
     inline int getMinClusterSize () { return (min_pts_per_cluster_); }
@@ -88,7 +95,7 @@ class ClusterSegmentor
     /** \brief Set the maximum number of points that a cluster needs to contain in order to be considered valid.
     * \param max_cluster_size the maximum cluster size
     */
-    inline void setMaxClusterSize (int max_cluster_size) { max_pts_per_cluster_ = max_cluster_size; }
+    inline void setMaxClusterSize(int max_cluster_size) { max_pts_per_cluster_ = max_cluster_size; }
 
     /** \brief Get the maximum number of points that a cluster needs to contain in order to be considered valid. */
     inline int getMaxClusterSize () { return (max_pts_per_cluster_); }
@@ -98,10 +105,10 @@ class ClusterSegmentor
      */
     void extract (std::vector<CloudPtr> &results)
     {
-      segmentTargetCloud(); // Sets target_cloud_
+      segmentTargetCloud();  // Sets target_cloud_
 
       std::vector<pcl::PointIndices> cluster_indices;
-      euclideanSegment (cluster_indices);
+      euclideanSegment(cluster_indices);
       if (cluster_indices.size () == 0)
         return;
 
@@ -109,7 +116,7 @@ class ClusterSegmentor
       for (size_t i = 0; i < cluster_indices.size (); i++)
       {
         temp_cloud.reset (new Cloud);
-        extractSegmentCluster (cluster_indices, i, *temp_cloud);
+        extractSegmentCluster(cluster_indices, i, *temp_cloud);
         results.push_back(temp_cloud);
         //std::stringstream filename;
         //filename << "segment_cluster_" << i << ".pcd";
@@ -120,15 +127,15 @@ class ClusterSegmentor
     void
     extractByCentered (std::vector<CloudPtr> &results)
     {
-      extract (results);
-      std::sort (results.begin(), results.end(), ClusterSegmentor::byCentered);
+      extract(results);
+      std::sort(results.begin(), results.end(), ClusterSegmentor::byCentered);
     }
 
     void
     extractByDistance (std::vector<CloudPtr> &results)
     {
-      extract (results);
-      std::sort (results.begin(), results.end(), ClusterSegmentor::byDistance);
+      extract(results);
+      std::sort(results.begin(), results.end(), ClusterSegmentor::byDistance);
     }
 
     /**
@@ -137,7 +144,7 @@ class ClusterSegmentor
      * the object is.
      */
     static bool
-    byCentered (const CloudPtr &a, const CloudPtr &b)
+    byCentered(const CloudPtr &a, const CloudPtr &b)
     {
       Eigen::Vector4f ca, cb;
       pcl::compute3DCentroid<PointType> (*a, ca);
@@ -151,7 +158,7 @@ class ClusterSegmentor
      * Sort function for clouds. Sorts by distance of cloud centroid to the origin. Closest first.
      */
     static bool
-    byDistance (const CloudPtr &a, const CloudPtr &b)
+    byDistance(const CloudPtr &a, const CloudPtr &b)
     {
       Eigen::Vector4f ca, cb;
       pcl::compute3DCentroid<PointType> (*a, ca);
@@ -168,12 +175,12 @@ class ClusterSegmentor
       pcl::EuclideanClusterExtraction<PointType> ec;
       KdTreePtr tree (new KdTree ());
 
-      ec.setClusterTolerance (cluster_tolerance_); // 2cm
-      ec.setMinClusterSize (min_pts_per_cluster_);
-      ec.setMaxClusterSize (max_pts_per_cluster_);
-      ec.setSearchMethod (tree);
-      ec.setInputCloud (target_cloud_);
-      ec.extract (cluster_indices);
+      ec.setClusterTolerance(cluster_tolerance_);  // 2cm
+      ec.setMinClusterSize(min_pts_per_cluster_);
+      ec.setMaxClusterSize(max_pts_per_cluster_);
+      ec.setSearchMethod(tree);
+      ec.setInputCloud(target_cloud_);
+      ec.extract(cluster_indices);
     }
 
     void
@@ -186,9 +193,9 @@ class ClusterSegmentor
       for (size_t i = 0; i < segmented_indices.indices.size (); i++)
       {
         PointType point = target_cloud_->points[segmented_indices.indices[i]];
-        result.points.push_back (point);
+        result.points.push_back(point);
       }
-      result.width = result.points.size ();
+      result.width = result.points.size();
       result.height = 1;
       result.is_dense = true;
     }
@@ -204,17 +211,17 @@ class ClusterSegmentor
 
       if (use_convex_hull_)
       {
-        planeSegmentation (*coefficients, *inliers);
+        planeSegmentation(*coefficients, *inliers);
         if (inliers->indices.size () > 3)
         {
           CloudPtr cloud_projected (new Cloud);
           cloud_hull_.reset (new Cloud);
           nonplane_cloud_.reset (new Cloud);
 
-          planeProjection (*cloud_projected, coefficients);
-          convexHull (cloud_projected, *cloud_hull_, hull_vertices_);
+          planeProjection(*cloud_projected, coefficients);
+          convexHull(cloud_projected, *cloud_hull_, hull_vertices_);
 
-          extractNonPlanePoints (input_, cloud_hull_, *nonplane_cloud_);
+          extractNonPlanePoints(input_, cloud_hull_, *nonplane_cloud_);
           target_cloud_ = nonplane_cloud_;
           //pcl::io::savePCDFileASCII("segment_target_cloud.pcd", *target_cloud_);
         }
@@ -234,31 +241,31 @@ class ClusterSegmentor
     planeSegmentation ( pcl::ModelCoefficients &coefficients, pcl::PointIndices &inliers)
     {
       pcl::SACSegmentation<PointType> seg;
-      seg.setOptimizeCoefficients (true);
-      seg.setModelType (pcl::SACMODEL_PLANE);
-      seg.setMethodType (pcl::SAC_RANSAC);
-      seg.setMaxIterations (1000);
-      seg.setDistanceThreshold (0.03);
-      seg.setInputCloud (input_);
-      seg.segment (inliers, coefficients);
+      seg.setOptimizeCoefficients(true);
+      seg.setModelType(pcl::SACMODEL_PLANE);
+      seg.setMethodType(pcl::SAC_RANSAC);
+      seg.setMaxIterations(1000);
+      seg.setDistanceThreshold(0.03);
+      seg.setInputCloud(input_);
+      seg.segment(inliers, coefficients);
     }
 
     void
     planeProjection (Cloud &result, const pcl::ModelCoefficients::ConstPtr &coefficients)
     {
       pcl::ProjectInliers<PointType> proj;
-      proj.setModelType (pcl::SACMODEL_PLANE);
-      proj.setInputCloud (input_);
-      proj.setModelCoefficients (coefficients);
-      proj.filter (result);
+      proj.setModelType(pcl::SACMODEL_PLANE);
+      proj.setInputCloud(input_);
+      proj.setModelCoefficients(coefficients);
+      proj.filter(result);
     }
 
     void
     convexHull (const CloudConstPtr &cloud, Cloud &result, std::vector<pcl::Vertices> &hull_vertices)
     {
       pcl::ConvexHull<PointType> chull;
-      chull.setInputCloud (cloud);
-      chull.reconstruct (*cloud_hull_, hull_vertices);
+      chull.setInputCloud(cloud);
+      chull.reconstruct(*cloud_hull_, hull_vertices);
     }
 
     void
@@ -266,16 +273,16 @@ class ClusterSegmentor
     {
       pcl::ExtractPolygonalPrismData<PointType> polygon_extract;
       pcl::PointIndices::Ptr inliers_polygon (new pcl::PointIndices ());
-      polygon_extract.setHeightLimits (0.01, 10.0);
-      polygon_extract.setInputPlanarHull (cloud_hull);
-      polygon_extract.setInputCloud (cloud);
-      polygon_extract.segment (*inliers_polygon);
+      polygon_extract.setHeightLimits(0.01, 10.0);
+      polygon_extract.setInputPlanarHull(cloud_hull);
+      polygon_extract.setInputCloud(cloud);
+      polygon_extract.segment(*inliers_polygon);
       {
         pcl::ExtractIndices<PointType> extract_positive;
-        extract_positive.setNegative (false);
-        extract_positive.setInputCloud (cloud);
-        extract_positive.setIndices (inliers_polygon);
-        extract_positive.filter (result);
+        extract_positive.setNegative(false);
+        extract_positive.setInputCloud(cloud);
+        extract_positive.setIndices(inliers_polygon);
+        extract_positive.filter(result);
       }
     }
 
@@ -284,10 +291,13 @@ class ClusterSegmentor
     /** \brief The spatial cluster tolerance as a measure in the L2 Euclidean space. */
     double cluster_tolerance_;
 
-    /** \brief The minimum number of points that a cluster needs to contain in order to be considered valid (default = 50). */
+    /** \brief The minimum number of points that a cluster needs to contain in order to 
+be considered valid 
+(default = 50). */
     int min_pts_per_cluster_;
 
-    /** \brief The maximum number of points that a cluster needs to contain in order to be considered valid (default = 25000). */
+    /** \brief The maximum number of points that a cluster needs to contain in order to be considered valid 
+(default = 25000). */
     int max_pts_per_cluster_;
 
     CloudConstPtr input_;
@@ -297,4 +307,6 @@ class ClusterSegmentor
     std::vector<pcl::Vertices> hull_vertices_;
 };
 
-} // sr_point_cloud
+}  // namespace sr_point_cloud
+
+#endif
