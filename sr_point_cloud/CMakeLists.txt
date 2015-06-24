@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp
   sensor_msgs
   tf
+  object_recognition_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -177,11 +178,11 @@ add_executable(triangulator
   src/triangulator.cpp
 )
 
-add_dependencies(triangulator
-  ${PROJECT_NAME}_gencfg
-  sr_grasp_msgs_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
+# add_dependencies(triangulator
+#   ${PROJECT_NAME}_gencfg
+#   sr_grasp_msgs_gencpp
+#   ${catkin_EXPORTED_TARGETS}
+# )
 
 target_link_libraries(triangulator
   ${catkin_LIBRARIES}
@@ -207,10 +208,10 @@ add_executable(cloud_services
   src/point_cloud_services_node.cpp
 )
 
-add_dependencies(cloud_services
-  sr_grasp_msgs_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
+# add_dependencies(cloud_services
+#   sr_grasp_msgs_gencpp
+#   ${catkin_EXPORTED_TARGETS}
+# )
 
 target_link_libraries(cloud_services
   ${catkin_LIBRARIES}
@@ -257,22 +258,22 @@ target_link_libraries(cloud_services
 #############
 
 ## Add gtest based cpp test target and link libraries
-add_rostest_gtest(test_triangulator
-  test/test_triangulator.test
-  test/test_triangulator.cpp
-)
-target_link_libraries(test_triangulator
-  ${catkin_LIBRARIES}
-  ${GTEST_LIBRARIES}
-)
-add_dependencies(test_triangulator
-  sr_grasp_msgs_gencpp
-  ${catkin_EXPORTED_TARGETS}
-)
+# add_rostest_gtest(test_triangulator
+#   test/test_triangulator.test
+#   test/test_triangulator.cpp
+# )
+# target_link_libraries(test_triangulator
+#   ${catkin_LIBRARIES}
+#   ${GTEST_LIBRARIES}
+# )
+# add_dependencies(test_triangulator
+#   sr_grasp_msgs_gencpp
+#   ${catkin_EXPORTED_TARGETS}
+# )
 
 add_rostest(test/cloud_tracker.test)
 add_rostest(test/cluster_segmentor.test)
-add_rostest(test/cloud_services.test)
+#add_rostest(test/cloud_services.test)
 add_rostest(test/cloud_cropping.test)
 
 ## Add folders to be run by python nosetests
