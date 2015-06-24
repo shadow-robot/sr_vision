@@ -1,6 +1,19 @@
 <launch>
+
   <include file="$(find freenect_launch)/launch/freenect.launch"/>
+
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
+  <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  />
+
+    <!-- set the color parameter for the segmentation -->
+    <!-- can be : ['red','blue','green','yellow'] -->
+    <param name="color" value="$(arg color)" />
+
   <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
+
+    <!-- display the control parameters window or not -->
+    <param name="control" value="False" />
+
   <node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  />
+
 </launch>

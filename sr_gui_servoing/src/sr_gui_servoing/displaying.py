@@ -4,7 +4,8 @@ import sys
 import cv2
 import numpy as np
 import rospy
-from cv_bridge import CvBridge, CvBridgeError
+
+from sr_object_tracking.utils import Utils
 
 from sensor_msgs.msg import RegionOfInterest, Image
 from sr_vision_msgs.msg import tracking_parameters
@@ -18,6 +19,8 @@ class DisplayImage(object):
     def __init__(self, node_name):
 
         rospy.init_node(node_name)
+        self.color = rospy.get_param('/color')
+        self.control = rospy.get_param('/control')
         self.cv_window_name = 'Video'
 
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
@@ -26,7 +29,7 @@ class DisplayImage(object):
         self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
         self.param_pub = rospy.Publisher('/roi/parameters', tracking_parameters, queue_size=1)
 
-        self.bridge = CvBridge()
+        self.utils = Utils()
 
         self.hist = None
         self.drag_start = None
@@ -41,12 +44,18 @@ class DisplayImage(object):
         self.vis = None
 
         # Minimum saturation of the tracked color in HSV space, and a threshold on the backprojection probability image
-        self.smin = 85
+        self.smin = 150
         self.threshold = 50
 
-        (self.lower, self.upper)=([0, 165, 0], [255, 255, 250])
-        self.lower = np.array(self.lower, dtype = "uint8")
-        self.upper = np.array(self.upper, dtype = "uint8")
+        boundaries = {
+            'red': ([145, 140, 0], [255, 255, 255]),
+            'blue': ([100, 110, 0], [125, 255, 255]),
+            'green': ([30, 115, 0], [65, 255, 255]),
+            'yellow': ([10, 80, 150], [20, 255, 255])
+        }
+        (self.lower, self.upper) = boundaries[self.color]
+        self.lower = np.array(self.lower, dtype="uint8")
+        self.upper = np.array(self.upper, dtype="uint8")
 
     def display(self, data):
         """
@@ -55,29 +64,29 @@ class DisplayImage(object):
         """
         # Create the main display window and the histogram one
         cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
-        cv2.namedWindow('Histogram', cv2.CV_WINDOW_AUTOSIZE)
-        cv2.moveWindow("Histogram", 700, 20)
+        if self.hist:
+            cv2.namedWindow('Histogram', cv2.CV_WINDOW_AUTOSIZE)
+            cv2.moveWindow("Histogram", 700, 20)
 
         # Set a call back on mouse clicks on the image window
         cv2.setMouseCallback(self.cv_window_name, self.on_mouse_click, None)
 
-        # Create parameters window with the slider controls for saturation, value and threshold
-        cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
-        #cv2.moveWindow("Parameters", 700, 325)
-        cv2.createTrackbar("Saturation", "Control", self.smin, 150, self.set_smin)
-        cv2.createTrackbar("Threshold", "Control", self.threshold, 255, self.set_threshold)
+        if self.control:
+            # Create parameters window with the slider controls for saturation, value and threshold
+            cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
+            cv2.createTrackbar("Saturation", "Control", self.smin, 150, self.set_smin)
+            cv2.createTrackbar("Threshold", "Control", self.threshold, 255, self.set_threshold)
 
-        cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
-        cv2.moveWindow("Control", 700, 600)
-        cv2.createTrackbar("LowH", "Control", self.lower[0], 240, self.set_lowh)
-        cv2.createTrackbar("HighH", "Control", self.upper[0], 255, self.set_highh)
-        cv2.createTrackbar("LowS", "Control", self.lower[1], 240, self.set_lows)
-        cv2.createTrackbar("HighS", "Control", self.upper[1], 255, self.set_highs)
-        #cv2.createTrackbar("LowV", "Control", self.lower[2], 240, self.set_lowv)
-        #cv2.createTrackbar("HighV", "Control", self.upper[2], 255, self.set_highv)
+            cv2.moveWindow("Control", 700, 600)
+            cv2.createTrackbar("LowH", "Control", self.lower[0], 240, self.set_lowh)
+            cv2.createTrackbar("HighH", "Control", self.upper[0], 255, self.set_highh)
+            cv2.createTrackbar("LowS", "Control", self.lower[1], 240, self.set_lows)
+            cv2.createTrackbar("HighS", "Control", self.upper[1], 255, self.set_highs)
+            cv2.createTrackbar("LowV", "Control", self.lower[2], 240, self.set_lowv)
+            cv2.createTrackbar("HighV", "Control", self.upper[2], 255, self.set_highv)
 
         # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
-        self.frame = self.convert_image(data, "bgr8")
+        self.frame = self.utils.convert_image(data, "bgr8")
         self.vis = self.frame.copy()
 
         try:
@@ -103,10 +112,12 @@ class DisplayImage(object):
             pass
 
         self.publish_parameters()
-        self.publish_selectbox()
-        imgHSV =  cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
+        roi = self.utils.publish_box(self.selection)
+        self.selection_pub.publish(roi)
+
+        imgHSV = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
         imgThresh = cv2.inRange(imgHSV, self.lower, self.upper)
-        img = cv2.bitwise_and(self.vis, self.vis, mask = imgThresh)
+        img = cv2.bitwise_and(self.vis, self.vis, mask=imgThresh)
 
         # Draw the tracking box, if possible
         try:
@@ -116,37 +127,22 @@ class DisplayImage(object):
             pass
 
         # Display the main window
-        res = np.hstack((img,self.vis))
+        res = np.hstack((self.vis, img))
         cv2.imshow(self.cv_window_name, res)
         cv2.waitKey(1)
 
     def roi_callback(self, data):
-
+        """
+        Convert the sensor_msgs/RegionOfInterest into a tuple of extrema coordinates
+        """
         pt1 = (data.x_offset, data.y_offset)
         pt2 = (data.x_offset + data.width, data.y_offset + data.height)
         self.track_box = (pt1, pt2)
 
-    def publish_selectbox(self):
-        """
-        Publish the region of interest as a RegionOfInterest message (2D box)
-        """
-        roi_box = box_to_rect(self.selection)
-
-        # Watch out for negative offsets
-        roi_box[0] = max(0, roi_box[0])
-        roi_box[1] = max(0, roi_box[1])
-
-        try:
-            roi = RegionOfInterest()
-            roi.x_offset = int(roi_box[0])
-            roi.y_offset = int(roi_box[1])
-            roi.width = int(roi_box[2])
-            roi.height = int(roi_box[3])
-            self.selection_pub.publish(roi)
-        except:
-            rospy.loginfo("Publishing ROI failed")
-
     def publish_parameters(self):
+        """
+        Publish the tracking parameters if changed by the user.
+        """
         param = tracking_parameters()
         param.smin = self.smin
         param.threshold = self.threshold
@@ -176,17 +172,6 @@ class DisplayImage(object):
                 if self.selection is not None:
                     self.tracking_state = 1
                     self.selection = None
-
-    def convert_image(self, ros_image, encode):
-        """
-        Use cv_bridge() to convert the ROS image to OpenCV format
-        @param ros_image - image in ROS format, to be converted in OpenCV format
-        """
-        try:
-            cv_image = self.bridge.imgmsg_to_cv2(ros_image, encode)
-            return cv_image
-        except CvBridgeError, e:
-            print e
 
     def show_hist(self):
         """
@@ -226,24 +211,6 @@ class DisplayImage(object):
 
     def set_highv(self, pos):
         self.upper[2] = pos
-
-def box_to_rect(roi):
-    """
-    Convert a region of interest as box format into a rect format
-    @param roi - region of interest (box format)
-    @return - region of interest (rect format)
-    """
-    try:
-        if len(roi) == 3:
-            (center, size, angle) = roi
-            pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-            pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
-            rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
-        else:
-            rect = list(roi)
-    except:
-        return [0, 0, 0, 0]
-    return rect
 
 
 def main(args):

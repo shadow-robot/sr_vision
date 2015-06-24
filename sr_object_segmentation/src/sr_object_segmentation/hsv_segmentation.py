@@ -2,36 +2,39 @@
 
 import cv2
 import numpy as np
-
+from scipy.ndimage.measurements import label, find_objects
 from sr_object_segmentation import SrObjectSegmentation
 
 
 class HSVSegmentation(SrObjectSegmentation):
     """
-    Segmentation based upon an HSV colorization (Hue, Saturation, Value parameters controlled by trackbars in the 
-    display mode
+    Segmentation based upon an HSV (Hue, Saturation, Value) colorization, according to a color given as parameter.
     """
 
-    def __init__(self):
+    def __init__(self, color):
         """
         Initialize the HSV_based segmentation object 
         """
         SrObjectSegmentation.__init__(self, None, {})
         self.name = 'HSV segmentation algorithm'
-        self.points = None
+        self.segmented_box = None
         self.nb_segments = 0
+        self.color = color
 
-    def segmentation(self, frame, size=100):
+    def segmentation(self, frame):
         """
-        Segment the image into blobs
+        Segment the image with the proper color. Update the box attribute according to the biggest segment found.
         @param frame - image to be segmented (numpy format)
-        @param size - approximate size of the object of interest
-        @return - coordinates of the ROI box (tuple)
-        
         """
         self.img = frame
 
-        (lower, upper) = ([0, 165, 0], [255, 255, 255])
+        boundaries = {
+            'red': ([145, 140, 0], [255, 255, 255]),
+            'blue': ([100, 110, 0], [125, 255, 255]),
+            'green': ([30, 115, 0], [65, 255, 255]),
+            'yellow': ([10, 80, 150], [20, 255, 255])
+        }
+        (lower, upper) = boundaries[self.color]
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
 
@@ -43,19 +46,19 @@ class HSVSegmentation(SrObjectSegmentation):
         opening = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
         closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
 
-        imgray = cv2.cvtColor(closing, cv2.COLOR_BGR2GRAY)
-        ret, thresh = cv2.threshold(imgray, 100, 255, 0)
-        contours, hierarchy = cv2.findContours(thresh, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+        labeled_array, num_features = label(closing)
+        segments = find_objects(labeled_array)
+        self.nb_segments = len(segments)
 
-        max_area = size
-        self.points = contours[0][0][0]
-        self.nb_segments = len(hierarchy)
-        if len(hierarchy) > 0:
-            for i in range(len(hierarchy)):
-                area = cv2.contourArea(contours[i])
-                if area > max_area:
-                    self.points = contours[i][0][0]
-                    size = area
+        slices = []
+        for i, slice in enumerate(segments):
+            slice_x = slice[1]
+            slice_y = slice[0]
+            slices.append((int(slice_x.start), int(slice_y.start), int(slice_x.stop - slice_x.start),
+                           int(slice_y.stop - slice_y.start)))
 
-        return (
-            self.points[0] - size / 2, self.points[1] - size / 2, self.points[0] + size / 2, self.points[1] + size / 2)
+        # Order the slices according to their size
+        slices.sort(key=lambda s: s[2] * s[3], reverse=True)
+
+        # Pick the biggest one
+        self.segmented_box = slices[0]
