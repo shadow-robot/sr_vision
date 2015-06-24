@@ -1,0 +1,9 @@
+<launch>
+  <node name="camera_cloud_bag" pkg="rosbag" type="play" args="-l $(find sr_point_cloud)/test/camera_cloud.bag" />
+  <node name="roi_box_bag" pkg="rosbag" type="play" args="-l $(find sr_point_cloud)/test/track_box.bag" />
+
+  <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
+  <node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  />
+
+  <test test-name="test_cloud_cropping" pkg="sr_point_cloud" type="test_cloud_cropping.py" />
+</launch>

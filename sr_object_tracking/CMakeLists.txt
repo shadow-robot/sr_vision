@@ -7,10 +7,7 @@ project(sr_object_tracking)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   rospy
-  pcl_conversions
 )
-
-find_package(PCL REQUIRED QUIET COMPONENTS common)
 
 
 ## System dependencies are found with CMake's conventions

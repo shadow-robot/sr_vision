@@ -95,8 +95,8 @@ class DisplayImage(object):
             hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
 
             mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
-            if self.selection != (0, 0, 0, 0):
-                x0, y0, x1, y1 = self.selection
+            if self.selection != [0, 0, 0, 0]:
+                [x0, y0, x1, y1] = self.selection
                 self.track_window = (x0, y0, x1 - x0, y1 - y0)
                 hsv_roi = hsv[y0:y1, x0:x1]
                 mask_roi = mask[y0:y1, x0:x1]
@@ -115,9 +115,9 @@ class DisplayImage(object):
         roi = self.utils.publish_box(self.selection)
         self.selection_pub.publish(roi)
 
-        imgHSV = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
-        imgThresh = cv2.inRange(imgHSV, self.lower, self.upper)
-        img = cv2.bitwise_and(self.vis, self.vis, mask=imgThresh)
+        img_hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
+        img_thresh = cv2.inRange(img_hsv, self.lower, self.upper)
+        img = cv2.bitwise_and(self.vis, self.vis, mask=img_thresh)
 
         # Draw the tracking box, if possible
         try:
@@ -165,7 +165,7 @@ class DisplayImage(object):
                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
                 self.selection = None
                 if x1 - x0 > 0 and y1 - y0 > 0:
-                    self.selection = (x0, y0, x1, y1)
+                    self.selection = [x0, y0, x1, y1]
 
             else:
                 self.drag_start = None
