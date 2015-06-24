@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-import sys
 
 from sensor_msgs.msg import PointCloud2, RegionOfInterest
 from sensor_msgs import point_cloud2

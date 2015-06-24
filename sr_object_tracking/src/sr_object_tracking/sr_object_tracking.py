@@ -2,7 +2,7 @@
 import rospy
 
 from sr_vision_msgs.msg import tracking_parameters
-from sensor_msgs.msg import Image, RegionOfInterest, PointField
+from sensor_msgs.msg import Image, RegionOfInterest
 from utils import Utils
 
 
