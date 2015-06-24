@@ -31,11 +31,11 @@ class DisplayImage(object):
         self.utils = Utils()
 
         self.hist = None
-        self.drag_start = (-1,-1)
+        self.drag_start = (-1, -1)
         self.track_box = None
         self.tracking_state = 0
         self.track_window = None
-        self.selection = [0, 0, 0, 0]
+        self.selection = (0, 0, 0, 0)
         self.frame = None
         self.frame_width = None
         self.frame_height = None
@@ -65,7 +65,7 @@ class DisplayImage(object):
         cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
         if self.hist is not None:
             cv2.namedWindow('Histogram', cv2.CV_WINDOW_AUTOSIZE)
-            cv2.moveWindow("Histogram", 700, 20)
+            cv2.moveWindow("Histogram", 700, 600)
 
         # Set a call back on mouse clicks on the image window
         cv2.setMouseCallback(self.cv_window_name, self.on_mouse_click, None)
@@ -76,7 +76,7 @@ class DisplayImage(object):
             cv2.createTrackbar("Saturation", "Control", self.smin, 150, self.set_smin)
             cv2.createTrackbar("Threshold", "Control", self.threshold, 255, self.set_threshold)
 
-            cv2.moveWindow("Control", 700, 600)
+            cv2.moveWindow("Control", 100, 600)
             cv2.createTrackbar("LowH", "Control", self.lower[0], 240, self.set_lowh)
             cv2.createTrackbar("HighH", "Control", self.upper[0], 255, self.set_highh)
             cv2.createTrackbar("LowS", "Control", self.lower[1], 240, self.set_lows)
@@ -94,8 +94,8 @@ class DisplayImage(object):
             hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
 
             mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
-            if self.selection != [0, 0, 0, 0]:
-                [x0, y0, x1, y1] = self.selection
+            if self.selection != (0, 0, 0, 0):
+                x0, y0, x1, y1 = self.selection
                 self.track_window = (x0, y0, x1 - x0, y1 - y0)
                 hsv_roi = hsv[y0:y1, x0:x1]
                 mask_roi = mask[y0:y1, x0:x1]
@@ -146,7 +146,7 @@ class DisplayImage(object):
         param.tracking_state = self.tracking_state
         self.param_pub.publish(param)
 
-    def on_mouse_click(self, event, x, y, flags,_):
+    def on_mouse_click(self, event, x, y, flags, _):
         """
         Select a ROI using the dragging
         """
@@ -154,21 +154,21 @@ class DisplayImage(object):
         if event == cv2.EVENT_LBUTTONDOWN:
             self.drag_start = (x, y)
             self.tracking_state = 0
-        if self.drag_start != (-1,-1):
+        if self.drag_start != (-1, -1):
             if flags & cv2.EVENT_FLAG_LBUTTON:
                 h, w = self.frame.shape[:2]
                 xo, yo = self.drag_start
                 x0, y0 = np.maximum(0, np.minimum([xo, yo], [x, y]))
                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
-                self.selection = [0, 0, 0, 0]
+                self.selection = (0, 0, 0, 0)
                 if x1 - x0 > 0 and y1 - y0 > 0:
-                    self.selection = [x0, y0, x1, y1]
+                    self.selection = x0, y0, x1, y1
 
             else:
                 self.drag_start = None
-                if self.selection != [0, 0, 0, 0]:
+                if self.selection != (0, 0, 0, 0):
                     self.tracking_state = 1
-                    self.selection = [0, 0, 0, 0]
+                    self.selection = (0, 0, 0, 0)
 
     def show_hist(self):
         """

@@ -12,7 +12,6 @@ class SrObjectTracking(object):
     """
 
     def __init__(self):
-
         self.utils = Utils()
 
         # Initialize a number of global variables
@@ -21,7 +20,7 @@ class SrObjectTracking(object):
         self.track_box = None
         self.track_window = None
         self.tracking_state = 0
-        self.selection = [0,0,0,0]
+        self.selection = (0, 0, 0, 0)
         self.frame = None
         self.depth_image = None
         self.vis = None
@@ -29,7 +28,10 @@ class SrObjectTracking(object):
 
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
-        self.selection_sub = rospy.Subscriber("/roi/segmented_box", RegionOfInterest, self.selection_callback)
+        self.selection_sub = rospy.Subscriber("/roi/segmented_box", RegionOfInterest, self.selection_callback,
+                                              callback_args=False)
+        self.selection_sub = rospy.Subscriber("/roi/selection", RegionOfInterest, self.selection_callback,
+                                              callback_args=True)
         self.param_sub = rospy.Subscriber("/roi/parameters", tracking_parameters, self.param_callback)
 
         # Initialize the Region of Interest publishers
@@ -41,10 +43,12 @@ class SrObjectTracking(object):
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 
-    def selection_callback(self, data):
+    def selection_callback(self, data, stop_seg):
         """
         Get the ROI box (selected or segmented)
         """
+        if stop_seg:
+            rospy.set_param('/stop_seg', True)
         self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
 
     def param_callback(self, data):

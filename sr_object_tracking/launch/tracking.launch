@@ -9,6 +9,10 @@
     <!-- can be : ['red','blue','green','yellow'] -->
     <param name="color" value="$(arg color)" />
 
+    <!-- Set the booleen variable controlling the segmentation -->
+    <!-- becomes True if a ROI is selected with the mouse -->
+    <param name="stop_seg" value="False" /> 
+
   <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
 
     <!-- display the control parameters window or not -->

@@ -26,11 +26,12 @@ class Segmentation(object):
         Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
         """
         self.frame = self.utils.convert_image(data, "bgr8")
-
+        stop_seg = rospy.get_param('/stop_seg')
         try:
-            self.seg.segmentation(self.frame)
-            roi = self.utils.publish_box(self.seg.segmented_box)
-            self.selection_pub.publish(roi)
+            if not stop_seg:
+                self.seg.segmentation(self.frame)
+                roi = self.utils.publish_box(self.seg.segmented_box)
+                self.selection_pub.publish(roi)
         except rospy.ROSInterruptException:
             pass
 
