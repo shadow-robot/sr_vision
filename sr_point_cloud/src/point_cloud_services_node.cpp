@@ -17,7 +17,7 @@
 #include <tf/transform_listener.h>
 
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
+#include <pcl_ros/point_cloud.h>  // Allow use of PCL cloud types for pubs and subs
 #include <pcl_ros/transforms.h>
 #include <pcl/filters/voxel_grid.h>
 
@@ -25,9 +25,11 @@
 #include "sr_vision_msgs/PclTransform.h"
 #include "sr_vision_msgs/PclFilter.h"
 
-namespace sr_point_cloud {
+namespace sr_point_cloud 
+{
 
-class PointCloudServicesNode {
+class PointCloudServicesNode 
+{
 
 public:
     typedef pcl::PointXYZRGB PointType;
@@ -43,7 +45,7 @@ public:
       : nh_("~")
     {
       cloud_tf_server_ = nh_.advertiseService("transform_cloud", &PointCloudServicesNode::transform_cloud_, this);
-      //This is a service that will allow to filter a single point cloud message (apply VoxelGrid for the time being)
+      // This is a service that will allow to filter a single point cloud message (apply VoxelGrid for the time being)
       cloud_filter_server_ = nh_.advertiseService("filter_cloud", &PointCloudServicesNode::filter_cloud_, this);
     }
 
@@ -80,9 +82,9 @@ protected:
     gridSample (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
     {
       pcl::VoxelGrid<PointType> grid;
-      grid.setLeafSize (leaf_size, leaf_size, leaf_size);
-      grid.setInputCloud (cloud);
-      grid.filter (result);
+      grid.setLeafSize(leaf_size, leaf_size, leaf_size);
+      grid.setInputCloud(cloud);
+      grid.filter(result);
     }
 
     bool
@@ -101,11 +103,11 @@ protected:
     }
 };
 
-} //sr_point_cloud
+}  // namespace sr_point_cloud
 
 int main (int argc, char** argv)
 {
-  ros::init (argc, argv, "point_cloud_transformer");
+  ros::init(argc, argv, "point_cloud_transformer");
   sr_point_cloud::PointCloudServicesNode node;
   node.spin();
   return 0;
