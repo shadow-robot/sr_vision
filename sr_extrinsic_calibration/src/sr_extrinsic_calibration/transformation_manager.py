@@ -84,7 +84,7 @@ class TransformationManager(object):
         @return transformation
         """
         data = []
-        for i in range(self._tf_sample_data_count):
+        for _ in range(self._tf_sample_data_count):
             transformation = self.get_recent_transformation(target_frame, source_frame, abort_callback)
             data.append(transformation)
 
