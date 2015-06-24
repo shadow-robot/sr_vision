@@ -1,3 +1,5 @@
+[![Build Status](https://api.shippable.com/projects/5551c20fedd7f2c052e9809d/badge?branchName=indigo-devel)](https://app.shippable.com/projects/5551c20fedd7f2c052e9809d) [![Code Health](https://landscape.io/github/shadow-robot/sr_vision/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr_vision/indigo-devel) [![codecov.io](http://codecov.io/github/shadow-robot/sr_vision/coverage.svg?branch=indigo-devel)](http://codecov.io/github/shadow-robot/sr_vision?branch=indigo-devel)
+
 sr_vision
 ------------
 
@@ -23,4 +25,3 @@ Contains nodes for extrinsic camera calibration based on Alvar markers positions
 You can find the architecture diagram below for a closer look at how this works.
 
 ![Architecture Diagram](doc/sr_vision.png)
-

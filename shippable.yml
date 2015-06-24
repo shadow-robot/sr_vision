@@ -1,0 +1,21 @@
+language: python
+build_image: shippableimages/ubuntu1404_python
+python:
+  - 2.7
+
+#codecov token (encrypted)
+env:
+  - secure: qf0twDJ5Nbac5Q9j4epQBigXHm6oof2DUVSvC2VJ74eMif71DidrJZinoXcJMP6Fmtzkevg+KE+aMpgNrwbuytOTMH/k/6FKVtyEGZFMs3CYmzr6eXI2w8SuEJmzmwkTaFEAcYbiS4I6ozgiE6d+/dpDxPUdjet8NnMJvZ8bhgMgiNDj3U2i9Kmq6RaqxJXjQHXXaM0R8FYuU63uH5Qo6LVRK+lrIUdeQsgWGYG3Fntgr6fLfgSYDc8A31GZ9l61Fb7b3NVKgB4HlvEi6b8WUurhRNzU9cOKzhTDtVgXn8BBYWqFVarwSuxOk5mryJen0Q7cp3D1N8nS/7aX97s/ew==
+
+cache: true
+
+install:
+  - sudo apt-get update
+  - sudo apt-get install curl -y
+
+script:
+  - export toolset_branch="master"
+  - export server_type="shippable"
+  - export used_modules="check_cache,install,create_workspace,code_style_check,unit_tests,codecov_tool"
+  - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
+  - curl -s "$( echo "$remote_shell_script" | sed 's/#/%23/g' )" | bash /dev/stdin "$toolset_branch" $server_type $used_modules
