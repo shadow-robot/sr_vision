@@ -21,14 +21,15 @@
 #include <pcl/surface/gp3.h>
 #include <pcl/surface/mls.h>
 
+#include <string>
+
 //-------------------------------------------------------------------------------
 
-namespace sr_point_cloud 
+namespace sr_point_cloud
 {
 
-class Triangulator 
+class Triangulator
 {
-
 protected:
   typedef pcl::PointXYZ PointType;
   typedef pcl::PointCloud<PointType> Cloud;

@@ -25,6 +25,7 @@
 
 #include <vector>
 #include <algorithm>
+#include <string>
 
 namespace sr_point_cloud
 {
