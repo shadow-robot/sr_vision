@@ -18,7 +18,7 @@ protected:
   {
     // setup coherences
     typename ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>::Ptr
-	coherence(new ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>());
+    coherence(new ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>());
 
     boost::shared_ptr<DistanceCoherence<pcl::PointXYZRGB> >
     distance_coherence(new DistanceCoherence<pcl::PointXYZRGB>());

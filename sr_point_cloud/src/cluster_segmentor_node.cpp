@@ -55,7 +55,7 @@ public:
     ClusterSegmentorNode()
       : nh_("~")
       , remove_nan_(true)
-      , recognize_objects_as_(nh_, "recognize_objects", 
+      , recognize_objects_as_(nh_, "recognize_objects",
 boost::bind(&ClusterSegmentorNode::recognize_objects_execute_cb_, this, _1), false)
     {
         config_server_.setCallback(boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2));

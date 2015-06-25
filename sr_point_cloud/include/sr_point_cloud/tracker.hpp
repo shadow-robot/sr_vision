@@ -127,13 +127,13 @@ protected:
     if (use_fixed)
     {
       boost::shared_ptr<ParticleFilterOMPTracker<PointType,
-	  ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+      ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker_ = tracker;
     }
     else
     {
       boost::shared_ptr<KLDAdaptiveParticleFilterOMPTracker<PointType,
-	  ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+      ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker->setMaximumParticleNum(500);
       tracker->setDelta(0.99);
       tracker->setEpsilon(0.2);
@@ -166,7 +166,7 @@ protected:
   {
     // setup coherences
     typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr
-	coherence(new ApproxNearestPairPointCloudCoherence<PointType>());
+    coherence(new ApproxNearestPairPointCloudCoherence<PointType>());
 
     boost::shared_ptr<DistanceCoherence<PointType> > distance_coherence(new DistanceCoherence<PointType>());
     coherence->addPointCoherence(distance_coherence);
@@ -373,9 +373,9 @@ protected:
     Eigen::Vector4f c;
     CloudPtr transed_ref(new Cloud);
     pcl::compute3DCentroid<PointType> (*ref_cloud, c);
-    Eigen::Affine3f trans = Eigen::Affine3f::Identity ();
+    Eigen::Affine3f trans = Eigen::Affine3f::Identity();
     trans.translation() = Eigen::Vector3f(c[0], c[1], c[2]);
-    pcl::transformPointCloud<PointType>(*ref_cloud, *transed_ref, trans.inverse ());
+    pcl::transformPointCloud<PointType>(*ref_cloud, *transed_ref, trans.inverse());
 
     initTracker();
     tracker_->setReferenceCloud(transed_ref);
