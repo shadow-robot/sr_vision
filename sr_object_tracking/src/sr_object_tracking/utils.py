@@ -51,6 +51,6 @@ class Utils(object):
                 rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
             else:
                 rect = list(roi)
-        except (IndexError, TypeError):
+        except (IndexError, TypeError, ValueError):
             return [0, 0, 0, 0]
         return rect

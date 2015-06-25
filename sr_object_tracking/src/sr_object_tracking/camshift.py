@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import cv2
+import rospy
 import numpy as np
 from sr_object_tracking import SrObjectTracking
 
@@ -46,4 +47,9 @@ class CamshiftTracking(SrObjectTracking):
                 self.track_box, self.track_window = cv2.CamShift(prob, self.track_window, term_crit)
 
         roi = self.utils.publish_box(self.track_box)
+
+        # Make sure that the object is still tracked, otherwise launch the segmentation
+        if roi.width * roi.height < 50 :
+            rospy.set_param('/stop_seg', False)
+
         self.roi_pub.publish(roi)

@@ -7,7 +7,6 @@ import rospy
 from sr_object_tracking.utils import Utils
 
 from sensor_msgs.msg import RegionOfInterest, Image
-from sr_vision_msgs.msg import tracking_parameters
 
 
 class DisplayImage(object):
@@ -26,7 +25,6 @@ class DisplayImage(object):
         self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
 
         self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
-        self.param_pub = rospy.Publisher('/roi/parameters', tracking_parameters, queue_size=1)
 
         self.utils = Utils()
 
@@ -43,8 +41,7 @@ class DisplayImage(object):
         self.vis = None
 
         # Minimum saturation of the tracked color in HSV space, and a threshold on the backprojection probability image
-        self.smin = 150
-        self.threshold = 50
+        self.smin = rospy.get_param('/saturation_min')
 
         boundaries = {
             'red': ([145, 140, 0], [255, 255, 255]),
@@ -71,10 +68,9 @@ class DisplayImage(object):
         cv2.setMouseCallback(self.cv_window_name, self.on_mouse_click, None)
 
         if self.control:
-            # Create parameters window with the slider controls for saturation, value and threshold
+            # Create parameters window with the slider controls for saturation and HSV levels
             cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
             cv2.createTrackbar("Saturation", "Control", self.smin, 150, self.set_smin)
-            cv2.createTrackbar("Threshold", "Control", self.threshold, 255, self.set_threshold)
 
             cv2.moveWindow("Control", 100, 600)
             cv2.createTrackbar("LowH", "Control", self.lower[0], 240, self.set_lowh)
@@ -110,7 +106,6 @@ class DisplayImage(object):
         except cv2.error:
             pass
 
-        self.publish_parameters()
         self.selection_pub.publish(self.utils.publish_box(self.selection))
 
         img_hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
@@ -136,16 +131,6 @@ class DisplayImage(object):
         pt2 = (data.x_offset + data.width, data.y_offset + data.height)
         self.track_box = (pt1, pt2)
 
-    def publish_parameters(self):
-        """
-        Publish the tracking parameters if changed by the user.
-        """
-        param = tracking_parameters()
-        param.smin = self.smin
-        param.threshold = self.threshold
-        param.tracking_state = self.tracking_state
-        self.param_pub.publish(param)
-
     def on_mouse_click(self, event, x, y, flags, _):
         """
         Select a ROI using the dragging
@@ -163,6 +148,7 @@ class DisplayImage(object):
                 self.selection = (0, 0, 0, 0)
                 if x1 - x0 > 0 and y1 - y0 > 0:
                     self.selection = x0, y0, x1, y1
+                    rospy.set_param('/stop_seg', True)
 
             else:
                 self.drag_start = (-1, -1)
@@ -187,9 +173,7 @@ class DisplayImage(object):
     # Set the callbacks for the slider controls
     def set_smin(self, pos):
         self.smin = pos
-
-    def set_threshold(self, pos):
-        self.threshold = pos
+        rospy.set_param('saturation_min', pos)
 
     def set_lowh(self, pos):
         self.lower[0] = pos

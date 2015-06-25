@@ -32,7 +32,8 @@ class Segmentation(object):
                 self.seg.segmentation(self.frame)
                 roi = self.utils.publish_box(self.seg.segmented_box)
                 self.selection_pub.publish(roi)
-        except rospy.ROSInterruptException:
+                rospy.set_param('/stop_seg', True)
+        except (rospy.ROSInterruptException, IndexError):
             pass
 
 

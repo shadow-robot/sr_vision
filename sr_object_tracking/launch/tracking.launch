@@ -3,6 +3,8 @@
   <include file="$(find freenect_launch)/launch/freenect.launch"/>
 
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
+    <param name="saturation_min" value="150" />
+
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  />
 
     <!-- set the color parameter for the segmentation -->

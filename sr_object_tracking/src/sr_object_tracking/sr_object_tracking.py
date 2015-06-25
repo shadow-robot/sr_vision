@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import rospy
 
-from sr_vision_msgs.msg import tracking_parameters
 from sensor_msgs.msg import Image, RegionOfInterest
 from utils import Utils
 
@@ -15,8 +14,7 @@ class SrObjectTracking(object):
         self.utils = Utils()
 
         # Initialize a number of global variables
-        self.smin = 150
-        self.threshold = 50
+        self.smin = rospy.get_param('/saturation_min')
         self.track_box = None
         self.track_window = None
         self.tracking_state = 0
@@ -28,11 +26,8 @@ class SrObjectTracking(object):
 
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
-        self.selection_sub = rospy.Subscriber("/roi/segmented_box", RegionOfInterest, self.selection_callback,
-                                              callback_args=False)
-        self.selection_sub = rospy.Subscriber("/roi/selection", RegionOfInterest, self.selection_callback,
-                                              callback_args=True)
-        self.param_sub = rospy.Subscriber("/roi/parameters", tracking_parameters, self.param_callback)
+        self.selection_sub = rospy.Subscriber("/roi/segmented_box", RegionOfInterest, self.selection_callback)
+        self.selection_sub = rospy.Subscriber("/roi/selection", RegionOfInterest, self.selection_callback)
 
         # Initialize the Region of Interest publishers
         self.roi_pub = rospy.Publisher("/roi/track_box", RegionOfInterest, queue_size=1)
@@ -43,18 +38,8 @@ class SrObjectTracking(object):
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 
-    def selection_callback(self, data, stop_seg):
+    def selection_callback(self, data):
         """
         Get the ROI box (selected or segmented)
         """
-        if stop_seg:
-            rospy.set_param('/stop_seg', True)
         self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
-
-    def param_callback(self, data):
-        """
-        Update several algorithm parameters that could be changed by the user
-        """
-        self.smin = data.smin
-        self.threshold = data.threshold
-        # self.tracking_state = data.tracking_state
