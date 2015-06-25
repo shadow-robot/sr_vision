@@ -165,7 +165,7 @@ class DisplayImage(object):
                     self.selection = x0, y0, x1, y1
 
             else:
-                self.drag_start = None
+                self.drag_start = (-1, -1)
                 if self.selection != (0, 0, 0, 0):
                     self.tracking_state = 1
                     self.selection = (0, 0, 0, 0)
