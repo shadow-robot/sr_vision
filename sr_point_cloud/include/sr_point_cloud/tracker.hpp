@@ -1,5 +1,11 @@
+/* Copyright 2015 ShadowRobot */
+
 #include <sstream>
 #include <typeinfo>
+
+#include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+#include <actionlib/server/simple_action_server.h>
 
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -15,10 +21,12 @@
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
+#include "pcl_ros/point_cloud.h"
 
 // PCL specific includes
 #include <pcl/point_cloud.h>
 #include <pcl/conversions.h>
+#include <pcl/point_types.h>
 
 #include <pcl/common/time.h>
 #include <pcl/common/centroid.h>
@@ -346,7 +354,7 @@ protected:
       cluster_segmentor.extractByCentered(clusters);
     else
       cluster_segmentor.extractByDistance(clusters);
-    ROS_INFO("... found %i clusters", static_cast<int>clusters.size());
+    ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
     if (clusters.size() > 0)
       ref_cloud = clusters[0];
 
