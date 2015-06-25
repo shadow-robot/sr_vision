@@ -1,3 +1,5 @@
+/* Copyright 2015 ShadowRobot */
+
 #pragma once
 
 #include <ros/ros.h>
