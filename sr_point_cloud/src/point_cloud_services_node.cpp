@@ -25,12 +25,11 @@
 #include "sr_vision_msgs/PclTransform.h"
 #include "sr_vision_msgs/PclFilter.h"
 
-namespace sr_point_cloud 
+namespace sr_point_cloud
 {
 
-class PointCloudServicesNode 
+class PointCloudServicesNode
 {
-
 public:
     typedef pcl::PointXYZRGB PointType;
     typedef pcl::PointCloud<PointType> Cloud;
@@ -79,7 +78,7 @@ protected:
     }
 
     void
-    gridSample (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+    gridSample(const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
     {
       pcl::VoxelGrid<PointType> grid;
       grid.setLeafSize(leaf_size, leaf_size, leaf_size);
@@ -105,7 +104,7 @@ protected:
 
 }  // namespace sr_point_cloud
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "point_cloud_transformer");
   sr_point_cloud::PointCloudServicesNode node;

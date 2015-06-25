@@ -309,7 +309,7 @@ void Triangulator::mirror_mesh_(Cloud &cloud)
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "point_cloud_triangulator");
   sr_point_cloud::Triangulator tri_node;

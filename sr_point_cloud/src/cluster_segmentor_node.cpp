@@ -41,9 +41,8 @@ namespace sr_point_cloud
 using std::vector;
 using namespace object_recognition_msgs;
 
-class ClusterSegmentorNode 
+class ClusterSegmentorNode
 {
-
 public:
     typedef pcl::PointXYZ PointType;
     typedef pcl::PointCloud<PointType> Cloud;
@@ -218,7 +217,7 @@ protected:
 
 }  // namespace sr_point_cloud
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cluster_segmentor");
   sr_point_cloud::ClusterSegmentorNode node;
