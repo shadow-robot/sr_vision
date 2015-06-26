@@ -1,15 +1,18 @@
+/* Copyright 2015 ShadowRobot */
+
 #include <sstream>
 #include <typeinfo>
 
 #include <ros/ros.h>
+#include <dynamic_reconfigure/server.h>
+#include <actionlib/server/simple_action_server.h>
+
 #include <sensor_msgs/PointCloud2.h>
 #include <geometry_msgs/PoseStamped.h>
 #include <tf/transform_broadcaster.h>
 
-#include <actionlib/server/simple_action_server.h>
 #include "sr_point_cloud/TrackAction.h"
 
-#include <dynamic_reconfigure/server.h>
 #include "sr_point_cloud/TrackerConfig.h"
 
 #include <kdl/frames.hpp>
@@ -18,12 +21,12 @@
 
 // ROS pcl includes
 #include "pcl_conversions/pcl_conversions.h"
-#include "pcl_ros/point_cloud.h" // Allow use of PCL cloud types for pubs and subs
+#include "pcl_ros/point_cloud.h"
 
 // PCL specific includes
 #include <pcl/point_cloud.h>
-#include <pcl/point_types.h>
 #include <pcl/conversions.h>
+#include <pcl/point_types.h>
 
 #include <pcl/common/time.h>
 #include <pcl/common/centroid.h>
@@ -47,7 +50,8 @@
 #include <pcl/filters/approximate_voxel_grid.h>
 
 
-namespace sr_point_cloud {
+namespace sr_point_cloud 
+{
 
 using namespace pcl::tracking;
 
@@ -79,7 +83,7 @@ public:
     , downsample_(true)
   {
     // Setup ROS topics and services
-    config_server_.setCallback( boost::bind(&Tracker::config_cb, this, _1, _2) );
+    config_server_.setCallback(boost::bind(&Tracker::config_cb, this, _1, _2) );
 
     input_sub_ = nh_home_.subscribe("input/points", 1, &Tracker::cloud_cb, this);
 
@@ -100,7 +104,7 @@ public:
     trackCloud(ref_cloud);
   }
 
-  void run () { ros::spin(); }
+  void run() { ros::spin(); }
 
 protected:
   /** Reset the tracker object to initial state.
@@ -118,14 +122,16 @@ protected:
 
     std::vector<double> initial_noise_covariance = std::vector<double>(6, 0.00001);
     std::vector<double> default_initial_mean = std::vector<double>(6, 0.0);
-    if (use_fixed) {
-      boost::shared_ptr<ParticleFilterOMPTracker<PointType, ParticleT> > tracker(
-                                                                                 new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+    if (use_fixed)
+    {
+      boost::shared_ptr<ParticleFilterOMPTracker<PointType,
+ ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker_ = tracker;
     }
-    else {
-      boost::shared_ptr<KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT> > tracker(
-                                                                                            new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+    else 
+    {
+      boost::shared_ptr<KLDAdaptiveParticleFilterOMPTracker<PointType,
+ ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker->setMaximumParticleNum(500);
       tracker->setDelta(0.99);
       tracker->setEpsilon(0.2);
@@ -171,7 +177,8 @@ protected:
   void
   config_cb(TrackerConfig &config, uint32_t level)
   {
-    //ROS_INFO("Reconfigure Request: %f %f %f", config.downsampling_grid_size, config.filter_z_min, config.filter_z_max );
+    // ROS_INFO("Reconfigure Request: %f %f %f", config.downsampling_grid_size,
+    // config.filter_z_min, config.filter_z_max );
     frame_id_ = config.frame_id;
     downsampling_grid_size_ = config.downsampling_grid_size;
     filter_z_min_ = config.filter_z_min;
@@ -183,21 +190,21 @@ protected:
   {
     input_ = cloud;
 
-    cloud_pass_.reset (new Cloud);
-    cloud_pass_downsampled_.reset (new Cloud);
+    cloud_pass_.reset(new Cloud);
+    cloud_pass_downsampled_.reset(new Cloud);
 
     pcl::PassThrough<PointType> pass;
-    pass.setFilterFieldName ("z");
-    pass.setFilterLimits (filter_z_min_, filter_z_max_);
-    pass.setKeepOrganized (false);
-    pass.setInputCloud (cloud);
-    pass.filter (*cloud_pass_);
+    pass.setFilterFieldName("z");
+    pass.setFilterLimits(filter_z_min_, filter_z_max_);
+    pass.setKeepOrganized(false);
+    pass.setInputCloud(cloud);
+    pass.filter(*cloud_pass_);
 
     if (downsample_)
     {
-      // TODO: param toggle use of approx downsampling
+      // TODO(shadow): param toggle use of approx downsampling
       // gridSampleApprox (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
-      gridSample (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
+      gridSample(cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
     }
     else
     {
@@ -206,9 +213,9 @@ protected:
     }
 
     if (reference_->points.size() > 0)
-      tracking ();
+      tracking();
 
-    output_downsampled_pub_.publish (cloud_pass_downsampled_);
+    output_downsampled_pub_.publish(cloud_pass_downsampled_);
   }
 
   void
@@ -240,7 +247,6 @@ protected:
     sensor_msgs::PointCloud2 input = goal->cloud;
     pcl::fromROSMsg(input, *ref_cloud);
     trackCloud(ref_cloud);
-
   }
 
   void
@@ -261,7 +267,8 @@ protected:
     typename ParticleFilter::PointCloudStatePtr particles = tracker_->getParticles();
     if (particles) {
       pcl::PointCloud<pcl::PointXYZ>::Ptr particle_cloud(new pcl::PointCloud<pcl::PointXYZ>());
-      for (size_t i = 0; i < particles->points.size(); i++) {
+      for (size_t i = 0; i < particles->points.size(); i++) 
+      {
         pcl::PointXYZ point;
         point.x = particles->points[i].x;
         point.y = particles->points[i].y;
@@ -271,7 +278,7 @@ protected:
       // Copy the header so we get the right frame
       // XXX - Should we update the time stamp?
       particle_cloud->header = input_->header;
-      particle_cloud_pub_.publish (*particle_cloud);
+      particle_cloud_pub_.publish(*particle_cloud);
     }
 
     // Publish the result cloud
@@ -294,7 +301,7 @@ protected:
     KDL::Rotation rot = KDL::Rotation::RPY(result.roll, result.pitch, result.yaw);
     rot.GetQuaternion(
                       pose.pose.orientation.x, pose.pose.orientation.y,
-                      pose.pose.orientation.z, pose.pose.orientation.w );
+                      pose.pose.orientation.z, pose.pose.orientation.w);
     result_pose_pub_.publish(pose);
 
     // broadcast the frame of the tracked object
@@ -319,18 +326,18 @@ protected:
   gridSampleApprox (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
   {
     pcl::ApproximateVoxelGrid<PointType> grid;
-    grid.setLeafSize (leaf_size, leaf_size, leaf_size);
-    grid.setInputCloud (cloud);
-    grid.filter (result);
+    grid.setLeafSize(leaf_size, leaf_size, leaf_size);
+    grid.setInputCloud(cloud);
+    grid.filter(result);
   }
 
   void
   gridSample (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
   {
     pcl::VoxelGrid<PointType> grid;
-    grid.setLeafSize (leaf_size, leaf_size, leaf_size);
-    grid.setInputCloud (cloud);
-    grid.filter (result);
+    grid.setLeafSize(leaf_size, leaf_size, leaf_size);
+    grid.setInputCloud(cloud);
+    grid.filter(result);
   }
 
   bool
@@ -347,7 +354,7 @@ protected:
       cluster_segmentor.extractByCentered(clusters);
     else
       cluster_segmentor.extractByDistance(clusters);
-    ROS_INFO("... found %i clusters", (int)clusters.size());
+    ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
     if (clusters.size() > 0)
       ref_cloud = clusters[0];
 
@@ -363,20 +370,19 @@ protected:
     CloudPtr transed_ref (new Cloud);
     pcl::compute3DCentroid<PointType> (*ref_cloud, c);
     Eigen::Affine3f trans = Eigen::Affine3f::Identity ();
-    trans.translation () = Eigen::Vector3f (c[0], c[1], c[2]);
+    trans.translation() = Eigen::Vector3f (c[0], c[1], c[2]);
     pcl::transformPointCloud<PointType> (*ref_cloud, *transed_ref, trans.inverse ());
 
     initTracker();
-    tracker_->setReferenceCloud (transed_ref);
-    tracker_->setTrans (trans);
-    tracker_->setMinIndices (ref_cloud->points.size () / 2);
+    tracker_->setReferenceCloud(transed_ref);
+    tracker_->setTrans(trans);
+    tracker_->setMinIndices(ref_cloud->points.size () / 2);
 
     reference_ = transed_ref;
     ROS_INFO_STREAM("ref_cloud: "
                     << " points: " << ref_cloud->points.size()
                     << " wh:" << ref_cloud->width << "x" << ref_cloud->height
-                    << " is_dense: " << (ref_cloud->is_dense ? "Yes" : "No")
-                    );
+                    << " is_dense: " << (ref_cloud->is_dense ? "Yes" : "No"));
   }
 
   ros::NodeHandle nh_, nh_home_;
@@ -398,6 +404,6 @@ protected:
 
   tf::TransformBroadcaster target_broadcaster_;
   tf::Transform target_transform_;
-}; // Tracker
+};  // Tracker
 
-} // sr_point_cloud
+}  // namespace sr_point_cloud

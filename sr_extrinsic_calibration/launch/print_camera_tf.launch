@@ -1,0 +1,31 @@
+<launch>
+
+  <arg name="initial_tf" default="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+
+  <arg name="base_frame" default="delta_base"/>
+
+  <arg name="cam_image_topic" default="/camera/image_raw" />
+  <arg name="cam_info_topic" default="/camera/camera_info" />
+  <arg name="camera_frame" default="camera" />
+
+  <arg name="marker_size" default="4.1" />
+  <arg name="marker_frames" default="['ar_marker_1', 'ar_marker_0', 'ar_marker_3']"/>
+  <arg name="robot_marker_frames" default="['alpha_marker_holder', 'beta_marker_holder', 'gamma_marker_holder']"/>
+
+  <include file="$(find ar_track_alvar)/launch/pr2_indiv_no_kinect.launch">
+    <arg name="cam_image_topic" value="$(arg cam_image_topic)" />
+    <arg name="cam_info_topic" value="$(arg cam_info_topic)" />
+    <arg name="output_frame" value="$(arg camera_frame)" />
+    <arg name="marker_size" value="$(arg marker_size)" />
+  </include>
+
+  <node name="print_camera_tf" pkg="sr_extrinsic_calibration" type="print_camera_tf" output="screen">
+    <param name="initial_tf" value="$(arg initial_tf)"/>
+
+    <param name="camera_frame" value="$(arg camera_frame)"/>
+    <param name="base_frame" value="$(arg base_frame)"/>
+
+    <rosparam param="robot_marker_frames" subst_value="True">$(arg robot_marker_frames)</rosparam>
+    <rosparam param="marker_frames" subst_value="True">$(arg marker_frames)</rosparam>
+  </node>
+</launch>

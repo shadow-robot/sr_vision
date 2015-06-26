@@ -1,0 +1,21 @@
+<launch>
+
+  <node pkg="tf" type="static_transform_publisher" name="base_to_marker_holder_frame_1" args="1.0 1.0 1.0 0 0 0 /delta_base /marker_holder_1 100" />
+  <node pkg="tf" type="static_transform_publisher" name="base_to_marker_holder_frame_2" args="-1.0 1.0 1.0 0 0 0 /delta_base /marker_holder_2 100" />
+  <node pkg="tf" type="static_transform_publisher" name="base_to_marker_holder_frame_3" args="-1.0 -1.0 1.0 0 0 0 /delta_base /marker_holder_3 100" />
+
+  <node pkg="tf" type="static_transform_publisher" name="camera_to_marker_frame_1" args="1.0 2.0 -1.0 0 0 0 /camera /ar_marker_1 100" />
+  <node pkg="tf" type="static_transform_publisher" name="camera_to_marker_frame_2" args="-1.0 2.0 -1.0 0 0 0 /camera /ar_marker_2 100" />
+  <node pkg="tf" type="static_transform_publisher" name="camera_to_marker_frame_3" args="-1.0 2.0 1.0 0 0 0 /camera /ar_marker_3 100" />
+
+
+  <node name="camera_calibration" pkg="sr_extrinsic_calibration" type="camera_calibration_node" output="screen">
+    <param name="camera_frame" value="camera"/>
+    <param name="base_frame" value="delta_base"/>
+
+    <rosparam param="robot_marker_frames">["marker_holder_1", "marker_holder_2", "marker_holder_3"]</rosparam>
+    <rosparam param="marker_frames">["ar_marker_1", "ar_marker_2", "ar_marker_3"]</rosparam>
+  </node>
+
+  <test test-name="test_three_points_translation_and_rotation" ns="camera_calibration" pkg="sr_extrinsic_calibration" type="test_translation_and_rotation.py"/>
+</launch>
