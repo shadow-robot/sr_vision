@@ -19,7 +19,9 @@ class SrObjectTracking(object):
         self.track_window = None
         self.tracking_state = 0
         self.selection = (0, 0, 0, 0)
+        self.prev_frame = None
         self.frame = None
+        self.next_frame = None
         self.depth_image = None
         self.vis = None
         self.hist = None
@@ -36,10 +38,13 @@ class SrObjectTracking(object):
         """
         Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
         """
-        self.frame = self.utils.convert_image(data, "bgr8")
+        self.prev_frame = self.frame
+        self.frame = self.next_frame
+        self.next_frame = self.utils.convert_image(data, "bgr8")
 
     def selection_callback(self, data):
         """
         Get the ROI box (selected or segmented)
         """
         self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
+
