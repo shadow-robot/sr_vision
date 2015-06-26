@@ -1,4 +1,7 @@
 <launch>
+
+  <arg name="initial_tf" default="[0.0, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+
   <arg name="base_frame" default="delta_base"/>
 
   <arg name="cam_image_topic" default="/camera/image_raw" />
@@ -17,6 +20,8 @@
   </include>
 
   <node name="print_camera_tf" pkg="sr_extrinsic_calibration" type="print_camera_tf" output="screen">
+    <param name="initial_tf" value="$(arg initial_tf)"/>
+
     <param name="camera_frame" value="$(arg camera_frame)"/>
     <param name="base_frame" value="$(arg base_frame)"/>
 
