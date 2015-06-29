@@ -47,4 +47,3 @@ class SrObjectTracking(object):
         Get the ROI box (selected or segmented)
         """
         self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
-
