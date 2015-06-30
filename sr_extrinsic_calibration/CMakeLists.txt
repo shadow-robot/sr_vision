@@ -159,15 +159,11 @@ include_directories(
 
 if (CATKIN_ENABLE_TESTING)
 
-  if (RUN_ROS_TESTS)
-
-    find_package(rostest REQUIRED)
-    add_rostest(test/test_continuous_calibration.test)
-    add_rostest(test/test_simple_translation.test)
-    add_rostest(test/test_three_points_translation_and_rotation.test)
-    add_rostest(test/test_translation_and_rotation.test)
-
-  endif()
+  find_package(rostest REQUIRED)
+  add_rostest(test/test_continuous_calibration.test)
+  add_rostest(test/test_simple_translation.test)
+  add_rostest(test/test_three_points_translation_and_rotation.test)
+  add_rostest(test/test_translation_and_rotation.test)
 
 endif()
 
