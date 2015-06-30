@@ -190,7 +190,7 @@ class ClusterSegmentor
     extractSegmentCluster(
         const std::vector<pcl::PointIndices> cluster_indices,
         const int segment_index,
-        Cloud *result)
+        Cloud &result)
     {
       pcl::PointIndices segmented_indices = cluster_indices[segment_index];
       for (size_t i = 0; i < segmented_indices.indices.size (); i++)

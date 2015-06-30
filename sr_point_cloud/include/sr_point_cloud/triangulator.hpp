@@ -66,7 +66,7 @@ public:
   void run(void);
 
 protected:
-  void config_cb_(TriangulatorConfig &config, uint32_t level);
+  void config_cb_(const TriangulatorConfig &config, uint32_t level);
 
   void cloud_cb_(const Cloud::ConstPtr &cloud);
 
@@ -80,7 +80,7 @@ protected:
 
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                            shape_msgs::Mesh &shapeMesh);
+                            shape_msgs::Mesh *shapeMesh);
 };  // Triangulator
 
 }  // End of namespace sr_point_cloud

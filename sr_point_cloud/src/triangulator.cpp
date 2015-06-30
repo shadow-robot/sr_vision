@@ -65,7 +65,7 @@ void Triangulator::run(void)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::config_cb_(TriangulatorConfig &config, uint32_t level)
+void Triangulator::config_cb_(const TriangulatorConfig &config, uint32_t level)
 {
   resample_ = config.resample;
   mu_ = config.mu;
@@ -218,7 +218,7 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
 
   // Convert to shape_msgs::Mesh type
   // The given cloud should NOT be used after resampling.
-  this->from_PCLPolygonMesh_(triangles, cloud_with_normals, shapeMesh);
+  this->from_PCLPolygonMesh_(triangles, cloud_with_normals, &shapeMesh);
 
   // Debug
   // pcl::io::saveVTKFile("mesh.vtk", triangles);
@@ -228,7 +228,7 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
 
 void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                                         const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                                        shape_msgs::Mesh &shapeMesh)
+                                        shape_msgs::Mesh *shapeMesh)
 {
   const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
@@ -240,7 +240,7 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     vertex.x = curr_point.x;
     vertex.y = curr_point.y;
     vertex.z = curr_point.z;
-    shapeMesh.vertices.push_back(vertex);
+    shapeMesh->vertices.push_back(vertex);
   }
 
   // Set the list of triangles.
@@ -252,7 +252,7 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     triangle.vertex_indices[0] = curr_poly.vertices[0];
     triangle.vertex_indices[1] = curr_poly.vertices[1];
     triangle.vertex_indices[2] = curr_poly.vertices[2];
-    shapeMesh.triangles.push_back(triangle);
+    shapeMesh->triangles.push_back(triangle);
   }
 }
 
