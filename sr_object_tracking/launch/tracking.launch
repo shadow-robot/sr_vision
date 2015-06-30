@@ -1,9 +1,10 @@
 <launch>
 
-  <include file="$(find freenect_launch)/launch/freenect.launch"/>
+  <!--include file="$(find freenect_launch)/launch/freenect.launch"/-->
 
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
     <param name="saturation_min" value="150" />
+    <param name="size" value="75" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  />
 
@@ -20,6 +21,6 @@
     <!-- display the control parameters window or not -->
     <param name="control" value="False" />
 
-  <node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  />
+  <!-- node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  /-->
 
 </launch>

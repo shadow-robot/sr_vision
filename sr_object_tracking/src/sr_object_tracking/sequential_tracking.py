@@ -29,10 +29,15 @@ class SequentialTracking(SrObjectTracking):
         diff_frame = cv2.bitwise_and(d1, d2)
         diff_frame = cv2.cvtColor(diff_frame, cv2.COLOR_BGR2GRAY)
 
-        # Seems better with a blur
         self.vis = cv2.blur(self.vis, (5, 5))
         hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
+
+        img_thresh = cv2.inRange(hsv, self.lower, self.upper)
+        img = cv2.bitwise_and(self.frame, self.frame, mask=img_thresh)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        seq = img + diff_frame
 
         if self.selection != (0, 0, 0, 0):
             x0, y0, x1, y1 = self.selection
@@ -46,7 +51,7 @@ class SequentialTracking(SrObjectTracking):
 
         if self.tracking_state == 1:
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
-            prob = prob + diff_frame
+            prob = prob + seq
             prob &= mask
             term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
             nb_iter = cv2.meanShift(prob, self.track_window, term_crit)[0]
@@ -56,7 +61,7 @@ class SequentialTracking(SrObjectTracking):
         roi = self.utils.publish_box(self.track_box)
 
         # Make sure that the object is still tracked, otherwise launch the segmentation
-        if roi.width * roi.height < 50:
+        if roi.width * roi.height not in [self.size - 10, self.size + 10]:
             rospy.set_param('/stop_seg', False)
 
         self.roi_pub.publish(roi)
