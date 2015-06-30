@@ -23,21 +23,11 @@ class SequentialTracking(SrObjectTracking):
         """
         self.vis = self.frame.copy()
 
-        # Motion detection using a differential image calculated from three consecutive frames
-        d1 = cv2.absdiff(self.next_frame, self.frame)
-        d2 = cv2.absdiff(self.frame, self.prev_frame)
-        diff_frame = cv2.bitwise_and(d1, d2)
-        diff_frame = cv2.cvtColor(diff_frame, cv2.COLOR_BGR2GRAY)
-
-        self.vis = cv2.blur(self.vis, (5, 5))
-        hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
+        self.frame = cv2.blur(self.frame, (5, 5))
+        hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
 
-        img_thresh = cv2.inRange(hsv, self.lower, self.upper)
-        img = cv2.bitwise_and(self.frame, self.frame, mask=img_thresh)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-
-        seq = img + diff_frame
+        seq = self.sequential_process(hsv)
 
         if self.selection != (0, 0, 0, 0):
             x0, y0, x1, y1 = self.selection
@@ -61,7 +51,22 @@ class SequentialTracking(SrObjectTracking):
         roi = self.utils.publish_box(self.track_box)
 
         # Make sure that the object is still tracked, otherwise launch the segmentation
-        if roi.width * roi.height not in [self.size - 10, self.size + 10]:
+        if roi.width * roi.height < 20:
             rospy.set_param('/stop_seg', False)
 
         self.roi_pub.publish(roi)
+
+
+    def sequential_process(self, hsv):
+
+        # Motion detection using a differential image calculated from three consecutive frames
+        d1 = cv2.absdiff(self.next_frame, self.frame)
+        d2 = cv2.absdiff(self.frame, self.prev_frame)
+        diff_frame = cv2.bitwise_and(d1, d2)
+        diff_frame = cv2.cvtColor(diff_frame, cv2.COLOR_BGR2GRAY)
+
+        img_thresh = cv2.inRange(hsv, self.lower, self.upper)
+        img = cv2.bitwise_and(self.frame, self.frame, mask=img_thresh)
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+
+        return img + diff_frame
