@@ -174,7 +174,7 @@ protected:
         cluster_segmentor_.setInputCloud(input_cloud_);
 
       ROS_INFO("Segmenting cloud...");
-      cluster_segmentor_.extract(clusters);
+      cluster_segmentor_.extract(&clusters);
       ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
 
       std_msgs::Header head = pcl_conversions::fromPCL(input_cloud_->header);

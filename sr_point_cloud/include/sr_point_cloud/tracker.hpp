@@ -355,9 +355,9 @@ protected:
 
     ROS_INFO("Segmenting cloud...");
     if (sort_type == SEGMENT_SORT_BY_CENTERED)
-      cluster_segmentor.extractByCentered(clusters);
+      cluster_segmentor.extractByCentered(&clusters);
     else
-      cluster_segmentor.extractByDistance(clusters);
+      cluster_segmentor.extractByDistance(&clusters);
     ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
     if (clusters.size() > 0)
       ref_cloud = clusters[0];
