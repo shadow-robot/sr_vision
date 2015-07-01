@@ -31,7 +31,7 @@ class PointCloudCropping(object):
         # Process the cropping if the track_box is initialized
         try:
             self.crop()
-        except:
+        except (TypeError, AttributeError):
             pass
 
     def camera_cloud_callback(self, data):
@@ -50,21 +50,21 @@ class PointCloudCropping(object):
             gen = point_cloud2.read_points(self.camera_cloud, uvs=pts)
             try:
                 roi_pts = list(gen)
-            except:
+            except AssertionError:
                 pass
             roi_pc = point_cloud2.create_cloud(self.camera_cloud.header, self.camera_cloud.fields, roi_pts)
             self.publish_cloud(roi_pc)
-        except:
+        except (AttributeError, point_cloud2.struct.error):
             pass
 
     def publish_cloud(self, roi_cloud):
         try:
             self.cloud_pub.publish(roi_cloud)
-        except:
+        except rospy.ROSInterruptException:
             print 'Publishing roi_cloud failed'
 
 
-def main(args):
+def main():
     try:
         rospy.init_node('cloud_cropping')
         PointCloudCropping()
@@ -74,4 +74,4 @@ def main(args):
 
 
 if __name__ == '__main__':
-    main(sys.argv)
+    main()
