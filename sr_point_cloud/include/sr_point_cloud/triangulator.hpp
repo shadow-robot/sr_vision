@@ -23,13 +23,12 @@
 
 #include <string>
 
-//-------------------------------------------------------------------------------
-
-namespace sr_point_cloud
+namespace sr_point_cloud 
 {
 
-class Triangulator
+class Triangulator 
 {
+
 protected:
   typedef pcl::PointXYZ PointType;
   typedef pcl::PointCloud<PointType> Cloud;
@@ -80,7 +79,7 @@ protected:
 
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                            shape_msgs::Mesh *shapeMesh);
+                            shape_msgs::Mesh &shapeMesh);
 };  // Triangulator
 
 }  // End of namespace sr_point_cloud

@@ -25,11 +25,12 @@
 #include "sr_vision_msgs/PclTransform.h"
 #include "sr_vision_msgs/PclFilter.h"
 
-namespace sr_point_cloud
+namespace sr_point_cloud 
 {
 
 class PointCloudServicesNode
 {
+
 public:
     typedef pcl::PointXYZRGB PointType;
     typedef pcl::PointCloud<PointType> Cloud;

@@ -52,7 +52,7 @@
 #include <vector>
 #include <string>
 
-namespace sr_point_cloud
+namespace sr_point_cloud 
 {
 
 using namespace pcl::tracking;
@@ -127,13 +127,13 @@ protected:
     if (use_fixed)
     {
       boost::shared_ptr<ParticleFilterOMPTracker<PointType,
-      ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+ ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker_ = tracker;
     }
-    else
+    else 
     {
       boost::shared_ptr<KLDAdaptiveParticleFilterOMPTracker<PointType,
-      ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+ ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker->setMaximumParticleNum(500);
       tracker->setDelta(0.99);
       tracker->setEpsilon(0.2);
@@ -357,7 +357,7 @@ protected:
     if (sort_type == SEGMENT_SORT_BY_CENTERED)
       cluster_segmentor.extractByCentered(&clusters);
     else
-      cluster_segmentor.extractByDistance(&clusters);
+      cluster_segmentor.extractByDistance(clusters);
     ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
     if (clusters.size() > 0)
       ref_cloud = clusters[0];
@@ -373,14 +373,14 @@ protected:
     Eigen::Vector4f c;
     CloudPtr transed_ref(new Cloud);
     pcl::compute3DCentroid<PointType> (*ref_cloud, c);
-    Eigen::Affine3f trans = Eigen::Affine3f::Identity();
-    trans.translation() = Eigen::Vector3f(c[0], c[1], c[2]);
-    pcl::transformPointCloud<PointType>(*ref_cloud, *transed_ref, trans.inverse());
+    Eigen::Affine3f trans = Eigen::Affine3f::Identity ();
+    trans.translation() = Eigen::Vector3f (c[0], c[1], c[2]);
+    pcl::transformPointCloud<PointType> (*ref_cloud, *transed_ref, trans.inverse ());
 
     initTracker();
     tracker_->setReferenceCloud(transed_ref);
     tracker_->setTrans(trans);
-    tracker_->setMinIndices(ref_cloud->points.size() / 2);
+    tracker_->setMinIndices(ref_cloud->points.size () / 2);
 
     reference_ = transed_ref;
     ROS_INFO_STREAM("ref_cloud: "

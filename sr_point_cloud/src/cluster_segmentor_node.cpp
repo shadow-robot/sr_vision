@@ -43,6 +43,7 @@ using namespace object_recognition_msgs;
 
 class ClusterSegmentorNode
 {
+
 public:
     typedef pcl::PointXYZ PointType;
     typedef pcl::PointCloud<PointType> Cloud;
@@ -55,7 +56,7 @@ public:
     ClusterSegmentorNode()
       : nh_("~")
       , remove_nan_(true)
-      , recognize_objects_as_(nh_, "recognize_objects",
+      , recognize_objects_as_(nh_, "recognize_objects", 
 boost::bind(&ClusterSegmentorNode::recognize_objects_execute_cb_, this, _1), false)
     {
         config_server_.setCallback(boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2));
@@ -174,7 +175,7 @@ protected:
         cluster_segmentor_.setInputCloud(input_cloud_);
 
       ROS_INFO("Segmenting cloud...");
-      cluster_segmentor_.extract(&clusters);
+      cluster_segmentor_.extract(clusters);
       ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
 
       std_msgs::Header head = pcl_conversions::fromPCL(input_cloud_->header);

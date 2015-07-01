@@ -1,7 +1,7 @@
 /* Copyright 2015 ShadowRobot */
 
 #include <string>
-#include <sr_vision_msgs/TriangulateAction.h>
+#include <sr_grasp_msgs/TriangulateAction.h>
 
 #include <ros/ros.h>
 #include <ros/package.h>

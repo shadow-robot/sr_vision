@@ -25,7 +25,6 @@
 
 #include <vector>
 #include <algorithm>
-#include <string>
 
 namespace sr_point_cloud
 {
@@ -111,7 +110,7 @@ class ClusterSegmentor
       segmentTargetCloud();  // Sets target_cloud_
 
       std::vector<pcl::PointIndices> cluster_indices;
-      euclideanSegment(&cluster_indices);
+      euclideanSegment(cluster_indices);
       if (cluster_indices.size () == 0)
         return;
 
@@ -120,10 +119,10 @@ class ClusterSegmentor
       {
         temp_cloud.reset (new Cloud);
         extractSegmentCluster(cluster_indices, i, *temp_cloud);
-        results->push_back(temp_cloud);
-        // std::stringstream filename;
-        // filename << "segment_cluster_" << i << ".pcd";
-        // pcl::io::savePCDFileASCII(filename.str(), *temp_cloud);
+        results.push_back(temp_cloud);
+        //std::stringstream filename;
+        //filename << "segment_cluster_" << i << ".pcd";
+        //pcl::io::savePCDFileASCII(filename.str(), *temp_cloud);
       }
     }
 
@@ -131,14 +130,14 @@ class ClusterSegmentor
     extractByCentered(std::vector<CloudPtr> *results)
     {
       extract(results);
-      std::sort(results->begin(), results->end(), ClusterSegmentor::byCentered);
+      std::sort(results.begin(), results.end(), ClusterSegmentor::byCentered);
     }
 
     void
     extractByDistance(std::vector<CloudPtr> *results)
     {
       extract(results);
-      std::sort(results->begin(), results->end(), ClusterSegmentor::byDistance);
+      std::sort(results.begin(), results.end(), ClusterSegmentor::byDistance);
     }
 
     /**
@@ -183,7 +182,7 @@ class ClusterSegmentor
       ec.setMaxClusterSize(max_pts_per_cluster_);
       ec.setSearchMethod(tree);
       ec.setInputCloud(target_cloud_);
-      ec.extract(*cluster_indices);
+      ec.extract(cluster_indices);
     }
 
     void
@@ -222,7 +221,7 @@ class ClusterSegmentor
           nonplane_cloud_.reset (new Cloud);
 
           planeProjection(*cloud_projected, coefficients);
-          convexHull(cloud_projected, *cloud_hull_, &hull_vertices_);
+          convexHull(cloud_projected, *cloud_hull_, hull_vertices_);
 
           extractNonPlanePoints(input_, cloud_hull_, *nonplane_cloud_);
           target_cloud_ = nonplane_cloud_;
@@ -241,7 +240,7 @@ class ClusterSegmentor
     }
 
     void
-    planeSegmentation(pcl::ModelCoefficients &coefficients, pcl::PointIndices &inliers)
+    planeSegmentation (pcl::ModelCoefficients &coefficients, pcl::PointIndices &inliers)
     {
       pcl::SACSegmentation<PointType> seg;
       seg.setOptimizeCoefficients(true);
@@ -268,7 +267,7 @@ class ClusterSegmentor
     {
       pcl::ConvexHull<PointType> chull;
       chull.setInputCloud(cloud);
-      chull.reconstruct(*cloud_hull_, *hull_vertices);
+      chull.reconstruct(*cloud_hull_, hull_vertices);
     }
 
     void
@@ -312,4 +311,4 @@ be considered valid
 
 }  // namespace sr_point_cloud
 
-#endif  // SR_POINT_CLOUD_CLUSTER_SEGMENTOR_H
+#endif

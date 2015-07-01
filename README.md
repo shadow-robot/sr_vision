@@ -18,6 +18,8 @@ Visualization package : display the image from the camera, let the user select a
 This package contains a tracker, a point cloud triangulator, a segmentation tool and a tool to transform point clouds.
   6. [Messages](sr_vision_msgs/)
 All messages, services and actions for sr_vision.
+  7. [Extrinsic camera calibration](sr_extrinsic_calibration/)
+Contains nodes for extrinsic camera calibration based on Alvar markers positions in camera and on real robot.
 
 
 You can find the architecture diagram below for a closer look at how this works.
