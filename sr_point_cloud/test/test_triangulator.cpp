@@ -1,4 +1,7 @@
-#include <sr_grasp_msgs/TriangulateAction.h>
+/* Copyright 2015 ShadowRobot */
+
+#include <string>
+#include <sr_vision_msgs/TriangulateAction.h>
 
 #include <ros/ros.h>
 #include <ros/package.h>
@@ -15,7 +18,7 @@
 
 // Called once when the goal completes
 void done_cb(const actionlib::SimpleClientGoalState& state,
-             const sr_grasp_msgs::TriangulateResultConstPtr& result)
+             const sr_vision_msgs::TriangulateResultConstPtr& result)
 {
   ROS_INFO("Finished in state [%s]", state.toString().c_str());
 
@@ -41,7 +44,7 @@ void active_cb()
 //-------------------------------------------------------------------------------
 
 // Called every time feedback is received for the goal
-void feedback_cb(const sr_grasp_msgs::TriangulateFeedbackConstPtr& feedback)
+void feedback_cb(const sr_vision_msgs::TriangulateFeedbackConstPtr& feedback)
 {
   // No feedback.
 }
@@ -56,20 +59,20 @@ TEST(TestTriangulator, testTriangulator)
   // Load input file into a pcl::PCLPointCloud2.
   pcl::PCLPointCloud2 pcl_pc2;
   int res = pcl::io::loadPCDFile(pcd_filename, pcl_pc2);
-  ASSERT_EQ(res, 0); // PCD file loaded?
+  ASSERT_EQ(res, 0);  // PCD file loaded?
 
   // Convert to sensor_msgs::PointCloud2.
   sensor_msgs::PointCloud2 sensor_pc2;
   pcl_conversions::fromPCL(pcl_pc2, sensor_pc2);
 
   // Set the action goal.
-  sr_grasp_msgs::TriangulateGoal goal;
+  sr_vision_msgs::TriangulateGoal goal;
   goal.point_cloud = sensor_pc2;
 
   // Create the action client, and true causes the client to spin its own thread.
   // true -> don't need ros::spin()
   std::string action_name("triangulator/triangulate");
-  actionlib::SimpleActionClient<sr_grasp_msgs::TriangulateAction> ac(action_name, true);
+  actionlib::SimpleActionClient<sr_vision_msgs::TriangulateAction> ac(action_name, true);
 
   ROS_INFO_STREAM("Waiting for action server to start.");
   ac.waitForServer();

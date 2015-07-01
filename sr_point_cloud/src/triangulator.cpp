@@ -1,7 +1,16 @@
+/*
+ * Copyright (c) 2015 Shadow Robot Company Ltd.
+ *  All rights reserved.
+ *
+ * This code is proprietary and may not be used, copied, distributed without
+ *  prior authorisation and agreement from Shadow Robot Company Ltd.
+ */
+
 #include "sr_point_cloud/triangulator.hpp"
 #include <pcl/common/transforms.h>
 #include <pcl/common/transformation_from_correspondences.h>
 #include <cmath>
+#include <vector>
 
 
 //-------------------------------------------------------------------------------
@@ -17,9 +26,9 @@ Triangulator::Triangulator()
   , resample_(true)
   , mu_(2.5)
   , maximum_nearest_neighbors_(100)
-  , maximum_surface_angle_(M_PI/4) // 45 degs
-  , minimum_angle_(M_PI/18) // 10 degs
-  , maximum_angle_(2*M_PI/3) // 120 degs
+  , maximum_surface_angle_(M_PI/4)  // 45 degs
+  , minimum_angle_(M_PI/18)  // 10 degs
+  , maximum_angle_(2*M_PI/3)  // 120 degs
   , gp3_search_radius_(0.025)
   , mls_search_radius_(0.03)
   , action_name_("triangulate")
@@ -29,7 +38,7 @@ Triangulator::Triangulator()
             false)
 {
   // Setup ROS topics and services
-  config_server_.setCallback( boost::bind(&Triangulator::config_cb_, this, _1, _2) );
+  config_server_.setCallback(boost::bind(&Triangulator::config_cb_, this, _1, _2));
   input_sub_ = nh_.subscribe("input/points", 1, &Triangulator::cloud_cb_, this);
   pcl_output_pub_ = nh_.advertise<pcl_msgs::PolygonMesh>("output/pcl/mesh", 1);
   shape_output_pub_ = nh_.advertise<shape_msgs::Mesh>("output/shape/mesh", 1);
@@ -56,7 +65,7 @@ void Triangulator::run(void)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::config_cb_(TriangulatorConfig &config, uint32_t level)
+void Triangulator::config_cb_(const TriangulatorConfig &config, uint32_t level)
 {
   resample_ = config.resample;
   mu_ = config.mu;
@@ -142,15 +151,15 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
     // Normal estimation
     pcl::NormalEstimation<PointType, pcl::Normal> n;
     pcl::PointCloud<pcl::Normal>::Ptr normals (new pcl::PointCloud<pcl::Normal>);
-    tree->setInputCloud (cloud);
-    n.setInputCloud (cloud);
-    n.setSearchMethod (tree);
-    n.setKSearch (20);
-    n.compute (*normals);
+    tree->setInputCloud(cloud);
+    n.setInputCloud(cloud);
+    n.setSearchMethod(tree);
+    n.setKSearch(20);
+    n.compute(*normals);
     // normals should contain the point normals + surface curvatures
 
-    cloud_with_normals.reset (new pcl::PointCloud<pcl::PointNormal>);
-    pcl::concatenateFields (*cloud, *normals, *cloud_with_normals);
+    cloud_with_normals.reset(new pcl::PointCloud<pcl::PointNormal>);
+    pcl::concatenateFields(*cloud, *normals, *cloud_with_normals);
   }
   else
   {
@@ -160,17 +169,17 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
     // Init object (second point type is for the normals, even if unused)
     pcl::MovingLeastSquares<PointType, pcl::PointNormal> mls;
 
-    mls.setComputeNormals (true);
+    mls.setComputeNormals(true);
 
     // Set parameters
-    mls.setInputCloud (cloud);
-    mls.setPolynomialFit (true);
-    mls.setSearchMethod (tree);
-    mls.setSearchRadius (mls_search_radius_);
+    mls.setInputCloud(cloud);
+    mls.setPolynomialFit(true);
+    mls.setSearchMethod(tree);
+    mls.setSearchRadius(mls_search_radius_);
 
     // Reconstruct.
     pcl::PointCloud<pcl::PointNormal> mls_points;
-    mls.process (mls_points);
+    mls.process(mls_points);
 
     // Set shared_ptr cloud_with_normals
     cloud_with_normals = boost::make_shared< pcl::PointCloud<pcl::PointNormal> > (mls_points);
@@ -179,18 +188,18 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
 
   // Create search tree
   pcl::search::KdTree<pcl::PointNormal>::Ptr tree2 (new pcl::search::KdTree<pcl::PointNormal>);
-  tree2->setInputCloud (cloud_with_normals);
+  tree2->setInputCloud(cloud_with_normals);
 
   // Initialize objects
   pcl::GreedyProjectionTriangulation<pcl::PointNormal> gp3;
   pcl::PolygonMesh triangles;
 
   // Set the maximum distance between connected points (maximum edge length)
-  gp3.setSearchRadius (gp3_search_radius_);
+  gp3.setSearchRadius(gp3_search_radius_);
 
   // Set typical values for the parameters
-  gp3.setMu (mu_);
-  gp3.setMaximumNearestNeighbors (maximum_nearest_neighbors_);
+  gp3.setMu(mu_);
+  gp3.setMaximumNearestNeighbors(maximum_nearest_neighbors_);
   gp3.setMaximumSurfaceAngle(maximum_surface_angle_);
   gp3.setMinimumAngle(minimum_angle_);
   gp3.setMaximumAngle(maximum_angle_);
@@ -200,16 +209,16 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   gp3.setNormalConsistency(true);
 
   // Get result
-  gp3.setInputCloud (cloud_with_normals);
-  gp3.setSearchMethod (tree2);
-  gp3.reconstruct (triangles);
+  gp3.setInputCloud(cloud_with_normals);
+  gp3.setSearchMethod(tree2);
+  gp3.reconstruct(triangles);
 
   // Convert to ROS type
   pcl_conversions::fromPCL(triangles, pclMesh);
 
   // Convert to shape_msgs::Mesh type
   // The given cloud should NOT be used after resampling.
-  this->from_PCLPolygonMesh_(triangles, cloud_with_normals, shapeMesh);
+  this->from_PCLPolygonMesh_(triangles, cloud_with_normals, &shapeMesh);
 
   // Debug
   // pcl::io::saveVTKFile("mesh.vtk", triangles);
@@ -219,7 +228,7 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
 
 void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                                         const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                                        shape_msgs::Mesh &shapeMesh)
+                                        shape_msgs::Mesh *shapeMesh)
 {
   const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
@@ -231,7 +240,7 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     vertex.x = curr_point.x;
     vertex.y = curr_point.y;
     vertex.z = curr_point.z;
-    shapeMesh.vertices.push_back(vertex);
+    shapeMesh->vertices.push_back(vertex);
   }
 
   // Set the list of triangles.
@@ -243,7 +252,7 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     triangle.vertex_indices[0] = curr_poly.vertices[0];
     triangle.vertex_indices[1] = curr_poly.vertices[1];
     triangle.vertex_indices[2] = curr_poly.vertices[2];
-    shapeMesh.triangles.push_back(triangle);
+    shapeMesh->triangles.push_back(triangle);
   }
 }
 
@@ -300,9 +309,9 @@ void Triangulator::mirror_mesh_(Cloud &cloud)
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
-  ros::init (argc, argv, "point_cloud_triangulator");
+  ros::init(argc, argv, "point_cloud_triangulator");
   sr_point_cloud::Triangulator tri_node;
   tri_node.run();
   return 0;

@@ -7,6 +7,7 @@
 # prior authorisation and agreement from Shadow Robot Company Ltd. *
 # ####################################################################
 
+import rospy
 from geometry_msgs.msg import PoseWithCovarianceStamped
 import sensor_msgs.point_cloud2
 

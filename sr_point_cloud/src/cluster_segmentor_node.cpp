@@ -20,7 +20,7 @@
 #include <tf/transform_listener.h>
 
 #include <pcl_conversions/pcl_conversions.h>
-#include <pcl_ros/point_cloud.h> // Allow use of PCL cloud types for pubs and subs
+#include <pcl_ros/point_cloud.h>  // Allow use of PCL cloud types for pubs and subs
 #include <pcl_ros/transforms.h>
 #include <pcl/filters/filter.h>
 #include <pcl/common/centroid.h>
@@ -32,13 +32,17 @@
 #include <object_recognition_msgs/ObjectRecognitionAction.h>
 #include <actionlib/server/simple_action_server.h>
 
-namespace sr_point_cloud {
+#include <string>
+#include <vector>
+
+namespace sr_point_cloud
+{
 
 using std::vector;
 using namespace object_recognition_msgs;
 
-class ClusterSegmentorNode {
-
+class ClusterSegmentorNode
+{
 public:
     typedef pcl::PointXYZ PointType;
     typedef pcl::PointCloud<PointType> Cloud;
@@ -51,9 +55,10 @@ public:
     ClusterSegmentorNode()
       : nh_("~")
       , remove_nan_(true)
-      , recognize_objects_as_(nh_, "recognize_objects", boost::bind(&ClusterSegmentorNode::recognize_objects_execute_cb_, this, _1), false)
+      , recognize_objects_as_(nh_, "recognize_objects",
+boost::bind(&ClusterSegmentorNode::recognize_objects_execute_cb_, this, _1), false)
     {
-        config_server_.setCallback( boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2) );
+        config_server_.setCallback(boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2));
         input_cloud_sub_ = nh_.subscribe("input/points", 1, &ClusterSegmentorNode::cloud_cb_, this);
         nh_.param<std::string>("output_frame", output_frame_, "");
 
@@ -62,7 +67,7 @@ public:
         // messing around with locks to get this to play nice with the actionlib
         // interface at the same time.
         // See cloud_cb_ for publish code.
-        //output_objects_pub_ = nh_.advertise<RecognizedObjectArray>("output/clusters", 1);
+        // output_objects_pub_ = nh_.advertise<RecognizedObjectArray>("output/clusters", 1);
 
         recognize_objects_as_.start();
     }
@@ -104,15 +109,15 @@ protected:
         Cloud::Ptr clean_cloud(new Cloud);
         pcl::removeNaNFromPointCloud(*cloud, *clean_cloud, indices);
         input_cloud_ = clean_cloud;
-        //ROS_INFO_STREAM("Segmenting cloud: " << *cloud << "\n" << *input_cloud_);
+        // ROS_INFO_STREAM("Segmenting cloud: " << *cloud << "\n" << *input_cloud_);
       }
       else
         input_cloud_ = cloud;
 
-      //@todo - streaming interface, see constructor
-      //RecognizedObjectArray objs;
-      //extract_(objs);
-      //output_objects_pub_.publish(objs);
+      // @todo - streaming interface, see constructor
+      // RecognizedObjectArray objs;
+      // extract_(objs);
+      // output_objects_pub_.publish(objs);
     }
 
     void recognize_objects_execute_cb_(const RecognitionServer::GoalConstPtr& goal)
@@ -145,23 +150,23 @@ protected:
 
         pcl::PassThrough<PointType> pass;
 
-        pass.setFilterFieldName ("x");
-        pass.setFilterLimits (filter_limits[0], filter_limits[1]);
-        pass.setKeepOrganized (false);
-        pass.setInputCloud (input_cloud_);
-        pass.filter (*cloud_pass_x);
+        pass.setFilterFieldName("x");
+        pass.setFilterLimits(filter_limits[0], filter_limits[1]);
+        pass.setKeepOrganized(false);
+        pass.setInputCloud(input_cloud_);
+        pass.filter(*cloud_pass_x);
 
-        pass.setFilterFieldName ("y");
-        pass.setFilterLimits (filter_limits[2], filter_limits[3]);
-        pass.setKeepOrganized (false);
-        pass.setInputCloud (cloud_pass_x);
-        pass.filter (*cloud_pass_y);
+        pass.setFilterFieldName("y");
+        pass.setFilterLimits(filter_limits[2], filter_limits[3]);
+        pass.setKeepOrganized(false);
+        pass.setInputCloud(cloud_pass_x);
+        pass.filter(*cloud_pass_y);
 
-        pass.setFilterFieldName ("z");
-        pass.setFilterLimits (filter_limits[4], filter_limits[5]);
-        pass.setKeepOrganized (false);
-        pass.setInputCloud (cloud_pass_y);
-        pass.filter (*cloud_pass_z);
+        pass.setFilterFieldName("z");
+        pass.setFilterLimits(filter_limits[4], filter_limits[5]);
+        pass.setKeepOrganized(false);
+        pass.setInputCloud(cloud_pass_y);
+        pass.filter(*cloud_pass_z);
 
         cluster_segmentor_.setInputCloud(cloud_pass_z);
       }
@@ -169,8 +174,8 @@ protected:
         cluster_segmentor_.setInputCloud(input_cloud_);
 
       ROS_INFO("Segmenting cloud...");
-      cluster_segmentor_.extract(clusters);
-      ROS_INFO("... found %i clusters", (int)clusters.size());
+      cluster_segmentor_.extract(&clusters);
+      ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
 
       std_msgs::Header head = pcl_conversions::fromPCL(input_cloud_->header);
       if (!output_frame_.empty())
@@ -210,11 +215,11 @@ protected:
     }
 };
 
-} //sr_point_cloud
+}  // namespace sr_point_cloud
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
-  ros::init (argc, argv, "cluster_segmentor");
+  ros::init(argc, argv, "cluster_segmentor");
   sr_point_cloud::ClusterSegmentorNode node;
   node.spin();
   return 0;
