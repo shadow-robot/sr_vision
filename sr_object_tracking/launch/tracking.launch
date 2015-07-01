@@ -11,15 +11,9 @@
     <!-- can be : ['red','blue','green','yellow'] -->
     <param name="color" value="$(arg color)" />
 
-    <!-- Set the booleen variable controlling the segmentation -->
-    <!-- becomes True if a ROI is selected with the mouse -->
-    <param name="stop_seg" value="False" /> 
-
   <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
 
-    <!-- display the control parameters window or not -->
-    <param name="control" value="False" />
-
   <node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  />
+  <node name="segmentation_control_service" pkg="sr_object_tracking" type="segmentation_control_server.py"  />
 
 </launch>

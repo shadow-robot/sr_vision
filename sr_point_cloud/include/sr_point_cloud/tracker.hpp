@@ -49,8 +49,6 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/approximate_voxel_grid.h>
 
-#include <vector>
-#include <string>
 
 namespace sr_point_cloud 
 {
@@ -165,8 +163,7 @@ protected:
   setup_coherences(void)
   {
     // setup coherences
-    typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr
-    coherence(new ApproxNearestPairPointCloudCoherence<PointType>());
+    typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr coherence(new ApproxNearestPairPointCloudCoherence<PointType>());
 
     boost::shared_ptr<DistanceCoherence<PointType> > distance_coherence(new DistanceCoherence<PointType>());
     coherence->addPointCoherence(distance_coherence);
@@ -189,7 +186,7 @@ protected:
   }
 
   void
-  cloud_cb(const typename Cloud::ConstPtr& cloud)
+  cloud_cb (const typename Cloud::ConstPtr& cloud)
   {
     input_ = cloud;
 
@@ -222,7 +219,7 @@ protected:
   }
 
   void
-  track_goal_cb()
+  track_goal_cb ()
   {
     TrackServer::GoalConstPtr goal = track_server_.acceptNewGoal();
 
@@ -253,7 +250,7 @@ protected:
   }
 
   void
-  track_preempt_cb()
+  track_preempt_cb ()
   {
     CloudPtr ref_cloud(new Cloud);
     trackCloud(ref_cloud);
@@ -261,17 +258,16 @@ protected:
   }
 
   void
-  tracking()
+  tracking ()
   {
     tracker_->setInputCloud(cloud_pass_downsampled_);
     tracker_->compute();
 
     // Publish the particle cloud
     typename ParticleFilter::PointCloudStatePtr particles = tracker_->getParticles();
-    if (particles)
-    {
+    if (particles) {
       pcl::PointCloud<pcl::PointXYZ>::Ptr particle_cloud(new pcl::PointCloud<pcl::PointXYZ>());
-      for (size_t i = 0; i < particles->points.size(); i++)
+      for (size_t i = 0; i < particles->points.size(); i++) 
       {
         pcl::PointXYZ point;
         point.x = particles->points[i].x;
@@ -292,7 +288,7 @@ protected:
     CloudPtr result_cloud(new Cloud());
     pcl::transformPointCloud<PointType>(*reference_, *result_cloud, transformation);
     result_cloud->header = input_->header;
-    result_cloud_pub_.publish(*result_cloud);
+    result_cloud_pub_.publish (*result_cloud);
 
     std_msgs::Header ros_header = pcl_conversions::fromPCL(input_->header);
 
@@ -327,7 +323,7 @@ protected:
   }
 
   void
-  gridSampleApprox(const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+  gridSampleApprox (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
   {
     pcl::ApproximateVoxelGrid<PointType> grid;
     grid.setLeafSize(leaf_size, leaf_size, leaf_size);
@@ -336,7 +332,7 @@ protected:
   }
 
   void
-  gridSample(const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+  gridSample (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
   {
     pcl::VoxelGrid<PointType> grid;
     grid.setLeafSize(leaf_size, leaf_size, leaf_size);
@@ -355,7 +351,7 @@ protected:
 
     ROS_INFO("Segmenting cloud...");
     if (sort_type == SEGMENT_SORT_BY_CENTERED)
-      cluster_segmentor.extractByCentered(&clusters);
+      cluster_segmentor.extractByCentered(clusters);
     else
       cluster_segmentor.extractByDistance(clusters);
     ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
@@ -368,10 +364,10 @@ protected:
   }
 
   void
-  trackCloud(const CloudConstPtr &ref_cloud)
+  trackCloud (const CloudConstPtr &ref_cloud)
   {
     Eigen::Vector4f c;
-    CloudPtr transed_ref(new Cloud);
+    CloudPtr transed_ref (new Cloud);
     pcl::compute3DCentroid<PointType> (*ref_cloud, c);
     Eigen::Affine3f trans = Eigen::Affine3f::Identity ();
     trans.translation() = Eigen::Vector3f (c[0], c[1], c[2]);

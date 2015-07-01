@@ -57,6 +57,7 @@ add_service_files(
   FILES
   PclTransform.srv
   PclFilter.srv
+  SegmentationControl.srv
 )
 
 ## Generate actions in the 'action' folder

@@ -1,7 +1,6 @@
 #include "sr_point_cloud/tracker.hpp"
 
-namespace sr_point_cloud
-{
+namespace sr_point_cloud {
 
 // pcl::PointXYZRGB
 class TrackerRGB : public Tracker<pcl::PointXYZRGB>
@@ -17,11 +16,9 @@ protected:
   setup_coherences(void)
   {
     // setup coherences
-    typename ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>::Ptr
-    coherence(new ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>());
+    typename ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>::Ptr coherence(new ApproxNearestPairPointCloudCoherence<pcl::PointXYZRGB>());
 
-    boost::shared_ptr<DistanceCoherence<pcl::PointXYZRGB> >
-    distance_coherence(new DistanceCoherence<pcl::PointXYZRGB>());
+    boost::shared_ptr<DistanceCoherence<pcl::PointXYZRGB> > distance_coherence(new DistanceCoherence<pcl::PointXYZRGB>());
     coherence->addPointCoherence(distance_coherence);
 
     /*
@@ -39,4 +36,4 @@ protected:
   }
 };  // TrackerRGB
 
-}  // namespace sr_point_cloud
+} // sr_point_cloud

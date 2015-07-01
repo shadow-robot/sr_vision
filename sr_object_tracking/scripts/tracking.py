@@ -13,7 +13,7 @@ def main():
         while not rospy.is_shutdown():
             try:
                 node.tracking()
-            except (AttributeError, cv2.error, rospy.ROSInterruptException) :
+            except (AttributeError, cv2.error, rospy.ROSInterruptException):
                 pass
         rospy.spin()
 

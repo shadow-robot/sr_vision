@@ -21,7 +21,7 @@
 #include <pcl/surface/gp3.h>
 #include <pcl/surface/mls.h>
 
-#include <string>
+//-------------------------------------------------------------------------------
 
 namespace sr_point_cloud 
 {
@@ -65,7 +65,7 @@ public:
   void run(void);
 
 protected:
-  void config_cb_(const TriangulatorConfig &config, uint32_t level);
+  void config_cb_(TriangulatorConfig &config, uint32_t level);
 
   void cloud_cb_(const Cloud::ConstPtr &cloud);
 
