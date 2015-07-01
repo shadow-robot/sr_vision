@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import rospy
-import sys
 
 from sensor_msgs.msg import PointCloud2, RegionOfInterest
 from sensor_msgs import point_cloud2
@@ -60,7 +59,7 @@ class PointCloudCropping(object):
     def publish_cloud(self, roi_cloud):
         try:
             self.cloud_pub.publish(roi_cloud)
-        except rospy.ROSInterruptException:
+        except (rospy.ROSInterruptException, rospy.ROSException):
             print 'Publishing roi_cloud failed'
 
 

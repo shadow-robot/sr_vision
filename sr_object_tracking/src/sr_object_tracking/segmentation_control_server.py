@@ -6,14 +6,17 @@ import rospy
 
 def segmentation_control(req):
     """
-    Return the booleen controlling the segmentation.
+    Control the segmentation process
     """
-    return req.stop_seg
+    self.seg.segmentation(self.frame)
+    roi = self.utils.publish_box(self.seg.segmented_box)
+    self.selection_pub.publish(roi)
+    self.seg_control(True)
 
 
 def seg_control_server():
-    rospy.init_node('segmentation_controller')
-    rospy.Service('segmentation_controller', SegmentationControl, segmentation_control)
+    rospy.init_node('~start')
+    rospy.Service('~start', SegmentationControl, segmentation_control)
     rospy.spin()
 
 

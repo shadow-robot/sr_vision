@@ -8,7 +8,6 @@ from sr_object_tracking.utils import Utils
 from sr_object_segmentation.hsv_segmentation import hsv_transform
 
 from sensor_msgs.msg import RegionOfInterest, Image
-from sr_vision_msgs.srv import SegmentationControl
 
 
 class DisplayImage(object):
@@ -22,16 +21,8 @@ class DisplayImage(object):
         self.color = rospy.get_param('/color')
         self.cv_window_name = 'Video'
 
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
-        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
-
-        self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
-
-        rospy.wait_for_service('segmentation_controller')
-        self.seg_control = rospy.ServiceProxy('segmentation_controller', SegmentationControl)
-
-        self.utils = Utils()
-
+        # Initialize a number of global variables
+        self.smin = rospy.get_param('/saturation_min')
         self.hist = None
         self.drag_start = (-1, -1)
         self.track_box = None
@@ -44,12 +35,16 @@ class DisplayImage(object):
         self.frame_size = None
         self.vis = None
 
-        # Minimum saturation of the tracked color in HSV space, and a threshold on the backprojection probability image
-        self.smin = rospy.get_param('/saturation_min')
+        self.utils = Utils()
+
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
+        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
+
+        self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
 
     def display(self, data):
         """
-        Display the main window as well as the parameters choice window and the histogram one (Camshift backrpojection).
+        Display the main window as well as the parameters choice window and the histogram one (Camshift backprojection).
         Draw a rectangle around the tracking box
         """
         # Create the main display window and the histogram one
@@ -127,8 +122,6 @@ class DisplayImage(object):
                 self.selection = (0, 0, 0, 0)
                 if x1 - x0 > 0 and y1 - y0 > 0:
                     self.selection = x0, y0, x1, y1
-                    self.seg_control(True)
-                    # rospy.set_param('/stop_seg', True)
 
             else:
                 self.drag_start = (-1, -1)
