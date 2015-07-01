@@ -28,7 +28,7 @@ class Segmentation(object):
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 
-    def segment(self, req):
+    def segment(self, _):
         """
         Launch the segmentation
         @return - Success of the segmentation as a booleen
