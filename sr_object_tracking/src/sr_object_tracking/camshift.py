@@ -14,17 +14,13 @@ class CamshiftTracking(SrObjectTracking):
         """
         Initialize the CamShift segmentation object
         """
-
         SrObjectTracking.__init__(self)
 
-    def tracking(self, frame, selection):
+    def tracking(self):
         """
         Track the RegionOfInterest and return the track box updating the attribute
-        @param frame - Image in a numpy format
-        @param selection - region of interest box selected by the user
+        @return - Success of the tracking as a booleen
         """
-        self.selection = selection
-        self.frame = frame
         self.vis = self.frame.copy()
 
         # Seems better with a blur
@@ -40,9 +36,7 @@ class CamshiftTracking(SrObjectTracking):
             hist = cv2.calcHist([hsv_roi], [0], mask_roi, [16], [0, 180])
             cv2.normalize(hist, hist, 0, 255, cv2.NORM_MINMAX)
             self.hist = hist.reshape(-1)
-            vis_roi = self.vis[y0:y1, x0:x1]
-            cv2.bitwise_not(vis_roi, vis_roi)
-            self.vis[mask == 0] = 0
+            self.tracking_state = 1
 
         if self.tracking_state == 1:
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
@@ -52,4 +46,11 @@ class CamshiftTracking(SrObjectTracking):
             if nb_iter != 0:
                 self.track_box, self.track_window = cv2.CamShift(prob, self.track_window, term_crit)
 
-        self.publish_roi()
+        roi = self.utils.publish_box(self.track_box)
+
+        # Make sure that the object is still tracked, otherwise launch the segmentation
+        if roi.width * roi.height < 50:
+            return False
+
+        self.roi_pub.publish(roi)
+        return True
