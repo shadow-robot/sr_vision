@@ -39,13 +39,14 @@ class HSVSegmentation(SrObjectSegmentation):
             seg_x = seg[1]
             seg_y = seg[0]
             segments.append((int(seg_x.start), int(seg_y.start), int(seg_x.stop - seg_x.start),
-                           int(seg_y.stop - seg_y.start)))
+                             int(seg_y.stop - seg_y.start)))
 
         # Order the slices according to their size
         segments.sort(key=lambda s: s[2] * s[3], reverse=True)
 
         # Pick the biggest one
         self.segmented_box = segments[0]
+
 
 def hsv_transform(img, color):
     """
@@ -56,11 +57,11 @@ def hsv_transform(img, color):
     """
 
     boundaries = {
-            'red': ([145, 140, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
+        'red': ([145, 140, 0], [255, 255, 255]),
+        'blue': ([100, 110, 0], [125, 255, 255]),
+        'green': ([30, 115, 0], [65, 255, 255]),
+        'yellow': ([10, 80, 150], [20, 255, 255])
+    }
     (lower, upper) = boundaries[color]
     lower = np.array(lower, dtype="uint8")
     upper = np.array(upper, dtype="uint8")

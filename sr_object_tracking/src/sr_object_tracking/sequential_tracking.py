@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import cv2
-import rospy
 import numpy as np
 from sr_object_tracking import SrObjectTracking
 
@@ -28,8 +27,6 @@ class SequentialTracking(SrObjectTracking):
         hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
 
-        seq = self.sequential_process(hsv)
-
         if self.selection != (0, 0, 0, 0):
             x0, y0, x1, y1 = self.selection
             self.track_window = (x0, y0, x1 - x0, y1 - y0)
@@ -42,6 +39,7 @@ class SequentialTracking(SrObjectTracking):
 
         if self.tracking_state == 1:
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
+            seq = self.sequential_process(hsv)
             prob = prob + seq
             prob &= mask
             term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
@@ -58,7 +56,6 @@ class SequentialTracking(SrObjectTracking):
         self.roi_pub.publish(roi)
         return True
 
-
     def sequential_process(self, hsv):
 
         # Motion detection using a differential image calculated from three consecutive frames
@@ -71,4 +68,4 @@ class SequentialTracking(SrObjectTracking):
         img = cv2.bitwise_and(self.frame, self.frame, mask=img_thresh)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        return img + diff_frame
+        return diff_frame + img
