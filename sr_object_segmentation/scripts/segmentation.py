@@ -31,7 +31,7 @@ class Segmentation(object):
     def segment(self, _):
         """
         Launch the segmentation
-        @return - Success of the segmentation as a booleen
+        @return - Success of the segmentation as a boolean
         """
         try:
             self.seg.segmentation(self.frame)
