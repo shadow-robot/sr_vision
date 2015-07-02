@@ -78,12 +78,12 @@ protected:
     }
 
     void
-    gridSample(const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+    gridSample(const CloudConstPtr &cloud, Cloud *result, double leaf_size = 0.01)
     {
       pcl::VoxelGrid<PointType> grid;
       grid.setLeafSize(leaf_size, leaf_size, leaf_size);
       grid.setInputCloud(cloud);
-      grid.filter(result);
+      grid.filter(*result);
     }
 
     bool
@@ -94,7 +94,7 @@ protected:
 
       pcl::fromROSMsg(req.point_cloud, *input_cloud);
 
-      gridSample(input_cloud, downsampled_cloud, req.downsampling_grid_size);
+      gridSample(input_cloud, &downsampled_cloud, req.downsampling_grid_size);
 
       pcl::toROSMsg(downsampled_cloud, res.point_cloud);
 
