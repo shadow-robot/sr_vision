@@ -50,7 +50,7 @@ class SequentialTracking(SrObjectTracking):
         roi = self.utils.publish_box(self.track_box)
 
         # Make sure that the object is still tracked, otherwise launch the segmentation
-        if roi.width * roi.height < 20:
+        if roi.width * roi.height < self.size:
             return False
 
         self.roi_pub.publish(roi)
