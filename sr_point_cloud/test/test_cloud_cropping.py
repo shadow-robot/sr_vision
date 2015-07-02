@@ -87,8 +87,8 @@ class TestCloudCropping(unittest.TestCase):
         box = rospy.wait_for_message('/roi/track_box', RegionOfInterest,
                                      timeout=4)
         box_size = box.width * box.height
-        box_centroid = (
-        box.x_offset + box.width / 2, box.y_offset + box.y_offset / 2)
+        box_centroid = (box.x_offset + box.width / 2,
+                        box.y_offset + box.y_offset / 2)
 
         cloud = self.lastMsg()
         cloud_size = cloud.width

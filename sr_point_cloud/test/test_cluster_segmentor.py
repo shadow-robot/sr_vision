@@ -3,7 +3,8 @@
 PKG = 'sr_point_cloud'
 
 import unittest
-import rospy, actionlib
+import rospy
+import actionlib
 from object_recognition_msgs.msg import *
 
 
