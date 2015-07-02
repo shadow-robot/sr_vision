@@ -32,7 +32,8 @@ class TestColorSegmentation(unittest.TestCase):
 
     def test_background(self):
         """
-        Verify that background is not take into account for Basic and Noise tests
+        Verify that background is not take into account for Basic and Noise
+        tests
         """
         theo_back = 640 * 480 - 200 * 300
         for seg in self.pts:
