@@ -12,7 +12,7 @@ class Utils(object):
     def convert_image(self, ros_image, encode):
         """
         Use cv_bridge() to convert the ROS image to OpenCV format
-        @param ros_image - image in ROS format, to be converted in OpenCV format
+        @param ros_image - image in ROS format to be converted in OpenCV format
         """
         try:
             cv_image = self.bridge.imgmsg_to_cv2(ros_image, encode)
@@ -46,8 +46,10 @@ class Utils(object):
         try:
             if len(roi) == 3:
                 (center, size, _) = roi
-                pt1 = (int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
-                pt2 = (int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
+                pt1 = (
+                int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
+                pt2 = (
+                int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
             else:
                 rect = list(roi)

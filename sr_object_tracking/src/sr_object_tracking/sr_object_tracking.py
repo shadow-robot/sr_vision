@@ -25,16 +25,23 @@ class SrObjectTracking(object):
         self.hist = None
 
         # Subscribe to the image topic and set the appropriate callback
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
-        self.selection_sub = rospy.Subscriber("/roi/segmented_box", RegionOfInterest, self.selection_callback)
-        self.selection_sub = rospy.Subscriber("/roi/selection", RegionOfInterest, self.selection_callback)
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image,
+                                          self.image_callback)
+        self.selection_sub = rospy.Subscriber("/roi/segmented_box",
+                                              RegionOfInterest,
+                                              self.selection_callback)
+        self.selection_sub = rospy.Subscriber("/roi/selection",
+                                              RegionOfInterest,
+                                              self.selection_callback)
 
         # Initialize the Region of Interest publishers
-        self.roi_pub = rospy.Publisher("/roi/track_box", RegionOfInterest, queue_size=1)
+        self.roi_pub = rospy.Publisher("/roi/track_box", RegionOfInterest,
+                                       queue_size=1)
 
     def image_callback(self, data):
         """
-        Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
+        Convert the ROS image to OpenCV format using a cv_bridge helper
+        function and make a copy
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 
@@ -42,4 +49,6 @@ class SrObjectTracking(object):
         """
         Get the ROI box (selected or segmented)
         """
-        self.selection = (data.x_offset, data.y_offset, data.x_offset + data.width, data.y_offset + data.height)
+        self.selection = (
+        data.x_offset, data.y_offset, data.x_offset + data.width,
+        data.y_offset + data.height)

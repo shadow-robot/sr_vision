@@ -9,9 +9,10 @@ class ImagesTest(object):
     def __init__(self):
         """
         Initialize a test dataset images for benchmarking
-        @attribute ref_seg - list of the dictionnaries corresponding to the segments (id as key and coordinates as
+        @attribute ref_seg - list of the dictionnaries corresponding to the
+        segments (id as key and coordinates as
         values) for each image of the dataset
-        @attribute nb_seg - total number of segments 
+        @attribute nb_seg - total number of segments
         @attribute np_img - test images with a numpy format
         """
 
@@ -23,7 +24,8 @@ class ImagesTest(object):
     def get_pixels_coord(self):
         """
         Get the coordinates of the points in which segments
-        @return - list of the dictionaries corresponding to the segments (id as key and coordinates as values) for
+        @return - list of the dictionaries corresponding to the segments
+        (id as key and coordinates as values) for
         each image of the dataset
         """
 
@@ -41,7 +43,8 @@ class ImagesTest(object):
                         blue_coord.append((y, x))
                     elif img.getpixel((x, y)) == (255, 0, 0):  # red stuffs
                         red_coord.append((y, x))
-                    elif img.getpixel((x, y)) == (255, 255, 0):  # yellow stuffs
+                    elif img.getpixel((x, y)) == (
+                    255, 255, 0):  # yellow stuffs
                         yellow_coord.append((y, x))
 
             if blue_coord:
@@ -61,7 +64,7 @@ class ImagesTest(object):
     def write_ref_file(self):
         """
         Write a segment reference text file for future usage.
-        Coded as : "segment id"   "row id"   "minimal column"   "maximal column"
+        Coded as : "segment id"   "row id"   "min column"   "max column"
         """
 
         for k, img in enumerate(self.pil_img):
@@ -73,15 +76,19 @@ class ImagesTest(object):
             for row in range(height):
                 column = 0
                 while column < width:
-                    for i, color in enumerate([(0, 0, 0), (0, 0, 255), (255, 0, 0), (255, 255, 0), (0, 0, 0)]):
+                    for i, color in enumerate(
+                            [(0, 0, 0), (0, 0, 255), (255, 0, 0),
+                             (255, 255, 0), (0, 0, 0)]):
                         if img.getpixel((column, row)) == color:
                             column_min = column
                             column_tmp = column
-                            while img.getpixel((column_tmp, row)) == color and column_tmp < width - 1:
+                            while img.getpixel((column_tmp,
+                                                row)) == color and column_tmp < width - 1:
                                 column_tmp += 1
                             if i == 4:
                                 i = 0
-                            f.write(str(i) + '\t' + str(row) + '\t' + str(column_min) + '\t' + str(column_tmp) + '\n')
+                            f.write(str(i) + '\t' + str(row) + '\t' + str(
+                                column_min) + '\t' + str(column_tmp) + '\n')
                             if column_tmp == width - 1:
                                 column = 0
                                 break
@@ -98,7 +105,7 @@ class BasicTest(ImagesTest):
     """
 
     def __init__(self):
-        """ 
+        """
         Initialize the Basic dataset object
         """
         ImagesTest.__init__(self)
@@ -119,7 +126,7 @@ class BasicTest(ImagesTest):
         draw = ImageDraw.Draw(images[0])
         draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
 
-        # Draw red circles with a radius of 30px outer of the rectangle : test1_2
+        # Draw red circles with a radius of 30px outer of the rectangle
         r = 30
         x, y = 100, 150
         images.append(Image.new("RGB", (640, 480), "black"))
@@ -127,7 +134,7 @@ class BasicTest(ImagesTest):
         draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
         draw.ellipse((x - r, y - r, x + r, y + r), fill=(255, 0, 0))
 
-        # Draw red circles with a radius of 30px inner  of the rectangle : test1_3
+        # Draw red circles with a radius of 30px inner  of the rectangle
         r = 30
         x, y = 400, 200
         images.append(Image.new("RGB", (640, 480), "black"))
@@ -139,7 +146,8 @@ class BasicTest(ImagesTest):
         images.append(Image.new("RGB", (640, 480), "black"))
         draw = ImageDraw.Draw(images[3])
         draw.rectangle([(500, 300), (200, 100)], fill=(0, 0, 255))
-        draw.polygon([(50, 50), (100, 100), (200, 100), (20, 170)], fill=(255, 255, 0))
+        draw.polygon([(50, 50), (100, 100), (200, 100), (20, 170)],
+                     fill=(255, 255, 0))
 
         return images
 
@@ -163,7 +171,8 @@ class NoiseTest(ImagesTest):
         """
         images = []
 
-        # Draw a blue rectangle and 2 red circles with a radius smaller and smaller (40,20,1 px)
+        # Draw a blue rectangle and 2 red circles with a radius smaller and
+        # smaller (40,20,1 px)
         # Image 1
         images.append(Image.new("RGB", (640, 480), "black"))
         draw = ImageDraw.Draw(images[0])

@@ -21,7 +21,8 @@ class TestObjectSegmentation(object):
         Initialize benchmarking comparison object
         @param image - image on which the benchmarking will be realized.
         @param algo - name of the class algorithm to be tested
-        @param ref_seg - dictionary containing the reference segments as keys and coordinates of the points as values
+        @param ref_seg - dictionary containing the reference segments as keys
+        and coordinates of the points as values
         """
         print 'SEGMENTATION ...'
         self.algo = algo(image)
@@ -32,21 +33,24 @@ class TestObjectSegmentation(object):
     def test_number(self):
         """ 
         Verify that number of segments is correct
-        @return - a score corresponding to the difference between number of segments found by the algorithm and the
+        @return - a score corresponding to the difference between number of
+        segments found by the algorithm and the
         theoretical, increase tenfold (arbitrary)
         """
 
         print 'NUMBER OF SEGMENTS TEST ...'
         res = abs(self.algo.nb_segments - self.ref.nb_segments)
-        print 'Algorithm segments :', self.algo.nb_segments, 'Theoretical segments :', self.ref.nb_segments, '\n'
+        print 'Algorithm segments :', self.algo.nb_segments, \
+            'Theoretical segments :', self.ref.nb_segments, '\n'
         return 10 * res
 
     @property
     def test_distance(self):
         """ 
-        If segments are not perfectly the same, this test measures the magnitude of the difference
-        @return - a score corresponding to the minimal distance between a wrong point and the theorical,
-        divided by 5 (arbitrary)
+        If segments are not perfectly the same, this test measures the
+        magnitude of the difference
+        @return - a score corresponding to the minimal distance between a
+        wrong point and the theorical, divided by 5 (arbitrary)
         """
         print 'DISTANCE TEST ...'
 
@@ -62,12 +66,14 @@ class TestObjectSegmentation(object):
         if len(dist_seg) == 0:
             return 0
         else:
-            return 0.02 * sum(dist_seg) / len(dist_seg)  # 0.02 is arbitrary, need some adjustments..
+            return 0.02 * sum(dist_seg) / len(
+                dist_seg)  # 0.02 is arbitrary, need some adjustments..
 
     def score(self):
         """
         Calulate the final score
-        @return - the sum of the two scores calculated by test_number and _test_distance methods
+        @return - the sum of the two scores calculated by test_number and
+        test_distance methods
         """
         r = self.test_number()
         d = self.test_distance
@@ -76,16 +82,19 @@ class TestObjectSegmentation(object):
 
 def get_corresp_seg(min_seg, max_seg):
     """
-    Correspondence between segments from ref and algo based upon number of pixels in common
+    Correspondence between segments from ref and algo based upon number of
+    pixels in common
     @param min_seg - smallest segment
     @param max_seg - biggest segment
-    @return - Dictionary with min_seg id as keys and the correspondent max_seg id as values
+    @return - Dictionary with min_seg id as keys and the correspondent
+    max_seg id as values
     """
     corresp = {}
     for id_min_seg in range(len(min_seg)):
         m = {}
         for id_max_seg in range(len(max_seg)):
-            m[id_max_seg] = len(set(min_seg[id_min_seg]) & set(max_seg[id_max_seg]))
+            m[id_max_seg] = len(
+                set(min_seg[id_min_seg]) & set(max_seg[id_max_seg]))
         # match[id_min_seg] = m
         inv_m = dict(zip(m.values(), m.keys()))
         maxi = sorted(m.values(), reverse=True)
@@ -101,10 +110,12 @@ def get_corresp_seg(min_seg, max_seg):
 
 def get_dist_seg(min_seg, max_seg, corresp):
     """
-    For the points misplaced, calculate the distance to the nearest point from the theoretical right segment.
+    For the points misplaced, calculate the distance to the nearest point
+    from the theoretical right segment.
     @param min_seg - smallest segment
     @param max_seg - biggest segment
-    @param corresp - correspondence dictionary between the reference and the found segments
+    @param corresp - correspondence dictionary between the reference and the
+     found segments
     @return - list of the minimal distances, for each misplaced point
     """
     dist_seg = []
@@ -119,7 +130,8 @@ def get_dist_seg(min_seg, max_seg, corresp):
                 if point1 not in seg2:
                     dist = 0
                     for point2 in seg2:
-                        d = sqrt((point1[0] - point2[0]) ** 2 + (point1[1] - point2[1]) ** 2)
+                        d = sqrt((point1[0] - point2[0]) ** 2 + (
+                            point1[1] - point2[1]) ** 2)
                         if d > dist:
                             dist = d
                     dist_seg.append(dist)
@@ -130,13 +142,16 @@ def run_test(algo, dataset, writing=False):
     """
     Run the test for the algo given as parameter, on the dataset also given
     @param algo - Algorithm to be tested, from the "algos" list
-    @param dataset - Dataset on which the algorithm will be tested, from the "tests" list
-    @param writing - Boolean optional parameter, writing or not a resume text file of the scores
+    @param dataset - Dataset on which the algorithm will be tested, from the
+    "tests" list
+    @param writing - Boolean optional parameter, writing or not a resume text
+    file of the scores
     @return - Results (string)
     """
     results = ''
     for i, img in enumerate(dataset.np_img):
-        r = '\n\n' + str(algo) + '\n\n ##### Test ' + dataset.name + str(i + 1) + '#####\n'
+        r = '\n\n' + str(algo) + '\n\n ##### Test ' + dataset.name + str(
+            i + 1) + '#####\n'
         print r
         results += r
         test = TestObjectSegmentation(img, algo, dataset.ref_seg[i])

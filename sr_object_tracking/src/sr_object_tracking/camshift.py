@@ -18,7 +18,7 @@ class CamshiftTracking(SrObjectTracking):
 
     def tracking(self):
         """
-        Track the RegionOfInterest and return the track box updating the attribute
+        Track the RegionOfInterest and return the track box as attribute
         @return - Success of the tracking as a booleen
         """
         self.vis = self.frame.copy()
@@ -26,7 +26,8 @@ class CamshiftTracking(SrObjectTracking):
         # Seems better with a blur
         self.vis = cv2.blur(self.vis, (5, 5))
         hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
+        mask = cv2.inRange(hsv, np.array((0., self.smin, 54)),
+                           np.array((180., 255., 255)))
 
         if self.selection != (0, 0, 0, 0):
             x0, y0, x1, y1 = self.selection
@@ -41,14 +42,18 @@ class CamshiftTracking(SrObjectTracking):
         if self.tracking_state == 1:
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
             prob &= mask
-            term_crit = (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
+            term_crit = (
+                cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
             nb_iter = cv2.meanShift(prob, self.track_window, term_crit)[0]
             if nb_iter != 0:
-                self.track_box, self.track_window = cv2.CamShift(prob, self.track_window, term_crit)
+                self.track_box, self.track_window = cv2.CamShift(prob,
+                                                                 self.track_window,
+                                                                 term_crit)
 
         roi = self.utils.publish_box(self.track_box)
 
-        # Make sure that the object is still tracked, otherwise launch the segmentation
+        # Make sure that the object is still tracked, otherwise launch the
+        # segmentation
         if roi.width * roi.height < 50:
             return False
 
