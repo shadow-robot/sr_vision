@@ -5,6 +5,7 @@ import numpy as np
 import rospy
 
 from sr_object_tracking.utils import Utils
+from sr_object_segmentation.hsv_segmentation import hsv_transform
 
 from sensor_msgs.msg import RegionOfInterest, Image
 
@@ -18,16 +19,10 @@ class DisplayImage(object):
 
         rospy.init_node(node_name)
         self.color = rospy.get_param('/color')
-        self.control = rospy.get_param('/control')
         self.cv_window_name = 'Video'
 
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
-        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
-
-        self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
-
-        self.utils = Utils()
-
+        # Initialize a number of global variables
+        self.smin = rospy.get_param('/saturation_min')
         self.hist = None
         self.drag_start = (-1, -1)
         self.track_box = None
@@ -40,22 +35,16 @@ class DisplayImage(object):
         self.frame_size = None
         self.vis = None
 
-        # Minimum saturation of the tracked color in HSV space, and a threshold on the backprojection probability image
-        self.smin = rospy.get_param('/saturation_min')
+        self.utils = Utils()
 
-        boundaries = {
-            'red': ([145, 140, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
-        (self.lower, self.upper) = boundaries[self.color]
-        self.lower = np.array(self.lower, dtype="uint8")
-        self.upper = np.array(self.upper, dtype="uint8")
+        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
+        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
+
+        self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
 
     def display(self, data):
         """
-        Display the main window as well as the parameters choice window and the histogram one (Camshift backrpojection).
+        Display the main window as well as the parameters choice window and the histogram one (Camshift backprojection).
         Draw a rectangle around the tracking box
         """
         # Create the main display window and the histogram one
@@ -66,19 +55,6 @@ class DisplayImage(object):
 
         # Set a call back on mouse clicks on the image window
         cv2.setMouseCallback(self.cv_window_name, self.on_mouse_click, None)
-
-        if self.control:
-            # Create parameters window with the slider controls for saturation and HSV levels
-            cv2.namedWindow("Control", cv2.CV_WINDOW_AUTOSIZE)
-            cv2.createTrackbar("Saturation", "Control", self.smin, 150, self.set_smin)
-
-            cv2.moveWindow("Control", 100, 600)
-            cv2.createTrackbar("LowH", "Control", self.lower[0], 240, self.set_lowh)
-            cv2.createTrackbar("HighH", "Control", self.upper[0], 255, self.set_highh)
-            cv2.createTrackbar("LowS", "Control", self.lower[1], 240, self.set_lows)
-            cv2.createTrackbar("HighS", "Control", self.upper[1], 255, self.set_highs)
-            cv2.createTrackbar("LowV", "Control", self.lower[2], 240, self.set_lowv)
-            cv2.createTrackbar("HighV", "Control", self.upper[2], 255, self.set_highv)
 
         # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
         self.frame = self.utils.convert_image(data, "bgr8")
@@ -108,9 +84,7 @@ class DisplayImage(object):
 
         self.selection_pub.publish(self.utils.publish_box(self.selection))
 
-        img_hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
-        img_thresh = cv2.inRange(img_hsv, self.lower, self.upper)
-        img = cv2.bitwise_and(self.vis, self.vis, mask=img_thresh)
+        img = hsv_transform(self.vis, self.color)
 
         # Draw the tracking box, if possible
         try:
@@ -148,7 +122,6 @@ class DisplayImage(object):
                 self.selection = (0, 0, 0, 0)
                 if x1 - x0 > 0 and y1 - y0 > 0:
                     self.selection = x0, y0, x1, y1
-                    rospy.set_param('/stop_seg', True)
 
             else:
                 self.drag_start = (-1, -1)
@@ -169,29 +142,6 @@ class DisplayImage(object):
                           (int(180.0 * i / bin_count), 255, 255), -1)
         img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
         cv2.imshow('Histogram', img)
-
-    # Set the callbacks for the slider controls
-    def set_smin(self, pos):
-        self.smin = pos
-        rospy.set_param('saturation_min', pos)
-
-    def set_lowh(self, pos):
-        self.lower[0] = pos
-
-    def set_highh(self, pos):
-        self.upper[0] = pos
-
-    def set_lows(self, pos):
-        self.lower[1] = pos
-
-    def set_highs(self, pos):
-        self.upper[1] = pos
-
-    def set_lowv(self, pos):
-        self.lower[2] = pos
-
-    def set_highv(self, pos):
-        self.upper[2] = pos
 
 
 def main():

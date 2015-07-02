@@ -20,6 +20,7 @@ class SequentialTracking(SrObjectTracking):
     def tracking(self):
         """
         Track the RegionOfInterest return the track box updating the attribute
+        @return - Success of the tracking as a booleen
         """
         self.vis = self.frame.copy()
 
@@ -52,9 +53,10 @@ class SequentialTracking(SrObjectTracking):
 
         # Make sure that the object is still tracked, otherwise launch the segmentation
         if roi.width * roi.height < 20:
-            rospy.set_param('/stop_seg', False)
+            return False
 
         self.roi_pub.publish(roi)
+        return True
 
 
     def sequential_process(self, hsv):

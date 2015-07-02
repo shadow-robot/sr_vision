@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 import cv2
-import rospy
 import numpy as np
 from sr_object_tracking import SrObjectTracking
 
@@ -20,6 +19,7 @@ class CamshiftTracking(SrObjectTracking):
     def tracking(self):
         """
         Track the RegionOfInterest and return the track box updating the attribute
+        @return - Success of the tracking as a booleen
         """
         self.vis = self.frame.copy()
 
@@ -49,7 +49,8 @@ class CamshiftTracking(SrObjectTracking):
         roi = self.utils.publish_box(self.track_box)
 
         # Make sure that the object is still tracked, otherwise launch the segmentation
-        if roi.width * roi.height < 50 :
-            rospy.set_param('/stop_seg', False)
+        if roi.width * roi.height < 50:
+            return False
 
         self.roi_pub.publish(roi)
+        return True

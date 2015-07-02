@@ -1,3 +1,6 @@
+/* Copyright 2015 ShadowRobot */
+
+#include <string>
 #include <sr_grasp_msgs/TriangulateAction.h>
 
 #include <ros/ros.h>
@@ -56,7 +59,7 @@ TEST(TestTriangulator, testTriangulator)
   // Load input file into a pcl::PCLPointCloud2.
   pcl::PCLPointCloud2 pcl_pc2;
   int res = pcl::io::loadPCDFile(pcd_filename, pcl_pc2);
-  ASSERT_EQ(res, 0); // PCD file loaded?
+  ASSERT_EQ(res, 0);  // PCD file loaded?
 
   // Convert to sensor_msgs::PointCloud2.
   sensor_msgs::PointCloud2 sensor_pc2;
