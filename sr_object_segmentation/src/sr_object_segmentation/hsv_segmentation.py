@@ -8,12 +8,13 @@ from sr_object_segmentation import SrObjectSegmentation
 
 class HSVSegmentation(SrObjectSegmentation):
     """
-    Segmentation based upon an HSV (Hue, Saturation, Value) colorization, according to a color given as parameter.
+    Segmentation based upon an HSV (Hue, Saturation, Value) colorization,
+    according to a color given as parameter.
     """
 
     def __init__(self, color):
         """
-        Initialize the HSV_based segmentation object 
+        Initialize the HSV_based segmentation object
         """
         SrObjectSegmentation.__init__(self, None, {})
         self.name = 'HSV segmentation algorithm'
@@ -23,7 +24,8 @@ class HSVSegmentation(SrObjectSegmentation):
 
     def segmentation(self, frame):
         """
-        Segment the image with the proper color. Update the box attribute according to the biggest segment found.
+        Segment the image with the proper color. Update the box attribute
+        according to the biggest segment found.
         @param frame - image to be segmented (numpy format)
         """
         self.img = frame
@@ -38,8 +40,9 @@ class HSVSegmentation(SrObjectSegmentation):
         for seg in objects:
             seg_x = seg[1]
             seg_y = seg[0]
-            segments.append((int(seg_x.start), int(seg_y.start), int(seg_x.stop - seg_x.start),
-                           int(seg_y.stop - seg_y.start)))
+            segments.append((int(seg_x.start), int(seg_y.start),
+                             int(seg_x.stop - seg_x.start),
+                             int(seg_y.stop - seg_y.start)))
 
         # Order the slices according to their size
         segments.sort(key=lambda s: s[2] * s[3], reverse=True)
@@ -47,20 +50,21 @@ class HSVSegmentation(SrObjectSegmentation):
         # Pick the biggest one
         self.segmented_box = segments[0]
 
+
 def hsv_transform(img, color):
     """
     Convert an RGB image into an HSV unique color one
     @param img - input image to be formatted
     @param color - color wanted
-    @return - output image with black background and "color" segments highlighted
+    @return - output image with black bg and "color" segments highlighted
     """
 
     boundaries = {
-            'red': ([145, 140, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
+        'red': ([145, 140, 0], [255, 255, 255]),
+        'blue': ([100, 110, 0], [125, 255, 255]),
+        'green': ([30, 115, 0], [65, 255, 255]),
+        'yellow': ([10, 80, 150], [20, 255, 255])
+    }
     (lower, upper) = boundaries[color]
     lower = np.array(lower, dtype="uint8")
     upper = np.array(upper, dtype="uint8")
