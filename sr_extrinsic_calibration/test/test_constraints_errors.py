@@ -109,8 +109,8 @@ class TestConstraintsErrors(TestCase):
         return {
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
-            "~robot_marker_frames": ["marker_holder_1", "marker_holder_2", "marker_holder_3"],
-            "~marker_frames": ["ar_marker_1", "ar_marker_2", "ar_marker_3"],
+            "~marker_holder_frames": ["marker_holder_1", "marker_holder_2", "marker_holder_3"],
+            "~markers_ids": ["ar_marker_1", "ar_marker_2", "ar_marker_3"],
             }.get(param_name, default)
 
     @staticmethod
@@ -118,8 +118,8 @@ class TestConstraintsErrors(TestCase):
         return {
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
-            "~robot_marker_frames": ["marker_holder_1", "marker_holder_2", "marker_holder_3", "marker_holder_4"],
-            "~marker_frames": ["ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"],
+            "~marker_holder_frames": ["marker_holder_1", "marker_holder_2", "marker_holder_3", "marker_holder_4"],
+            "~markers_ids": ["ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"],
             }.get(param_name, default)
 
     @staticmethod
@@ -127,8 +127,8 @@ class TestConstraintsErrors(TestCase):
         return {
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
-            "~robot_marker_frames": ["marker_holder_1", "marker_holder_2", "marker_holder_3"],
-            "~marker_frames": ["ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"],
+            "~marker_holder_frames": ["marker_holder_1", "marker_holder_2", "marker_holder_3"],
+            "~markers_ids": ["ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"],
             }.get(param_name, default)
 
     @staticmethod
@@ -136,8 +136,8 @@ class TestConstraintsErrors(TestCase):
         return {
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
-            "~robot_marker_frames": ["marker_holder_1"],
-            "~marker_frames": ["ar_marker_1"],
+            "~marker_holder_frames": ["marker_holder_1"],
+            "~markers_ids": ["ar_marker_1"],
             }.get(param_name, default)
 
     def test_different_frames_count(self):
@@ -150,14 +150,14 @@ class TestConstraintsErrors(TestCase):
         try:
             CameraCalibration()
         except Exception as e:
-            self.assertEqual("Amount of robot_marker_frames and marker_frames should be equal", e.message,
+            self.assertEqual("Amount of marker_holder_frames and markers_ids should be equal", e.message,
                              "Incorrect validation exception message: " + e.message)
 
         rospy.get_param = TestConstraintsErrors._params_not_3_or_4_parameters_mock
         try:
             CameraCalibration()
         except Exception as e:
-            self.assertEqual("robot_marker_frames should have 3 or 4 elements", e.message,
+            self.assertEqual("marker_holder_frames should have 3 or 4 elements", e.message,
                              "Incorrect validation exception message " + e.message)
 
     @staticmethod
