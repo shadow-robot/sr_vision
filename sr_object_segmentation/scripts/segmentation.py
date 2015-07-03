@@ -13,12 +13,11 @@ class Segmentation(object):
     def __init__(self):
 
         self.color = rospy.get_param('/color')
-        self.camera = rospy.get_param('/camera_topic')
 
         self.seg = HSVSegmentation(self.color)
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber(self.camera, Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image, self.image_callback)
 
         self.selection_pub = rospy.Publisher("/roi/segmented_box", RegionOfInterest, queue_size=1)
 

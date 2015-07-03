@@ -1,18 +1,17 @@
 <launch>
 
   <include file="$(find freenect_launch)/launch/freenect.launch"/>
-    <param name="camera_topic" value="/camera/rgb/image_color" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  />
 
-    <!-- set the color parameter for the segmentation -->
-    <!-- can be : ['red','blue','green','yellow'] -->
-    <param name="color" value="$(arg color)" />
+      <!-- set the color parameter for the segmentation -->
+      <!-- can be : ['red','blue','green','yellow'] -->
+      <param name="color" value="$(arg color)" />
 
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
 
-    <param name="saturation_min" value="150" />
-    <param name="size" value="75" />
+      <param name="saturation_min" value="150" />
+      <param name="size" value="75" />
 
   <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
 

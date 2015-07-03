@@ -1,18 +1,19 @@
 <launch>
 
-  <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen"/>
-    <param name="camera_topic" value="/image_raw" />
+  <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
+      <remap from="/image_raw" to="/camera/rgb/image_color"/>
+  </node>
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  />
 
-    <!-- set the color parameter for the segmentation -->
-    <!-- can be : ['red','blue','green','yellow'] -->
-    <param name="color" value="$(arg color)" />
+      <!-- set the color parameter for the segmentation -->
+      <!-- can be : ['red','blue','green','yellow'] -->
+      <param name="color" value="$(arg color)" />
 
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  />
 
-    <param name="saturation_min" value="150" />
-    <param name="size" value="75" />
+      <param name="saturation_min" value="150" />
+      <param name="size" value="75" />
 
   <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
 

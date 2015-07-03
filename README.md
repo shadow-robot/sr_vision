@@ -7,9 +7,9 @@ sr_vision
 Contains our vision related algorithm (segmentation, tracking, recognition, etc...)
 
   1. [Tracking](sr_object_tracking/)
-This package contains the tracker executable. The launch file starts the Kinect as well as the tracking node and the visualization one.
+This package contains the tracker executable. The launch file starts the video acquisition as well as the tracking node and the visualization one. A color parameter is necessary to process the segmentation.
   2. [Segmentation](sr_object_segmentation/)
-Segment the image from the camera in order to find the region of interest.
+Segment the image from the camera in order to find the region of interest, with a color given as parameter.
   3. [Benchmarking](sr_object_benchmarking/)
 Benchmarking package for the different segmentation algorithms.
   4. [Visualization](sr_gui_servoing/)
@@ -21,7 +21,18 @@ All messages, services and actions for sr_vision.
   7. [Extrinsic camera calibration](sr_extrinsic_calibration/)
 Contains nodes for extrinsic camera calibration based on Alvar markers positions in camera and on real robot.
 
-
 You can find the architecture diagram below for a closer look at how this works.
 
 ![Architecture Diagram](doc/sr_vision.png)
+
+
+## Usage
+For the segmentation, different colors are available : red, blue, green, yellow.
+
+### With a Kinect
+`roslaunch sr_object_tracking tracking_kinect.launch color:=<color>`
+
+### With an UVC camera
+`roslaunch sr_object_tracking tracking.launch color:=<color>`
+
+
