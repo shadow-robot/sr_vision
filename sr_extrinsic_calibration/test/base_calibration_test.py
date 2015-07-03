@@ -30,8 +30,8 @@ class BaseCalibrationTest(TestCase):
         """
         Reads parameters from camera calibration node because test has the same namespace as node name
         """
-        self._robot_marker_frames = rospy.get_param(self._get_test_namespace() + "robot_marker_frames")
-        self._camera_marker_frames = rospy.get_param(self._get_test_namespace() + "marker_frames")
+        self._marker_holder_frames = rospy.get_param(self._get_test_namespace() + "marker_holder_frames")
+        self._camera_markers_ids = rospy.get_param(self._get_test_namespace() + "markers_ids")
 
         self._base_frame = rospy.get_param(self._get_test_namespace() + "base_frame")
         self._camera_frame = rospy.get_param(self._get_test_namespace() + "camera_frame")
@@ -60,7 +60,7 @@ class BaseCalibrationTest(TestCase):
 
         rospy.sleep(rospy.Duration(2))
 
-        for robot_frame, marker_frame in zip(self._robot_marker_frames, self._camera_marker_frames):
+        for robot_frame, marker_frame in zip(self._marker_holder_frames, self._camera_markers_ids):
             robot_transformation = self._get_recent_camera_transformation(robot_frame)
             real_marker_transformation = self._get_recent_camera_transformation(marker_frame)
             self.assertVector3Close(robot_transformation.transform.translation,

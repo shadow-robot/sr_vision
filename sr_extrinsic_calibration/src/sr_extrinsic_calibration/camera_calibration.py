@@ -35,14 +35,14 @@ class CameraCalibration(TransformationManager):
         if len(camera_pose) < 6:
             raise Exception("Parameter initial_tf should contain 6 items [x, y, z and 3 Euler angles]")
 
-        self._robot_marker_frames = rospy.get_param("~robot_marker_frames")
-        self._camera_marker_frames = rospy.get_param("~marker_frames")
+        self._marker_holder_frames = rospy.get_param("~marker_holder_frames")
+        self._camera_markers_ids = rospy.get_param("~markers_ids")
 
-        if len(self._robot_marker_frames) != len(self._camera_marker_frames):
-            raise Exception("Amount of robot_marker_frames and marker_frames should be equal")
+        if len(self._marker_holder_frames) != len(self._camera_markers_ids):
+            raise Exception("Amount of marker_holder_frames and markers_ids should be equal")
 
-        if not len(self._robot_marker_frames) in [3, 4]:
-            raise Exception("robot_marker_frames should have 3 or 4 elements")
+        if not len(self._marker_holder_frames) in [3, 4]:
+            raise Exception("marker_holder_frames should have 3 or 4 elements")
 
         self._base_frame = rospy.get_param("~base_frame")
         self._camera_frame = rospy.get_param("~camera_frame")
@@ -66,10 +66,10 @@ class CameraCalibration(TransformationManager):
         @param index2 index of the second value
         @return boolean
         """
-        transformation1 = self.get_recent_transformation(self._robot_marker_frames[index1],
-                                                         self._robot_marker_frames[index2])
-        transformation2 = self.get_recent_filtered_transformation(self._camera_marker_frames[index1],
-                                                                  self._camera_marker_frames[index2])
+        transformation1 = self.get_recent_transformation(self._marker_holder_frames[index1],
+                                                         self._marker_holder_frames[index2])
+        transformation2 = self.get_recent_filtered_transformation(self._camera_markers_ids[index1],
+                                                                  self._camera_markers_ids[index2])
 
         vector1 = TransformationManager.point_from_tf(transformation1)
         vector2 = TransformationManager.point_from_tf(transformation2)
@@ -78,8 +78,8 @@ class CameraCalibration(TransformationManager):
         norm2 = vector_norm(vector2)
 
         if math.fabs(norm1 - norm2) > self._acceptable_distance_error:
-            rospy.logerr("Distance between " + self._camera_marker_frames[index1] + " and " +
-                         self._camera_marker_frames[index2] + " is not matching appropriate robot marker distances")
+            rospy.logerr("Distance between " + self._camera_markers_ids[index1] + " and " +
+                         self._camera_markers_ids[index2] + " is not matching appropriate robot marker distances")
             rospy.logerr("It is " + str(norm2) + " and should be " + str(norm1))
             return False
 
@@ -93,11 +93,11 @@ class CameraCalibration(TransformationManager):
         """
         result = True
 
-        if 3 <= len(self._robot_marker_frames):
+        if 3 <= len(self._marker_holder_frames):
             result = self._is_distance_between_frames_similar(0, 1) and \
                      self._is_distance_between_frames_similar(0, 2) and self._is_distance_between_frames_similar(1, 2)
 
-        if 4 <= len(self._robot_marker_frames):
+        if 4 <= len(self._marker_holder_frames):
             result = result and self._is_distance_between_frames_similar(0, 3) and \
                      self._is_distance_between_frames_similar(1, 3)
         return result
@@ -110,16 +110,16 @@ class CameraCalibration(TransformationManager):
             return
 
         positions = []
-        for i in range(len(self._camera_marker_frames)):
-            transformation = self.get_recent_transformation(self._camera_frame, self._camera_marker_frames[i])
+        for i in range(len(self._camera_markers_ids)):
+            transformation = self.get_recent_transformation(self._camera_frame, self._camera_markers_ids[i])
             point = TransformationManager.point_from_tf(transformation)
             positions.append(point)
 
         markers_positions = numpy.array(positions)
 
         positions = []
-        for i in range(len(self._robot_marker_frames)):
-            transformation = self.get_recent_filtered_transformation(self._camera_frame, self._robot_marker_frames[i])
+        for i in range(len(self._marker_holder_frames)):
+            transformation = self.get_recent_filtered_transformation(self._camera_frame, self._marker_holder_frames[i])
             point = TransformationManager.point_from_tf(transformation)
             positions.append(point)
 

@@ -10,8 +10,8 @@ This node publishes transformations from base of the robot to camera position
 
 * camera_frame - name of the camera frame
 * base_frame - name of the base frame of the robot
-* robot_marker_frames - array of robot marker holder frames 3 or 4 items
-* marker_frames - array of markers from any marker tracking system which should correspond to robot_marker_frames
+* marker_holder_frames - array of robot marker holder frames 3 or 4 items
+* markers_ids - array of markers from any marker tracking system which should correspond to marker_holder_frames
 * initial_tf - (optional) initial position of the camera
 
 ### How to add to launch file
@@ -23,8 +23,8 @@ Examples of node usage in the launch file
   <node name="camera_calibration" pkg="sr_extrinsic_calibration" type="camera_calibration_node" output="screen">
     <param name="camera_frame" value="camera"/>
     <param name="base_frame" value="delta_base"/>
-    <rosparam param="robot_marker_frames">["marker_holder_1", "marker_holder_2", "marker_holder_3", "marker_holder_4"]</rosparam>
-    <rosparam param="marker_frames">["ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"]</rosparam>
+    <rosparam param="marker_holder_frames">["marker_holder_1", "marker_holder_2", "marker_holder_3", "marker_holder_4"]</rosparam>
+    <rosparam param="markers_ids">["ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"]</rosparam>
     <rosparam param="initial_tf">[0, 0, 10.0, 0, 0, 3.1415926]</rosparam>
   </node>
 ```
