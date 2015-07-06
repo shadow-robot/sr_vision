@@ -18,11 +18,11 @@ class DisplayImage(object):
     def __init__(self, node_name):
 
         rospy.init_node(node_name)
-        self.color = rospy.get_param('/color')
+        self.color = rospy.get_param('/tracking/color')
         self.cv_window_name = 'Video'
 
         # Initialize a number of global variables
-        self.smin = rospy.get_param('/saturation_min')
+        self.smin = rospy.get_param('/tracking/saturation_min')
         self.hist = None
         self.drag_start = (-1, -1)
         self.track_box = None
@@ -37,14 +37,18 @@ class DisplayImage(object):
 
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image, self.display)
-        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
+        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image,
+                                          self.display)
+        self.roi_sub = rospy.Subscriber("roi/track_box", RegionOfInterest,
+                                        self.roi_callback)
 
-        self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)
+        self.selection_pub = rospy.Publisher("roi/selection", RegionOfInterest,
+                                             queue_size=1)
 
     def display(self, data):
         """
-        Display the main window as well as the parameters choice window and the histogram one (Camshift backprojection).
+        Display the main window as well as the parameters choice window and
+        the histogram one (Camshift backprojection).
         Draw a rectangle around the tracking box
         """
         # Create the main display window and the histogram one
@@ -56,7 +60,8 @@ class DisplayImage(object):
         # Set a call back on mouse clicks on the image window
         cv2.setMouseCallback(self.cv_window_name, self.on_mouse_click, None)
 
-        # Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
+        # Convert the ROS image to OpenCV format using a cv_bridge helper
+        # function and make a copy
         self.frame = self.utils.convert_image(data, "bgr8")
         self.vis = self.frame.copy()
 
@@ -65,7 +70,8 @@ class DisplayImage(object):
             self.vis = cv2.blur(self.vis, (5, 5))
             hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
 
-            mask = cv2.inRange(hsv, np.array((0., self.smin, 54)), np.array((180., 255., 255)))
+            mask = cv2.inRange(hsv, np.array((0., self.smin, 54)),
+                               np.array((180., 255., 255)))
             if self.selection != (0, 0, 0, 0):
                 x0, y0, x1, y1 = self.selection
                 self.track_window = (x0, y0, x1 - x0, y1 - y0)
@@ -88,8 +94,10 @@ class DisplayImage(object):
 
         # Draw the tracking box, if possible
         try:
-            cv2.rectangle(self.vis, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
-            cv2.rectangle(img, self.track_box[0], self.track_box[1], (0, 0, 255), 2)
+            cv2.rectangle(self.vis, self.track_box[0], self.track_box[1],
+                          (0, 0, 255), 2)
+            cv2.rectangle(img, self.track_box[0], self.track_box[1],
+                          (0, 0, 255), 2)
         except (cv2.error, TypeError):
             pass
 
@@ -99,7 +107,8 @@ class DisplayImage(object):
 
     def roi_callback(self, data):
         """
-        Convert the sensor_msgs/RegionOfInterest into a tuple of extrema coordinates
+        Convert the sensor_msgs/RegionOfInterest into a tuple of extrema
+        coordinates
         """
         pt1 = (data.x_offset, data.y_offset)
         pt2 = (data.x_offset + data.width, data.y_offset + data.height)
@@ -138,7 +147,8 @@ class DisplayImage(object):
         img = np.zeros((256, bin_count * bin_w, 3), np.uint8)
         for i in xrange(bin_count):
             h = int(self.hist[i])
-            cv2.rectangle(img, (i * bin_w + 2, 255), ((i + 1) * bin_w - 2, 255 - h),
+            cv2.rectangle(img, (i * bin_w + 2, 255),
+                          ((i + 1) * bin_w - 2, 255 - h),
                           (int(180.0 * i / bin_count), 255, 255), -1)
         img = cv2.cvtColor(img, cv2.COLOR_HSV2BGR)
         cv2.imshow('Histogram', img)

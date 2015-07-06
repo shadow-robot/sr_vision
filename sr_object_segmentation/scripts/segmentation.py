@@ -12,20 +12,24 @@ from sr_vision_msgs.srv import SegmentationControl
 class Segmentation(object):
     def __init__(self):
 
-        self.color = rospy.get_param('/color')
+        self.color = rospy.get_param('/tracking/color')
 
         self.seg = HSVSegmentation(self.color)
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image,
+                                          self.image_callback)
 
-        self.selection_pub = rospy.Publisher("/roi/segmented_box", RegionOfInterest, queue_size=1)
+        self.selection_pub = rospy.Publisher("roi/segmented_box",
+                                             RegionOfInterest, queue_size=1)
 
-        self.server = rospy.Service('~start', SegmentationControl, self.segment)
+        self.server = rospy.Service('~start', SegmentationControl,
+                                    self.segment)
 
     def image_callback(self, data):
         """
-        Convert the ROS image to OpenCV format using a cv_bridge helper function and make a copy
+        Convert the ROS image to OpenCV format using a cv_bridge helper
+        function and make a copy
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 

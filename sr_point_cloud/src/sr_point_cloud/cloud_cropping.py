@@ -8,15 +8,19 @@ from sensor_msgs import point_cloud2
 
 class PointCloudCropping(object):
     """
-    Getting the whole PointCloud from the camera and the tracking box from the tracking node, process a crop to
+    Getting the whole PointCloud from the camera and the tracking box from the
+    tracking node, process a crop to
     publish the ROI as a sensor_msgs/PointCloud2
     """
 
     def __init__(self):
-        self.camera_cloud_sub = rospy.Subscriber("/camera/depth_registered/points", PointCloud2,
-                                                 self.camera_cloud_callback)
-        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
-        self.cloud_pub = rospy.Publisher("/roi/track_cloud", PointCloud2, queue_size=1)
+        self.camera_cloud_sub = rospy.Subscriber(
+            "/camera/depth_registered/points", PointCloud2,
+            self.camera_cloud_callback)
+        self.roi_sub = rospy.Subscriber("roi/track_box", RegionOfInterest,
+                                        self.roi_callback)
+        self.cloud_pub = rospy.Publisher("roi/track_cloud", PointCloud2,
+                                         queue_size=1)
 
         self.camera_cloud = None
         self.track_box = None
@@ -41,8 +45,10 @@ class PointCloudCropping(object):
         Create a new PointCloud from the tracking box's points and publish it.
         """
         pt1 = (self.track_box.x_offset, self.track_box.y_offset)
-        pt2 = (self.track_box.x_offset + self.track_box.width, self.track_box.y_offset + self.track_box.height)
-        pts = [(x, y) for x in range(pt1[0], pt2[0]) for y in range(pt1[1], pt2[1])]
+        pt2 = (self.track_box.x_offset + self.track_box.width,
+               self.track_box.y_offset + self.track_box.height)
+        pts = [(x, y) for x in range(pt1[0], pt2[0]) for y in
+               range(pt1[1], pt2[1])]
 
         roi_pts = []
         try:
@@ -51,7 +57,9 @@ class PointCloudCropping(object):
                 roi_pts = list(gen)
             except AssertionError:
                 pass
-            roi_pc = point_cloud2.create_cloud(self.camera_cloud.header, self.camera_cloud.fields, roi_pts)
+            roi_pc = point_cloud2.create_cloud(self.camera_cloud.header,
+                                               self.camera_cloud.fields,
+                                               roi_pts)
             self.publish_cloud(roi_pc)
         except (AttributeError, point_cloud2.struct.error):
             pass
