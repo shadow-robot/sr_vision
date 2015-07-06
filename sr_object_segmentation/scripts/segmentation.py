@@ -42,7 +42,7 @@ class Segmentation(object):
             roi = self.utils.publish_box(self.seg.segmented_box)
             self.selection_pub.publish(roi)
             return True
-        except AttributeError:
+        except (AttributeError, IndexError):
             return False
 
 
