@@ -37,7 +37,7 @@ class DisplayImage(object):
 
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.display)
+        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image, self.display)
         self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest, self.roi_callback)
 
         self.selection_pub = rospy.Publisher("/roi/selection", RegionOfInterest, queue_size=1)

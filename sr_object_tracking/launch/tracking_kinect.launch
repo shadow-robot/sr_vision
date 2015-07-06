@@ -1,8 +1,6 @@
 <launch>
 
-  <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
-      <remap from="/image_raw" to="/camera/rgb/image_color"/>
-  </node>
+  <include file="$(find freenect_launch)/launch/freenect.launch"/>
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  />
 
@@ -16,5 +14,7 @@
       <param name="size" value="75" />
 
   <node name="viewer" pkg="sr_gui_servoing" type="displaying.py"  />
+
+  <node name="cloud_publishing" pkg="sr_point_cloud" type="cloud_cropping.py"  />
 
 </launch>

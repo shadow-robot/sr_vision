@@ -17,7 +17,8 @@ class Segmentation(object):
         self.seg = HSVSegmentation(self.color)
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image, self.image_callback)
+        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image, self.image_callback)
+
         self.selection_pub = rospy.Publisher("/roi/segmented_box", RegionOfInterest, queue_size=1)
 
         self.server = rospy.Service('~start', SegmentationControl, self.segment)
@@ -38,7 +39,7 @@ class Segmentation(object):
             roi = self.utils.publish_box(self.seg.segmented_box)
             self.selection_pub.publish(roi)
             return True
-        except AttributeError:
+        except (AttributeError, IndexError):
             return False
 
 
