@@ -18,11 +18,11 @@ class DisplayImage(object):
     def __init__(self, node_name):
 
         rospy.init_node(node_name)
-        self.color = rospy.get_param('/tracking/color')
+        self.color = rospy.get_param('~color')
         self.cv_window_name = 'Video'
 
         # Initialize a number of global variables
-        self.smin = rospy.get_param('/tracking/saturation_min')
+        self.smin = rospy.get_param('~saturation')
         self.hist = None
         self.drag_start = (-1, -1)
         self.track_box = None
@@ -37,7 +37,7 @@ class DisplayImage(object):
 
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image,
+        self.image_sub = rospy.Subscriber('camera/rgb/image_color', Image,
                                           self.display)
         self.roi_sub = rospy.Subscriber("roi/track_box", RegionOfInterest,
                                         self.roi_callback)
@@ -156,7 +156,7 @@ class DisplayImage(object):
 
 def main():
     try:
-        DisplayImage("sr_gui_servoing")
+        DisplayImage("viewer")
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down sr_gui_servoing node."

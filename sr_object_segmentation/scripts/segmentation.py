@@ -12,12 +12,12 @@ from sr_vision_msgs.srv import SegmentationControl
 class Segmentation(object):
     def __init__(self):
 
-        self.color = rospy.get_param('/tracking/color')
+        self.color = rospy.get_param('~color')
 
         self.seg = HSVSegmentation(self.color)
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image,
+        self.image_sub = rospy.Subscriber('camera/rgb/image_color', Image,
                                           self.image_callback)
 
         self.selection_pub = rospy.Publisher("roi/segmented_box",

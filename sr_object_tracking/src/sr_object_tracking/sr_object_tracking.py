@@ -16,9 +16,9 @@ class SrObjectTracking(object):
         self.utils = Utils()
 
         # Initialize a number of global variables
-        self.smin = rospy.get_param('/tracking/saturation_min')
-        self.size = rospy.get_param('/tracking/size')
-        self.color = rospy.get_param('/tracking/color')
+        self.smin = rospy.get_param('~saturation')
+        self.size = rospy.get_param('~size')
+        self.color = rospy.get_param('~color')
         self.track_box = None
         self.track_window = None
         self.tracking_state = 0
@@ -41,7 +41,7 @@ class SrObjectTracking(object):
         self.upper = np.array(self.upper, dtype="uint8")
 
         # Subscribe to the image topic and set the appropriate callback
-        self.image_sub = rospy.Subscriber('/camera/rgb/image_color', Image,
+        self.image_sub = rospy.Subscriber('camera/rgb/image_color', Image,
                                           self.image_callback)
         self.selection_sub = rospy.Subscriber("roi/segmented_box",
                                               RegionOfInterest,
