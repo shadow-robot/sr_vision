@@ -3,6 +3,7 @@ import rospy
 import numpy as np
 
 from sensor_msgs.msg import Image, RegionOfInterest
+from geometry_msgs.msg import PoseStamped
 
 from utils import Utils
 
@@ -43,6 +44,7 @@ class SrObjectTracking(object):
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber('camera/rgb/image_color', Image,
                                           self.image_callback)
+
         self.selection_sub = rospy.Subscriber("roi/segmented_box",
                                               RegionOfInterest,
                                               self.selection_callback)
@@ -53,6 +55,7 @@ class SrObjectTracking(object):
         # Initialize the Region of Interest publishers
         self.roi_pub = rospy.Publisher("roi/track_box", RegionOfInterest,
                                        queue_size=1)
+        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped, queue_size=1)
 
     def image_callback(self, data):
         """
@@ -68,5 +71,5 @@ class SrObjectTracking(object):
         Get the ROI box (selected or segmented)
         """
         self.selection = (
-        data.x_offset, data.y_offset, data.x_offset + data.width,
-        data.y_offset + data.height)
+            data.x_offset, data.y_offset, data.x_offset + data.width,
+            data.y_offset + data.height)

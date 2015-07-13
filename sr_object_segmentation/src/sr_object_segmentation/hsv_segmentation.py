@@ -2,7 +2,7 @@
 
 import cv2
 import numpy as np
-from scipy.ndimage.measurements import label, find_objects
+from scipy.ndimage.measurements import label, find_objects, center_of_mass
 from sr_object_segmentation import SrObjectSegmentation
 
 
@@ -34,11 +34,15 @@ class HSVSegmentation(SrObjectSegmentation):
         objects = find_objects(labeled_array)
         self.nb_segments = num_features
 
+        self.poses = center_of_mass(closing, labeled_array)
+
         segments = []
         for seg in objects:
             seg_x = seg[1]
             seg_y = seg[0]
-            segments.append((int(seg_x.start), int(seg_y.start), int(seg_x.stop - seg_x.start),
+
+            segments.append((int(seg_x.start), int(seg_y.start),
+                             int(seg_x.stop - seg_x.start),
                              int(seg_y.stop - seg_y.start)))
 
         # Order the slices according to their size

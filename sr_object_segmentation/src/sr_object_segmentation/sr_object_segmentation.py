@@ -2,6 +2,7 @@
 
 from sr_object_tracking.utils import Utils
 
+
 class SrObjectSegmentation(object):
     """
     Base class for object segmentation
@@ -11,14 +12,16 @@ class SrObjectSegmentation(object):
         """
         Initialize the segmentation object
         @param image - image to be segmented
-        @param points - dictionary with segments and corresponding points (optional)
+        @param points - dictionary with segments and corresponding points
+        (optional)
         @attribute nb_segments - number of segments found in the image
         """
         self.name = ''
         self.img = image
         self.frame = None
+        self.depth = None
         self.points = points
         self.nb_segments = len(self.points)
         self.selection = None
         self.utils = Utils()
-
+        self.poses = None
