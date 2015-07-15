@@ -41,7 +41,7 @@ class TestCloudTracker(unittest.TestCase):
         else:
             is_publishing = True
         self.assertTrue(is_publishing,
-                        topic + " is not publishing : " + str(err)
+                        topic + " is not publishing : " + str(err))
         return is_publishing
 
     def assertIsNotPublishing(self, topic, topic_type, timeout=3.0):
