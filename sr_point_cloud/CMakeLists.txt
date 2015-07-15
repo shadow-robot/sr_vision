@@ -178,11 +178,11 @@ add_executable(triangulator
   src/triangulator.cpp
 )
 
-# add_dependencies(triangulator
-#   ${PROJECT_NAME}_gencfg
-#   sr_grasp_msgs_gencpp
-#   ${catkin_EXPORTED_TARGETS}
-# )
+add_dependencies(triangulator
+  ${PROJECT_NAME}_gencfg
+  sr_vision_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
 
 target_link_libraries(triangulator
   ${catkin_LIBRARIES}
@@ -208,10 +208,10 @@ add_executable(cloud_services
   src/point_cloud_services_node.cpp
 )
 
-# add_dependencies(cloud_services
-#   sr_grasp_msgs_gencpp
-#   ${catkin_EXPORTED_TARGETS}
-# )
+add_dependencies(cloud_services
+  sr_grasp_msgs_gencpp
+  ${catkin_EXPORTED_TARGETS}
+)
 
 target_link_libraries(cloud_services
   ${catkin_LIBRARIES}
