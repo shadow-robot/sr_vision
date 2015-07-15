@@ -15,9 +15,7 @@
   </group>
 
   <group unless="$(arg kinect)">
-    <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
-        <remap from="/image_raw" to="/camera/rgb/image_color"/>
-    </node>
+    <include file="$(find autopic)/launch/camera.launch" />
   </group>
 
 
