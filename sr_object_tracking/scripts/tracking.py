@@ -22,7 +22,6 @@ def main():
         while not rospy.is_shutdown():
             try:
                 success_track = node.tracking()
-                print success_track
                 if not success_track:
                     seg_success = seg().success
                     while not seg_success:
