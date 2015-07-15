@@ -41,16 +41,16 @@ class CameraCalibration(TransformationManager):
                 "Parameter initial_tf should contain 6 items [x, y, z and 3 "
                 "Euler angles]")
 
-        self._robot_marker_frames = rospy.get_param("~robot_marker_frames")
-        self._camera_marker_frames = rospy.get_param("~marker_frames")
+        self._marker_holder_frames = rospy.get_param("~marker_holder_frames")
+        self._camera_markers_ids = rospy.get_param("~markers_ids")
 
         if len(self._robot_marker_frames) != len(self._camera_marker_frames):
             raise Exception(
                 "Amount of robot_marker_frames and marker_frames should be "
                 "equal")
 
-        if not len(self._robot_marker_frames) in [3, 4]:
-            raise Exception("robot_marker_frames should have 3 or 4 elements")
+        if not len(self._marker_holder_frames) in [3, 4]:
+            raise Exception("marker_holder_frames should have 3 or 4 elements")
 
         self._base_frame = rospy.get_param("~base_frame")
         self._camera_frame = rospy.get_param("~camera_frame")
@@ -108,7 +108,7 @@ class CameraCalibration(TransformationManager):
         """
         result = True
 
-        if 3 <= len(self._robot_marker_frames):
+        if 3 <= len(self._marker_holder_frames):
             result = self._is_distance_between_frames_similar(0, 1) and \
                      self._is_distance_between_frames_similar(0,2) and \
                      self._is_distance_between_frames_similar(1, 2)
