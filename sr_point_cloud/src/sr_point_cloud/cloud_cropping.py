@@ -8,8 +8,8 @@ from sensor_msgs import point_cloud2
 
 class PointCloudCropping(object):
     """
-    Getting the whole PointCloud from the camera and the tracking box from
-    the tracking node, process a crop to
+    Getting the whole PointCloud from the camera and the tracking box from the
+    tracking node, process a crop to
     publish the ROI as a sensor_msgs/PointCloud2
     """
 
@@ -17,9 +17,9 @@ class PointCloudCropping(object):
         self.camera_cloud_sub = rospy.Subscriber(
             "/camera/depth_registered/points", PointCloud2,
             self.camera_cloud_callback)
-        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest,
+        self.roi_sub = rospy.Subscriber("roi/track_box", RegionOfInterest,
                                         self.roi_callback)
-        self.cloud_pub = rospy.Publisher("/roi/track_cloud", PointCloud2,
+        self.cloud_pub = rospy.Publisher("roi/track_cloud", PointCloud2,
                                          queue_size=1)
 
         self.camera_cloud = None

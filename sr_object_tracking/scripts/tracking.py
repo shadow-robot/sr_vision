@@ -12,8 +12,8 @@ def main():
         rospy.init_node('sr_object_tracking')
         node = SequentialTracking()
 
-        rospy.wait_for_service('/segmentation/start')
-        seg = rospy.ServiceProxy('/segmentation/start', SegmentationControl)
+        rospy.wait_for_service('segmentation/start')
+        seg = rospy.ServiceProxy('segmentation/start', SegmentationControl)
 
         seg_success = seg().success
         while not seg_success:

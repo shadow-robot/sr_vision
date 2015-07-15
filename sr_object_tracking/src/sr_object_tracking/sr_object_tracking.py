@@ -3,6 +3,7 @@ import rospy
 import numpy as np
 
 from sensor_msgs.msg import Image, RegionOfInterest
+from geometry_msgs.msg import PoseStamped
 
 from utils import Utils
 
@@ -16,8 +17,9 @@ class SrObjectTracking(object):
         self.utils = Utils()
 
         # Initialize a number of global variables
-        self.smin = rospy.get_param('/saturation_min')
-        self.size = rospy.get_param('/size')
+        self.smin = rospy.get_param('~saturation')
+        self.size = rospy.get_param('~size')
+        self.color = rospy.get_param('~color')
         self.track_box = None
         self.track_window = None
         self.tracking_state = 0
@@ -28,7 +30,6 @@ class SrObjectTracking(object):
         self.depth_image = None
         self.vis = None
         self.hist = None
-        self.color = rospy.get_param('/color')
 
         boundaries = {
             'red': ([145, 140, 0], [255, 255, 255]),
@@ -51,8 +52,9 @@ class SrObjectTracking(object):
                                               self.selection_callback)
 
         # Initialize the Region of Interest publishers
-        self.roi_pub = rospy.Publisher("/roi/track_box", RegionOfInterest,
+        self.roi_pub = rospy.Publisher("roi/track_box", RegionOfInterest,
                                        queue_size=1)
+        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped, queue_size=1)
 
     def image_callback(self, data):
         """
@@ -68,5 +70,5 @@ class SrObjectTracking(object):
         Get the ROI box (selected or segmented)
         """
         self.selection = (
-        data.x_offset, data.y_offset, data.x_offset + data.width,
-        data.y_offset + data.height)
+            data.x_offset, data.y_offset, data.x_offset + data.width,
+            data.y_offset + data.height)

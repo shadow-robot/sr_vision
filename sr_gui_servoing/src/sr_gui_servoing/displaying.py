@@ -8,6 +8,7 @@ from sr_object_tracking.utils import Utils
 from sr_object_segmentation.hsv_segmentation import hsv_transform
 
 from sensor_msgs.msg import RegionOfInterest, Image
+from geometry_msgs.msg import PoseStamped
 
 
 class DisplayImage(object):
@@ -18,11 +19,12 @@ class DisplayImage(object):
     def __init__(self, node_name):
 
         rospy.init_node(node_name)
-        self.color = rospy.get_param('/color')
+
+        self.color = rospy.get_param('~color')
         self.cv_window_name = 'Video'
 
         # Initialize a number of global variables
-        self.smin = rospy.get_param('/saturation_min')
+        self.smin = rospy.get_param('~saturation')
         self.hist = None
         self.drag_start = (-1, -1)
         self.track_box = None
@@ -44,6 +46,8 @@ class DisplayImage(object):
 
         self.selection_pub = rospy.Publisher("/roi/selection",
                                              RegionOfInterest, queue_size=1)
+        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped, 
+                                        queue_size=1)
 
     def display(self, data):
         """
@@ -88,7 +92,14 @@ class DisplayImage(object):
         except cv2.error:
             pass
 
-        self.selection_pub.publish(self.utils.publish_box(self.selection))
+        try:
+            roi = self.utils.publish_box(self.selection)
+            pose = self.utils.publish_pose(roi=roi)
+
+            self.pose_pub.publish(pose)
+            self.selection_pub.publish(roi)
+        except (AttributeError, TypeError, IndexError):
+            pass
 
         img = hsv_transform(self.vis, self.color)
 
@@ -118,10 +129,12 @@ class DisplayImage(object):
         """
         Select a ROI using the dragging
         """
+
         x, y = np.int16([x, y])
         if event == cv2.EVENT_LBUTTONDOWN:
             self.drag_start = (x, y)
             self.tracking_state = 0
+            return
         if self.drag_start != (-1, -1):
             if flags & cv2.EVENT_FLAG_LBUTTON:
                 h, w = self.frame.shape[:2]
@@ -156,7 +169,7 @@ class DisplayImage(object):
 
 def main():
     try:
-        DisplayImage("sr_gui_servoing")
+        DisplayImage("viewer")
         rospy.spin()
     except KeyboardInterrupt:
         print "Shutting down sr_gui_servoing node."
