@@ -6,6 +6,7 @@ from sr_object_segmentation.hsv_segmentation import HSVSegmentation
 from sr_object_tracking.utils import Utils
 
 from sensor_msgs.msg import Image, RegionOfInterest
+from geometry_msgs.msg import PoseStamped
 from sr_vision_msgs.srv import SegmentationControl
 
 
@@ -19,6 +20,9 @@ class Segmentation(object):
 
         self.image_sub = rospy.Subscriber('camera/rgb/image_color', Image,
                                           self.image_callback)
+
+        self.pose_pub = rospy.Publisher("roi/pose",
+                                        PoseStamped, queue_size=1)
 
         self.selection_pub = rospy.Publisher("roi/segmented_box",
                                              RegionOfInterest, queue_size=1)
@@ -40,10 +44,15 @@ class Segmentation(object):
         """
         try:
             self.seg.segmentation(self.frame)
+
             roi = self.utils.publish_box(self.seg.segmented_box)
+            pose = self.utils.publish_pose(moment=self.seg.poses)
+
             self.selection_pub.publish(roi)
+            self.pose_pub.publish(pose)
+
             return True
-        except (AttributeError, IndexError):
+        except (IndexError, TypeError, AttributeError):
             return False
 
 
