@@ -3,7 +3,7 @@ import rospy
 import numpy as np
 
 from sensor_msgs.msg import Image, RegionOfInterest
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Pose
 
 from utils import Utils
 
@@ -42,7 +42,7 @@ class SrObjectTracking(object):
         self.upper = np.array(self.upper, dtype="uint8")
 
         # Subscribe to the image topic and set the appropriate callback
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image,
+        self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
         self.selection_sub = rospy.Subscriber("/roi/segmented_box",
                                               RegionOfInterest,
@@ -54,7 +54,7 @@ class SrObjectTracking(object):
         # Initialize the Region of Interest publishers
         self.roi_pub = rospy.Publisher("roi/track_box", RegionOfInterest,
                                        queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped, queue_size=1)
+        self.pose_pub = rospy.Publisher("roi/pose", Pose, queue_size=1)
 
     def image_callback(self, data):
         """

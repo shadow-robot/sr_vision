@@ -8,7 +8,7 @@ from sr_object_tracking.utils import Utils
 from sr_object_segmentation.hsv_segmentation import hsv_transform
 
 from sensor_msgs.msg import RegionOfInterest, Image
-from geometry_msgs.msg import PoseStamped
+from geometry_msgs.msg import Pose
 
 
 class DisplayImage(object):
@@ -39,7 +39,7 @@ class DisplayImage(object):
 
         self.utils = Utils()
 
-        self.image_sub = rospy.Subscriber("/camera/rgb/image_color", Image,
+        self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.display)
         self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest,
                                         self.roi_callback)
