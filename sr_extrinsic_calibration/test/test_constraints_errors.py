@@ -114,7 +114,7 @@ class TestConstraintsErrors(TestCase):
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
             "~marker_holder_frames": ["marker_holder_1", "marker_holder_2",
-                                     "marker_holder_3"],
+                                      "marker_holder_3"],
             "~markers_ids": ["ar_marker_1", "ar_marker_2", "ar_marker_3"],
         }.get(param_name, default)
 
@@ -123,10 +123,11 @@ class TestConstraintsErrors(TestCase):
         return {
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
-            "~marker_holder_frames": ["marker_holder_1", "marker_holder_2",
-                                     "marker_holder_3", "marker_holder_4"],
-            "~markers_ids": ["ar_marker_1", "ar_marker_2", "ar_marker_3",
-                               "ar_marker_4"],
+            "~marker_holder_frames": [
+                "marker_holder_1", "marker_holder_2",
+                "marker_holder_3", "marker_holder_4"],
+            "~markers_ids": [
+                "ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"],
         }.get(param_name, default)
 
     @staticmethod
@@ -134,10 +135,10 @@ class TestConstraintsErrors(TestCase):
         return {
             "~camera_frame": "camera",
             "~base_frame": "delta_base",
-            "~marker_holder_frames": ["marker_holder_1", "marker_holder_2",
-                                     "marker_holder_3"],
-            "~markers_ids": ["ar_marker_1", "ar_marker_2", "ar_marker_3",
-                               "ar_marker_4"],
+            "~marker_holder_frames": [
+                "marker_holder_1", "marker_holder_2", "marker_holder_3"],
+            "~markers_ids": [
+                "ar_marker_1", "ar_marker_2", "ar_marker_3", "ar_marker_4"],
         }.get(param_name, default)
 
     @staticmethod

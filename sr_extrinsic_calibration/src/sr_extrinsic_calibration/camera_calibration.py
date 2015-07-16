@@ -6,8 +6,8 @@ import numpy
 import math
 
 import rospy
-from tf.transformations import superimposition_matrix,\
-    quaternion_from_matrix, translation_from_matrix, quaternion_multiply,\
+from tf.transformations import superimposition_matrix, \
+    quaternion_from_matrix, translation_from_matrix, quaternion_multiply, \
     quaternion_from_euler, vector_norm, euler_from_quaternion
 from geometry_msgs.msg import TransformStamped
 from sr_extrinsic_calibration.transformation_manager import \
@@ -90,10 +90,9 @@ class CameraCalibration(TransformationManager):
 
         if math.fabs(norm1 - norm2) > self._acceptable_distance_error:
             rospy.logerr("Distance between " + self._camera_markers_ids[
-                index1] + " and " +
-                         self._camera_markers_ids[
-                             index2] + " is not matching appropriate robot "
-                                       "marker distances")
+                index1] + " and " + self._camera_markers_ids[
+                index2] + " is not matching appropriate robot "
+                          "marker distances")
             rospy.logerr(
                 "It is " + str(norm2) + " and should be " + str(norm1))
             return False
@@ -109,13 +108,13 @@ class CameraCalibration(TransformationManager):
         result = True
 
         if 3 <= len(self._marker_holder_frames):
-            result = self._is_distance_between_frames_similar(0, 1) and \
-                     self._is_distance_between_frames_similar(0,2) and \
-                     self._is_distance_between_frames_similar(1, 2)
+            result = self._is_distance_between_frames_similar(
+                0, 1) and self._is_distance_between_frames_similar(
+                0, 2) and self._is_distance_between_frames_similar(1, 2)
 
         if 4 <= len(self._marker_holder_frames):
-            result = result and self._is_distance_between_frames_similar(0,3)\
-                     and self._is_distance_between_frames_similar(1, 3)
+            result = result and self._is_distance_between_frames_similar(
+                0, 3) and self._is_distance_between_frames_similar(1, 3)
         return result
 
     def _adjust_camera_position(self):
