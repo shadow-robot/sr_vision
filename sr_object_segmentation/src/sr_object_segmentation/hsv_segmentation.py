@@ -8,12 +8,13 @@ from sr_object_segmentation import SrObjectSegmentation
 
 class HSVSegmentation(SrObjectSegmentation):
     """
-    Segmentation based upon an HSV (Hue, Saturation, Value) colorization, according to a color given as parameter.
+    Segmentation based upon an HSV (Hue, Saturation, Value) colorization,
+    according to a color given as parameter.
     """
 
     def __init__(self, color):
         """
-        Initialize the HSV_based segmentation object 
+        Initialize the HSV_based segmentation object
         """
         SrObjectSegmentation.__init__(self, None, {})
         self.name = 'HSV segmentation algorithm'
@@ -23,7 +24,8 @@ class HSVSegmentation(SrObjectSegmentation):
 
     def segmentation(self, frame):
         """
-        Segment the image with the proper color. Update the box attribute according to the biggest segment found.
+        Segment the image with the proper color. Update the box attribute
+        according to the biggest segment found.
         @param frame - image to be segmented (numpy format)
         """
         self.img = frame
@@ -57,7 +59,7 @@ def hsv_transform(img, color):
     Convert an RGB image into an HSV unique color one
     @param img - input image to be formatted
     @param color - color wanted
-    @return - output image with black background and "color" segments highlighted
+    @return - output image with black bg and "color" segments highlighted
     """
 
     boundaries = {

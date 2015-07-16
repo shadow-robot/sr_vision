@@ -15,7 +15,7 @@
 
 //-------------------------------------------------------------------------------
 
-using namespace sr_point_cloud;
+using sr_point_cloud::Triangulator;
 
 //-------------------------------------------------------------------------------
 
@@ -65,7 +65,7 @@ void Triangulator::run(void)
 
 //-------------------------------------------------------------------------------
 
-void Triangulator::config_cb_(TriangulatorConfig &config, uint32_t level)
+void Triangulator::config_cb_(const TriangulatorConfig &config, uint32_t level)
 {
   resample_ = config.resample;
   mu_ = config.mu;
@@ -90,7 +90,7 @@ void Triangulator::cloud_cb_(const Cloud::ConstPtr &cloud)
   // Triangulate.
   pcl_msgs::PolygonMesh pclMesh;
   shape_msgs::Mesh shapeMesh;
-  this->triangulate(cloud, pclMesh, shapeMesh);
+  this->triangulate(cloud, &pclMesh, &shapeMesh);
 
   // Publish the mesh.
   pcl_output_pub_.publish(pclMesh);
@@ -116,8 +116,8 @@ void Triangulator::goal_cb_(const sr_vision_msgs::TriangulateGoalConstPtr &goal)
   pcl_msgs::PolygonMesh pclMesh;
   shape_msgs::Mesh shapeMesh;
   if (goal->mirror_mesh)
-    mirror_mesh_(*cloud);
-  this->triangulate(cloud, pclMesh, shapeMesh);
+    mirror_mesh_(cloud.get());
+  this->triangulate(cloud, &pclMesh, &shapeMesh);
 
   if (pclMesh.polygons.size() > 2)
   {
@@ -136,8 +136,8 @@ void Triangulator::goal_cb_(const sr_vision_msgs::TriangulateGoalConstPtr &goal)
 //-------------------------------------------------------------------------------
 
 void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
-                               pcl_msgs::PolygonMesh &pclMesh,
-                               shape_msgs::Mesh &shapeMesh)
+                               pcl_msgs::PolygonMesh *pclMesh,
+                               shape_msgs::Mesh *shapeMesh)
 {
   pcl::search::KdTree<PointType>::Ptr tree (new pcl::search::KdTree<PointType>);
 
@@ -214,7 +214,7 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
   gp3.reconstruct(triangles);
 
   // Convert to ROS type
-  pcl_conversions::fromPCL(triangles, pclMesh);
+  pcl_conversions::fromPCL(triangles, *pclMesh);
 
   // Convert to shape_msgs::Mesh type
   // The given cloud should NOT be used after resampling.
@@ -228,7 +228,7 @@ void Triangulator::triangulate(const Cloud::ConstPtr &cloud,
 
 void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                                         const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                                        shape_msgs::Mesh &shapeMesh)
+                                        shape_msgs::Mesh *shapeMesh)
 {
   const std::vector<pcl::Vertices> &polygons = pclMesh.polygons;
 
@@ -240,7 +240,7 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     vertex.x = curr_point.x;
     vertex.y = curr_point.y;
     vertex.z = curr_point.z;
-    shapeMesh.vertices.push_back(vertex);
+    shapeMesh->vertices.push_back(vertex);
   }
 
   // Set the list of triangles.
@@ -252,21 +252,25 @@ void Triangulator::from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
     triangle.vertex_indices[0] = curr_poly.vertices[0];
     triangle.vertex_indices[1] = curr_poly.vertices[1];
     triangle.vertex_indices[2] = curr_poly.vertices[2];
-    shapeMesh.triangles.push_back(triangle);
+    shapeMesh->triangles.push_back(triangle);
   }
 }
 
-void Triangulator::mirror_mesh_(Cloud &cloud)
+void Triangulator::mirror_mesh_(Cloud *cloud)
 {
-  using namespace Eigen; using namespace pcl; using namespace std;
+  using Eigen::Vector4f;
+  using Eigen::Vector3f;
+  using Eigen::Affine3f;
+  using Eigen::Translation3f;
+  using pcl::TransformationFromCorrespondences;
 
   Vector4f centroid4;
-  compute3DCentroid(cloud, centroid4);
+  compute3DCentroid(*cloud, centroid4);
   const Vector3f centroid = centroid4.head(3);
 
   // calculate oriented bounded box
   PointType min_pt, max_pt;
-  getMinMax3D(cloud, min_pt, max_pt);
+  getMinMax3D(*cloud, min_pt, max_pt);
 
   //  calculate transformation based on point correspondences
 
@@ -301,15 +305,15 @@ void Triangulator::mirror_mesh_(Cloud &cloud)
 
   // Construct the mirrored point cloud and append its points to the original
   Cloud mirrored_cloud;
-  transformPointCloud(cloud, mirrored_cloud, transformationMatrix);
-  cloud += mirrored_cloud;
+  transformPointCloud(*cloud, mirrored_cloud, transformationMatrix);
+  *cloud += mirrored_cloud;
 }
 
 
 //-------------------------------------------------------------------------------
 //-------------------------------------------------------------------------------
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "point_cloud_triangulator");
   sr_point_cloud::Triangulator tri_node;

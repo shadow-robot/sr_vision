@@ -41,12 +41,13 @@ class DisplayImage(object):
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.display)
-        self.roi_sub = rospy.Subscriber("roi/track_box", RegionOfInterest,
+        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest,
                                         self.roi_callback)
 
-        self.selection_pub = rospy.Publisher("roi/selection", RegionOfInterest,
-                                             queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", Pose, queue_size=1)
+        self.selection_pub = rospy.Publisher("/roi/selection",
+                                             RegionOfInterest, queue_size=1)
+        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped,
+                                        queue_size=1)
 
     def display(self, data):
         """

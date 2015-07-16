@@ -4,7 +4,8 @@ PKG = 'sr_point_cloud'
 NAME = 'test_cloud_tracker'
 
 import unittest
-import rospy, rostest
+import rospy
+import rostest
 from sensor_msgs.msg import PointCloud2, RegionOfInterest
 
 
@@ -33,11 +34,14 @@ class TestCloudCropping(unittest.TestCase):
             pass
         else:
             is_publishing = True
-        self.assertTrue(is_publishing, topic + " is not publishing : " + str(err))
+        self.assertTrue(is_publishing,
+                        topic + " is not publishing : " + str(err))
         return is_publishing
 
     def assertIsNotPublishing(self, topic, topic_type, timeout=3.0):
-        """Test if a topic is not publishing something of the correct type."""
+        """
+        Test if a topic is not publishing something of the correct type.
+        """
         is_publishing = False
         try:
             rospy.wait_for_message(topic, topic_type, timeout=timeout)
@@ -58,7 +62,7 @@ class TestCloudCropping(unittest.TestCase):
 
     def test_basic(self):
         """
-        Test if the camera's running and the simulated track_box bag is published.
+        Test if the camera's running and the simulated track_box bag published
         # track_box.bag contains a single RegionOfInterest message.
         # Can be created with something like:
         # $ rosbag record -l1 -o track_box /roi/track_box
@@ -80,9 +84,11 @@ class TestCloudCropping(unittest.TestCase):
         """
         self.assertIsPublishing('/roi/track_cloud', PointCloud2)
 
-        box = rospy.wait_for_message('/roi/track_box', RegionOfInterest, timeout=4)
+        box = rospy.wait_for_message('/roi/track_box', RegionOfInterest,
+                                     timeout=4)
         box_size = box.width * box.height
-        box_centroid = (box.x_offset + box.width / 2, box.y_offset + box.y_offset / 2)
+        box_centroid = (box.x_offset + box.width / 2,
+                        box.y_offset + box.y_offset / 2)
 
         cloud = self.lastMsg()
         cloud_size = cloud.width

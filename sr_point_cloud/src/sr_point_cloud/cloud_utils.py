@@ -14,6 +14,7 @@ import sensor_msgs.point_cloud2
 # Cloud and mesh utils
 #
 
+
 def centroid_mesh(mesh):
     """
     Takes a shape_msgs/Mesh as input and modifies it's
@@ -27,13 +28,14 @@ def centroid_mesh(mesh):
         sx += p.x
         sy += p.y
         sz += p.z
-    cx = sx/count
-    cy = sy/count
-    cz = sz/count
+    cx = sx / count
+    cy = sy / count
+    cz = sz / count
     for p in mesh.vertices:
         p.x = p.x - cx
         p.y = p.y - cy
         p.z = p.z - cz
+
 
 def centroid_point_cloud(cloud):
     """
@@ -46,16 +48,17 @@ def centroid_point_cloud(cloud):
         sx += p[0]
         sy += p[1]
         sz += p[2]
-    cx = sx/count
-    cy = sy/count
-    cz = sz/count
+    cx = sx / count
+    cy = sy / count
+    cz = sz / count
 
     new_points = []
     for p in sensor_msgs.point_cloud2.read_points(cloud):
-        new_points.append( (p[0]-cx, p[1]-cy, p[2]-cz) + p[3:] )
+        new_points.append((p[0] - cx, p[1] - cy, p[2] - cz) + p[3:])
     out_cloud = sensor_msgs.point_cloud2.create_cloud(
-            cloud.header, cloud.fields, new_points)
+        cloud.header, cloud.fields, new_points)
     return out_cloud
+
 
 def centroid_object(obj, frame_id=None):
     """
@@ -74,6 +77,3 @@ def centroid_object(obj, frame_id=None):
     stamp = obj.pose.header.stamp
     obj.pose = PoseWithCovarianceStamped()
     obj.pose.header.stamp = stamp
-        
-        
-        

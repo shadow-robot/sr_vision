@@ -44,11 +44,10 @@ class SrObjectTracking(object):
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
-
-        self.selection_sub = rospy.Subscriber("roi/segmented_box",
+        self.selection_sub = rospy.Subscriber("/roi/segmented_box",
                                               RegionOfInterest,
                                               self.selection_callback)
-        self.selection_sub = rospy.Subscriber("roi/selection",
+        self.selection_sub = rospy.Subscriber("/roi/selection",
                                               RegionOfInterest,
                                               self.selection_callback)
 
