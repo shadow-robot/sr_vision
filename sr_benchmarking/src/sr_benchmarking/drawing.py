@@ -81,8 +81,9 @@ class ImagesTest(object):
                         if img.getpixel((column, row)) == color:
                             column_min = column
                             column_tmp = column
-                            while img.getpixel((column_tmp, row)) == color and\
-                                            column_tmp < width - 1:
+                            while img.getpixel(
+                                    (column_tmp, row)) == color \
+                                    and column_tmp < width - 1:
                                 column_tmp += 1
                             if i == 4:
                                 i = 0
