@@ -17,7 +17,6 @@ class Segmentation(object):
 
         self.seg = HSVSegmentation(self.color)
         self.utils = Utils()
-        self.frame = None
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
