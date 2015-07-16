@@ -31,7 +31,7 @@ class TestObjectSegmentation(object):
         self.ref = SrObjectSegmentation(image, ref_seg)
 
     def test_number(self):
-        """ 
+        """
         Verify that number of segments is correct
         @return - a score corresponding to the difference between number of
         segments found by the algorithm and the
@@ -46,7 +46,7 @@ class TestObjectSegmentation(object):
 
     @property
     def test_distance(self):
-        """ 
+        """
         If segments are not perfectly the same, this test measures the
         magnitude of the difference
         @return - a score corresponding to the minimal distance between a

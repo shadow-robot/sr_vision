@@ -3,7 +3,7 @@
 PKG = 'sr_point_cloud'
 
 import unittest
-import rospy\
+import rospy
 from sr_grasp_msgs.srv import PclTransform, PclFilter
 from sensor_msgs.msg import PointCloud2
 

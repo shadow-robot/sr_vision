@@ -43,8 +43,7 @@ class ImagesTest(object):
                         blue_coord.append((y, x))
                     elif img.getpixel((x, y)) == (255, 0, 0):  # red stuffs
                         red_coord.append((y, x))
-                    elif img.getpixel((x, y)) == (
-                    255, 255, 0):  # yellow stuffs
+                    elif img.getpixel((x, y)) == (255, 255, 0):  # yellow
                         yellow_coord.append((y, x))
 
             if blue_coord:
@@ -82,8 +81,8 @@ class ImagesTest(object):
                         if img.getpixel((column, row)) == color:
                             column_min = column
                             column_tmp = column
-                            while img.getpixel((column_tmp,
-                                                row)) == color and column_tmp < width - 1:
+                            while img.getpixel((column_tmp, row)) == color and\
+                                            column_tmp < width - 1:
                                 column_tmp += 1
                             if i == 4:
                                 i = 0
