@@ -1,7 +1,7 @@
 <launch>
 
-  <!-- set the device type (Kinect=True or False) in order to launch the right driver node -->
-  <arg name="kinect" default="false" />
+  <arg name="kinect"/>
+  <param name="kinect" value="$(arg kinect)"/>
 
   <!-- specify the calibration file for the camera -->
   <arg name="cam_calibration_file" default="file://$(find sr_object_tracking)/config/logitech_HDPro_c920_800x600.yaml" />
