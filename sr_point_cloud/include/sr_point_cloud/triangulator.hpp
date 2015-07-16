@@ -73,10 +73,10 @@ protected:
   void goal_cb_(const sr_vision_msgs::TriangulateGoalConstPtr &goal);
 
   void triangulate(const Cloud::ConstPtr &cloud,
-                   pcl_msgs::PolygonMesh &pclMesh,
-                   shape_msgs::Mesh &shapeMesh);
+                   pcl_msgs::PolygonMesh *pclMesh,
+                   shape_msgs::Mesh *shapeMesh);
 
-  void mirror_mesh_(Cloud &cloud);
+  void mirror_mesh_(Cloud *cloud);
 
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,

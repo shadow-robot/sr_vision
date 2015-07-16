@@ -39,7 +39,10 @@ namespace sr_point_cloud
 {
 
 using std::vector;
-using namespace object_recognition_msgs;
+using object_recognition_msgs::ObjectRecognitionAction;
+using object_recognition_msgs::RecognizedObjectArray;
+using object_recognition_msgs::ObjectRecognitionResult;
+using object_recognition_msgs::RecognizedObject;
 
 class ClusterSegmentorNode
 {

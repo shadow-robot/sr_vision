@@ -55,7 +55,12 @@
 namespace sr_point_cloud
 {
 
-using namespace pcl::tracking;
+using pcl::tracking::ParticleXYZRPY;
+using pcl::tracking::ParticleFilterTracker;
+using pcl::tracking::ParticleFilterOMPTracker;
+using pcl::tracking::KLDAdaptiveParticleFilterOMPTracker;
+using pcl::tracking::ApproxNearestPairPointCloudCoherence;
+using pcl::tracking::DistanceCoherence;
 
 // pcl::PointXYZ
 template <class PointType>
@@ -178,7 +183,7 @@ protected:
   }
 
   void
-  config_cb(TrackerConfig &config, uint32_t level)
+  config_cb(const TrackerConfig &config, uint32_t level)
   {
     // ROS_INFO("Reconfigure Request: %f %f %f", config.downsampling_grid_size,
     // config.filter_z_min, config.filter_z_max );
@@ -207,7 +212,7 @@ protected:
     {
       // TODO(shadow): param toggle use of approx downsampling
       // gridSampleApprox (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
-      gridSample(cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
+      gridSample(cloud_pass_, cloud_pass_downsampled_.get(), downsampling_grid_size_);
     }
     else
     {
@@ -327,21 +332,21 @@ protected:
   }
 
   void
-  gridSampleApprox(const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+  gridSampleApprox(const CloudConstPtr &cloud, Cloud *result, double leaf_size = 0.01)
   {
     pcl::ApproximateVoxelGrid<PointType> grid;
     grid.setLeafSize(leaf_size, leaf_size, leaf_size);
     grid.setInputCloud(cloud);
-    grid.filter(result);
+    grid.filter(*result);
   }
 
   void
-  gridSample(const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+  gridSample(const CloudConstPtr &cloud, Cloud *result, double leaf_size = 0.01)
   {
     pcl::VoxelGrid<PointType> grid;
     grid.setLeafSize(leaf_size, leaf_size, leaf_size);
     grid.setInputCloud(cloud);
-    grid.filter(result);
+    grid.filter(*result);
   }
 
   bool

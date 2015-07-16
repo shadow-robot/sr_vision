@@ -1,7 +1,11 @@
+/* Copyright 2015 ShadowRobot */
+
 #include "sr_point_cloud/tracker.hpp"
 
 namespace sr_point_cloud
 {
+
+using pcl::tracking::HSVColorCoherence;
 
 // pcl::PointXYZRGB
 class TrackerRGB : public Tracker<pcl::PointXYZRGB>
