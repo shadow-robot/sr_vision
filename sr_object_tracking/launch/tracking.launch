@@ -1,25 +1,19 @@
 <launch>
 
+  <!-- the camera has to be launched (value = true) for an independant usage -->
+  <arg name="camera" default="$(arg camera)" />
+  <!-- set the device type (Kinect=True or False) in order to launch the right driver node -->
+  <arg name="kinect" default="false" />
+
+  <!-- set the visualization window or not -->
+  <arg name="display" default="true" />
+
   <!-- set the color parameter for the segmentation -->
   <!-- can be : ['red','blue','green','yellow'] -->
   <arg name="color" default="$(arg color)" />
 
   <arg name="saturation_min" default="150" />
   <arg name="size" default="75" />
-
-  <!-- set the device type (Kinect=True or False) in order to launch the right driver node -->
-  <arg name="kinect" default="$(arg kinect" />
-
-  <group if="$(arg kinect)">
-    <include file="$(find freenect_launch)/launch/freenect.launch"/>
-  </group>
-
-  <group unless="$(arg kinect)">
-    <node pkg="uvc_camera" type="uvc_camera_node" name="uvc_camera" output="screen">
-        <remap from="/image_raw" to="/camera/rgb/image_color"/>
-    </node>
-  </group>
-
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  >
     <param name="color" value="$(arg color)" />
@@ -31,9 +25,17 @@
     <param name="color" value="$(arg color)" />
   </node>
 
-  <node name="viewer" pkg="sr_gui_servoing" type="displaying.py" >
-    <param name="saturation" value="$(arg saturation_min)" />
-    <param name="color" value="$(arg color)" />
-  </node>
+  <group if="$(arg display)">
+    <node name="viewer" pkg="sr_gui_servoing" type="displaying.py" >
+      <param name="saturation" value="$(arg saturation_min)" />
+      <param name="color" value="$(arg color)" />
+    </node>
+  </group>
+
+  <group if="$(arg camera)">
+    <include file="$(find sr_object_tracking)/launch/camera.launch">
+      <arg name="kinect" value="$(arg kinect)" />
+    </include>
+  </group>
 
 </launch>

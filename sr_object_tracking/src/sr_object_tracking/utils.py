@@ -2,31 +2,35 @@
 
 import rospy
 
-from sensor_msgs.msg import RegionOfInterest
-from geometry_msgs.msg import PoseStamped
 from cv_bridge import CvBridge, CvBridgeError
-from sensor_msgs.msg import Image, RegionOfInterest
-from geometry_msgs.msg import PoseStamped
+
+from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
+from geometry_msgs.msg import Pose
+
+from image_geometry import PinholeCameraModel
 
 
 class Utils(object):
     def __init__(self):
-        # Create the cv_bridge object
+
         self.bridge = CvBridge()
         self.depth = None
+        self.cam_info = None
 
         self.depth_sub = rospy.Subscriber('camera/depth/image_rect_raw', Image,
                                           self.depth_callback)
+        self.cam_info = rospy.Subscriber('camera/camera_info', CameraInfo,
+                                         self.cam_info_callback)
 
         # Initialize the Region of Interest publishers
         self.roi_pub = rospy.Publisher("roi/track_box", RegionOfInterest,
                                        queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped, queue_size=1)
+        self.pose_pub = rospy.Publisher("roi/pose", Pose, queue_size=1)
 
     def convert_image(self, ros_image, encode):
         """
         Use cv_bridge() to convert the ROS image to OpenCV format
-        @param ros_image - image in ROS format, to be converted in OpenCV format
+        @param ros_image - image in ROS format, to be converted
         """
         try:
             cv_image = self.bridge.imgmsg_to_cv2(ros_image, encode)
@@ -42,10 +46,16 @@ class Utils(object):
 
         self.depth = self.convert_image(data, "passthrough")
 
+    def cam_info_callback(self, data):
+        """
+        Get the camera information from its calibration
+        """
+        self.cam_info = data
+
     def publish_pose(self, roi=None, moment=None):
         """
-        Publish the region of interest as a geometry_msgs/PoseStamped message
-        from the ROI or the center of mass coordinates
+        Publish the region of interest as a geometry_msgs/Pose message from
+        the ROI or the center of mass coordinates
         @param roi - sensor_msgs/RegionOfInterest
         @param moment - object's center of mass
         """
@@ -53,13 +63,21 @@ class Utils(object):
             moment = (roi.x_offset + int(roi.width / 2),
                       roi.y_offset + int(roi.height / 2))
 
-        ps = PoseStamped()
-        ps.header.frame_id = "/camera_link"
-        ps.pose.orientation.w = 1
-        x, y = int(moment[0]), int(moment[1])
-        ps.pose.position.x = x
-        ps.pose.position.y = y
-        ps.pose.position.z = self.depth[y, x]
+        u, v = int(moment[0]), int(moment[1])
+
+        ps = Pose()
+        ps.orientation.x = 0.0
+        ps.orientation.y = 0.0
+        ps.orientation.z = 0.0
+        ps.orientation.w = 1.0
+
+        cam = PinholeCameraModel()
+        cam.fromCameraInfo(self.cam_info)
+        (x, y, z) = cam.projectPixelTo3dRay((u, v))
+
+        ps.position.x = x
+        ps.position.y = y
+        ps.position.z = z
 
         return ps
 
@@ -80,7 +98,8 @@ class Utils(object):
         roi.height = int(roi_box[3])
         return roi
 
-    def box_to_rect(self, roi):
+    @staticmethod
+    def box_to_rect(roi):
         """
         Convert a region of interest as box format into a rect format
         @param roi - region of interest (box format)

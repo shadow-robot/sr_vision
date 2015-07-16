@@ -47,9 +47,10 @@ class SequentialTracking(SrObjectTracking):
                 cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
             nb_iter = cv2.meanShift(prob, self.track_window, term_crit)[0]
             if nb_iter != 0:
-                self.track_box, self.track_window = cv2.CamShift(prob,
-                                                        self.track_window,
-                                                               term_crit)
+                self.track_box, self.track_window = \
+                    cv2.CamShift(prob, self.track_window, term_crit)
+            else:
+                return False
 
         roi = self.utils.publish_box(self.track_box)
 
