@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 
 import rospy
+import numpy as np
 
-from sr_object_segmentation.hsv_segmentation import HSVSegmentation
+from sr_object_segmentation.shape_color_segmentation import \
+    ShapeColorSegmentation
 from sr_object_tracking.utils import Utils
 
 from sensor_msgs.msg import Image, RegionOfInterest
@@ -14,8 +16,10 @@ class Segmentation(object):
     def __init__(self):
 
         self.color = rospy.get_param('~color')
+        self.shape = np.load(rospy.get_param('~shape'))
+        self.size = rospy.get_param('~size')
 
-        self.seg = HSVSegmentation(self.color)
+        self.seg = ShapeColorSegmentation(self.color, self.shape, self.size)
         self.utils = Utils()
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
@@ -42,15 +46,15 @@ class Segmentation(object):
         Launch the segmentation
         @return - Success of the segmentation as a boolean
         """
+
         try:
             self.seg.segmentation(self.frame)
+            for i, seg in enumerate(self.seg.segmented_box):
+                roi = self.utils.box_to_roi(seg)
+                self.selection_pub.publish(roi)
 
-            roi = self.utils.publish_box(self.seg.segmented_box)
-            pose = self.utils.publish_pose(moment=self.seg.poses)
-
-            self.selection_pub.publish(roi)
-            self.pose_pub.publish(pose)
-
+                pose = self.utils.publish_pose(seg, moment=self.seg.poses[i])
+                self.pose_pub.publish(pose)
             return True
         except (IndexError, TypeError, AttributeError):
             return False

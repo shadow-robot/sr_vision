@@ -52,7 +52,7 @@ class SequentialTracking(SrObjectTracking):
             else:
                 return False
 
-        roi = self.utils.publish_box(self.track_box)
+        roi = self.utils.box_to_roi(self.track_box)
 
         # Make sure that the object is still tracked, otherwise launch the
         # segmentation

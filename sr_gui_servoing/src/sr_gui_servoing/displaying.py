@@ -5,7 +5,6 @@ import numpy as np
 import rospy
 
 from sr_object_tracking.utils import Utils
-from sr_object_segmentation.hsv_segmentation import hsv_transform
 
 from sensor_msgs.msg import RegionOfInterest, Image
 from geometry_msgs.msg import Pose
@@ -92,7 +91,7 @@ class DisplayImage(object):
             pass
 
         try:
-            roi = self.utils.publish_box(self.selection)
+            roi = self.utils.box_to_roi(self.selection)
             pose = self.utils.publish_pose(roi=roi)
 
             self.pose_pub.publish(pose)
@@ -100,7 +99,7 @@ class DisplayImage(object):
         except (AttributeError, TypeError, IndexError):
             pass
 
-        img = hsv_transform(self.vis, self.color)
+        img = self.utils.hsv_transform(self.vis, self.color)
 
         # Draw the tracking box, if possible
         try:
