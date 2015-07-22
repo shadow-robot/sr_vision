@@ -45,7 +45,7 @@ class DisplayImage(object):
 
         self.selection_pub = rospy.Publisher("/roi/selection",
                                              RegionOfInterest, queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", PoseStamped,
+        self.pose_pub = rospy.Publisher("roi/pose", Pose,
                                         queue_size=1)
 
     def display(self, data):

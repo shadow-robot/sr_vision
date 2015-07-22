@@ -113,8 +113,9 @@ class CameraCalibration(TransformationManager):
                       self._is_distance_between_frames_similar(1, 2))
 
         if 4 <= len(self._marker_holder_frames):
-            result = (result and self._is_distance_between_frames_similar(0, 3)
-                      and self._is_distance_between_frames_similar(1, 3))
+            result = (result and
+                      self._is_distance_between_frames_similar(0, 3) and
+                      self._is_distance_between_frames_similar(1, 3))
         return result
 
     def _adjust_camera_position(self):

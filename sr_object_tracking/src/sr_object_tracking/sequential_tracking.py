@@ -21,8 +21,6 @@ class SequentialTracking(SrObjectTracking):
         Track the RegionOfInterest return the track box updating the attribute
         @return - Success of the tracking as a booleen
         """
-        self.vis = self.frame.copy()
-
         self.frame = cv2.blur(self.frame, (5, 5))
         hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, np.array((0., self.smin, 54)),
