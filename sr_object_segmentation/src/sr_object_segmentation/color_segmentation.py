@@ -16,12 +16,12 @@ class ColorSegmentation(SrObjectSegmentation):
         segment as parameter
         @param image - image to be segmented (numpy format)
         """
-        SrObjectSegmentation.__init__(self, image, {})
+        SrObjectSegmentation.__init__(self)
         self.name = 'Color segmentation algorithm'
-        self.points = self.segmentation()
+        self.points = self.segmentation(image)
         self.nb_segments = len(self.points)
 
-    def segmentation(self):
+    def segmentation(self, image):
         """
         Segmente the image according to the color given as parameter
         @return - dictionnary of segments found with points coordinates

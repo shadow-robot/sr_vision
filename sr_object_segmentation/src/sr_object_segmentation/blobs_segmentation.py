@@ -15,18 +15,18 @@ class BlobsSegmentation(SrObjectSegmentation):
         Initialize the blob segmentation object
         @param image - image to be segmented (numpy format)
         """
-        SrObjectSegmentation.__init__(self, image, {})
+        SrObjectSegmentation.__init__(self)
         self.name = 'Finding blobs segmentation algorithm'
-        self.points = self.segmentation()
-        self.nb_segments = len(self.points)
+        self.points = self.segmentation(image)
+        self.nb_segments = len(self.segmented_box)
 
-    def segmentation(self):
+    def segmentation(self, image):
         """
         Segmente the image into blobs
         @return - dictionnary of segments found with points coordinates
         """
 
-        img = sCV.Image(self.img)
+        img = sCV.Image(image)
         blobs = img.findBlobs()
 
         if blobs:
