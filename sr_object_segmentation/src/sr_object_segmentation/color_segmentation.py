@@ -12,7 +12,8 @@ class ColorSegmentation(SrObjectSegmentation):
 
     def __init__(self, image):
         """
-        Initialize the color segmentation object with the color chosen to segment as parameter
+        Initialize the color segmentation object with the color chosen to
+        segment as parameter
         @param image - image to be segmented (numpy format)
         """
         SrObjectSegmentation.__init__(self, image, {})
@@ -42,8 +43,8 @@ class ColorSegmentation(SrObjectSegmentation):
                         pts.append((x, y))
             dic[i] = pts
 
-        # Sort by descending size of segments
-        seg_by_length = sorted(dic.values(), key=len, reverse=True)[1:]  # Remove the background (basic and noise test)
+        # Sort by descending size of segments removing the background
+        seg_by_length = sorted(dic.values(), key=len, reverse=True)[1:]
         for i in range(len(seg_by_length)):
             dic_fin[i] = seg_by_length[i]
 

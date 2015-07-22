@@ -21,14 +21,15 @@
 #include <pcl/surface/gp3.h>
 #include <pcl/surface/mls.h>
 
+#include <string>
+
 //-------------------------------------------------------------------------------
 
-namespace sr_point_cloud 
+namespace sr_point_cloud
 {
 
-class Triangulator 
+class Triangulator
 {
-
 protected:
   typedef pcl::PointXYZ PointType;
   typedef pcl::PointCloud<PointType> Cloud;
@@ -65,21 +66,21 @@ public:
   void run(void);
 
 protected:
-  void config_cb_(TriangulatorConfig &config, uint32_t level);
+  void config_cb_(const TriangulatorConfig &config, uint32_t level);
 
   void cloud_cb_(const Cloud::ConstPtr &cloud);
 
   void goal_cb_(const sr_vision_msgs::TriangulateGoalConstPtr &goal);
 
   void triangulate(const Cloud::ConstPtr &cloud,
-                   pcl_msgs::PolygonMesh &pclMesh,
-                   shape_msgs::Mesh &shapeMesh);
+                   pcl_msgs::PolygonMesh *pclMesh,
+                   shape_msgs::Mesh *shapeMesh);
 
-  void mirror_mesh_(Cloud &cloud);
+  void mirror_mesh_(Cloud *cloud);
 
   void from_PCLPolygonMesh_(const pcl::PolygonMesh &pclMesh,
                             const pcl::PointCloud<pcl::PointNormal>::ConstPtr cloud_with_normals,
-                            shape_msgs::Mesh &shapeMesh);
+                            shape_msgs::Mesh *shapeMesh);
 };  // Triangulator
 
 }  // End of namespace sr_point_cloud

@@ -49,11 +49,18 @@
 #include <pcl/filters/voxel_grid.h>
 #include <pcl/filters/approximate_voxel_grid.h>
 
+#include <vector>
+#include <string>
 
-namespace sr_point_cloud 
+namespace sr_point_cloud
 {
 
-using namespace pcl::tracking;
+using pcl::tracking::ParticleXYZRPY;
+using pcl::tracking::ParticleFilterTracker;
+using pcl::tracking::ParticleFilterOMPTracker;
+using pcl::tracking::KLDAdaptiveParticleFilterOMPTracker;
+using pcl::tracking::ApproxNearestPairPointCloudCoherence;
+using pcl::tracking::DistanceCoherence;
 
 // pcl::PointXYZ
 template <class PointType>
@@ -125,13 +132,13 @@ protected:
     if (use_fixed)
     {
       boost::shared_ptr<ParticleFilterOMPTracker<PointType,
- ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+      ParticleT> > tracker(new ParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker_ = tracker;
     }
-    else 
+    else
     {
       boost::shared_ptr<KLDAdaptiveParticleFilterOMPTracker<PointType,
- ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
+      ParticleT> > tracker(new KLDAdaptiveParticleFilterOMPTracker<PointType, ParticleT>(thread_nr));
       tracker->setMaximumParticleNum(500);
       tracker->setDelta(0.99);
       tracker->setEpsilon(0.2);
@@ -163,7 +170,8 @@ protected:
   setup_coherences(void)
   {
     // setup coherences
-    typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr coherence(new ApproxNearestPairPointCloudCoherence<PointType>());
+    typename ApproxNearestPairPointCloudCoherence<PointType>::Ptr
+    coherence(new ApproxNearestPairPointCloudCoherence<PointType>());
 
     boost::shared_ptr<DistanceCoherence<PointType> > distance_coherence(new DistanceCoherence<PointType>());
     coherence->addPointCoherence(distance_coherence);
@@ -175,7 +183,7 @@ protected:
   }
 
   void
-  config_cb(TrackerConfig &config, uint32_t level)
+  config_cb(const TrackerConfig &config, uint32_t level)
   {
     // ROS_INFO("Reconfigure Request: %f %f %f", config.downsampling_grid_size,
     // config.filter_z_min, config.filter_z_max );
@@ -186,7 +194,7 @@ protected:
   }
 
   void
-  cloud_cb (const typename Cloud::ConstPtr& cloud)
+  cloud_cb(const typename Cloud::ConstPtr& cloud)
   {
     input_ = cloud;
 
@@ -204,7 +212,7 @@ protected:
     {
       // TODO(shadow): param toggle use of approx downsampling
       // gridSampleApprox (cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
-      gridSample(cloud_pass_, *cloud_pass_downsampled_, downsampling_grid_size_);
+      gridSample(cloud_pass_, cloud_pass_downsampled_.get(), downsampling_grid_size_);
     }
     else
     {
@@ -219,7 +227,7 @@ protected:
   }
 
   void
-  track_goal_cb ()
+  track_goal_cb()
   {
     TrackServer::GoalConstPtr goal = track_server_.acceptNewGoal();
 
@@ -250,7 +258,7 @@ protected:
   }
 
   void
-  track_preempt_cb ()
+  track_preempt_cb()
   {
     CloudPtr ref_cloud(new Cloud);
     trackCloud(ref_cloud);
@@ -258,16 +266,17 @@ protected:
   }
 
   void
-  tracking ()
+  tracking()
   {
     tracker_->setInputCloud(cloud_pass_downsampled_);
     tracker_->compute();
 
     // Publish the particle cloud
     typename ParticleFilter::PointCloudStatePtr particles = tracker_->getParticles();
-    if (particles) {
+    if (particles)
+    {
       pcl::PointCloud<pcl::PointXYZ>::Ptr particle_cloud(new pcl::PointCloud<pcl::PointXYZ>());
-      for (size_t i = 0; i < particles->points.size(); i++) 
+      for (size_t i = 0; i < particles->points.size(); i++)
       {
         pcl::PointXYZ point;
         point.x = particles->points[i].x;
@@ -288,7 +297,7 @@ protected:
     CloudPtr result_cloud(new Cloud());
     pcl::transformPointCloud<PointType>(*reference_, *result_cloud, transformation);
     result_cloud->header = input_->header;
-    result_cloud_pub_.publish (*result_cloud);
+    result_cloud_pub_.publish(*result_cloud);
 
     std_msgs::Header ros_header = pcl_conversions::fromPCL(input_->header);
 
@@ -323,21 +332,21 @@ protected:
   }
 
   void
-  gridSampleApprox (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+  gridSampleApprox(const CloudConstPtr &cloud, Cloud *result, double leaf_size = 0.01)
   {
     pcl::ApproximateVoxelGrid<PointType> grid;
     grid.setLeafSize(leaf_size, leaf_size, leaf_size);
     grid.setInputCloud(cloud);
-    grid.filter(result);
+    grid.filter(*result);
   }
 
   void
-  gridSample (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+  gridSample(const CloudConstPtr &cloud, Cloud *result, double leaf_size = 0.01)
   {
     pcl::VoxelGrid<PointType> grid;
     grid.setLeafSize(leaf_size, leaf_size, leaf_size);
     grid.setInputCloud(cloud);
-    grid.filter(result);
+    grid.filter(*result);
   }
 
   bool
@@ -351,9 +360,9 @@ protected:
 
     ROS_INFO("Segmenting cloud...");
     if (sort_type == SEGMENT_SORT_BY_CENTERED)
-      cluster_segmentor.extractByCentered(clusters);
+      cluster_segmentor.extractByCentered(&clusters);
     else
-      cluster_segmentor.extractByDistance(clusters);
+      cluster_segmentor.extractByDistance(&clusters);
     ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
     if (clusters.size() > 0)
       ref_cloud = clusters[0];
@@ -364,19 +373,19 @@ protected:
   }
 
   void
-  trackCloud (const CloudConstPtr &ref_cloud)
+  trackCloud(const CloudConstPtr &ref_cloud)
   {
     Eigen::Vector4f c;
-    CloudPtr transed_ref (new Cloud);
+    CloudPtr transed_ref(new Cloud);
     pcl::compute3DCentroid<PointType> (*ref_cloud, c);
-    Eigen::Affine3f trans = Eigen::Affine3f::Identity ();
-    trans.translation() = Eigen::Vector3f (c[0], c[1], c[2]);
-    pcl::transformPointCloud<PointType> (*ref_cloud, *transed_ref, trans.inverse ());
+    Eigen::Affine3f trans = Eigen::Affine3f::Identity();
+    trans.translation() = Eigen::Vector3f(c[0], c[1], c[2]);
+    pcl::transformPointCloud<PointType>(*ref_cloud, *transed_ref, trans.inverse());
 
     initTracker();
     tracker_->setReferenceCloud(transed_ref);
     tracker_->setTrans(trans);
-    tracker_->setMinIndices(ref_cloud->points.size () / 2);
+    tracker_->setMinIndices(ref_cloud->points.size() / 2);
 
     reference_ = transed_ref;
     ROS_INFO_STREAM("ref_cloud: "

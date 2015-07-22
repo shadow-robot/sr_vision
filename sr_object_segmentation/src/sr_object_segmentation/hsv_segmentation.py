@@ -12,7 +12,7 @@ class HSVSegmentation(SrObjectSegmentation):
 
     def __init__(self, color):
         """
-        Initialize the HSV_based segmentation object 
+        Initialize the HSV_based segmentation object
         """
         SrObjectSegmentation.__init__(self)
         self.name = 'HSV segmentation algorithm'

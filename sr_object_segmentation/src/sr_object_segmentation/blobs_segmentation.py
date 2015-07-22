@@ -22,7 +22,7 @@ class BlobsSegmentation(SrObjectSegmentation):
 
     def segmentation(self):
         """
-        Segmente the image into blobs 
+        Segmente the image into blobs
         @return - dictionnary of segments found with points coordinates
         """
 

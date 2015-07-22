@@ -22,29 +22,37 @@ class MainApplication(tk.Frame):
 
         # frame 1
         self.Frame1 = tk.Frame(self.parent, borderwidth=2, relief=tk.GROOVE)
-        algo_label = tk.Label(self.Frame1, text="Algorithm", relief=tk.GROOVE, font='Verdana 20 bold')
+        algo_label = tk.Label(self.Frame1, text="Algorithm", relief=tk.GROOVE,
+                              font='Verdana 20 bold')
         algo_label.pack()
         self.algo_var = [tk.IntVar(0), tk.IntVar(0)]
-        self.algo1 = tk.Checkbutton(self.Frame1, text="Finding blobs", variable=self.algo_var[0])
-        self.algo2 = tk.Checkbutton(self.Frame1, text="Main colors", variable=self.algo_var[1])
+        self.algo1 = tk.Checkbutton(self.Frame1, text="Finding blobs",
+                                    variable=self.algo_var[0])
+        self.algo2 = tk.Checkbutton(self.Frame1, text="Main colors",
+                                    variable=self.algo_var[1])
         self.algo1.pack(padx=10, pady=5)
         self.algo2.pack(padx=10, pady=5)
         self.Frame1.grid(column=0, row=0, padx=10, pady=10)
 
         # frame 2
         self.Frame2 = tk.Frame(self.parent, borderwidth=2, relief=tk.GROOVE)
-        data_label = tk.Label(self.Frame2, text="Dataset", relief=tk.GROOVE, font='Verdana 20 bold')
+        data_label = tk.Label(self.Frame2, text="Dataset", relief=tk.GROOVE,
+                              font='Verdana 20 bold')
         data_label.pack()
         self.data_var = [tk.IntVar(0), tk.IntVar(0)]
-        self.data1 = tk.Checkbutton(self.Frame2, text="Basic", variable=self.data_var[0])
-        self.data2 = tk.Checkbutton(self.Frame2, text="Noise", variable=self.data_var[1])
+        self.data1 = tk.Checkbutton(self.Frame2, text="Basic",
+                                    variable=self.data_var[0])
+        self.data2 = tk.Checkbutton(self.Frame2, text="Noise",
+                                    variable=self.data_var[1])
         self.data1.pack(padx=10, pady=5)
         self.data2.pack(padx=10, pady=5)
         self.Frame2.grid(column=2, row=0, padx=10, pady=10)
 
         # frame 3
         self.Frame3 = tk.Frame(self.parent, borderwidth=2, relief=tk.GROOVE)
-        self.bouton = tk.Button(self.Frame3, text="Lancer", command=self.launch, relief=tk.GROOVE, font='Verdana 20 ')
+        self.bouton = tk.Button(self.Frame3, text="Lancer",
+                                command=self.launch, relief=tk.GROOVE,
+                                font='Verdana 20 ')
         self.bouton.pack()
         self.Frame3.grid(column=1, row=3, padx=10, pady=10)
 

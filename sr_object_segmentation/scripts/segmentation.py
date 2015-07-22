@@ -25,11 +25,10 @@ class Segmentation(object):
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
 
+        self.selection_pub = rospy.Publisher("/roi/segmented_box",
+                                             RegionOfInterest, queue_size=1)
         self.pose_pub = rospy.Publisher("roi/pose",
                                         Pose, queue_size=1)
-
-        self.selection_pub = rospy.Publisher("roi/segmented_box",
-                                             RegionOfInterest, queue_size=1)
 
         self.server = rospy.Service('~start', SegmentationControl,
                                     self.segment)
