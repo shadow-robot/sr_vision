@@ -21,20 +21,18 @@ class ColorSegmentation(SrObjectSegmentation):
         self.points = self.segmentation(image)
         self.nb_segments = len(self.points)
 
-    def segmentation(self, image):
+    def segmentation(self, img):
         """
         Segmente the image according to the color given as parameter
         @return - dictionnary of segments found with points coordinates
         """
-        img = self.img
-
         width = img.shape[0]
         height = img.shape[1]
 
         dic = {}
         dic_fin = {}
 
-        main_colors = get_main_color(self.img, 4)
+        main_colors = get_main_color(img, 4)
         for i, color in enumerate(main_colors):
             pts = []
             for x in range(width):
