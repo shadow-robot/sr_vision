@@ -21,8 +21,6 @@ class SequentialTracking(SrObjectTracking):
         Track the RegionOfInterest return the track box updating the attribute
         @return - Success of the tracking as a booleen
         """
-        self.vis = self.frame.copy()
-
         self.frame = cv2.blur(self.frame, (5, 5))
         hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, np.array((0., self.smin, 54)),
@@ -52,7 +50,7 @@ class SequentialTracking(SrObjectTracking):
             else:
                 return False
 
-        roi = self.utils.publish_box(self.track_box)
+        roi = self.utils.box_to_roi(self.track_box)
 
         # Make sure that the object is still tracked, otherwise launch the
         # segmentation

@@ -22,7 +22,7 @@ class TestColorSegmentation(unittest.TestCase):
         for dataset in self.datasets:
             images = dataset.np_img
             for img in images:
-                self.pts = self.algo(img).points
+                self.pts = self.algo(img).segmented_box
 
     def test_not_empty(self):
         """

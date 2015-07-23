@@ -9,7 +9,7 @@ Contains our vision related algorithm (segmentation, tracking, recognition, etc.
   1. [Tracking](sr_object_tracking/)
 This package contains the tracker executable. The launch file starts the video acquisition as well as the tracking node and the visualization one. A color parameter is necessary to process the segmentation.
   2. [Segmentation](sr_object_segmentation/)
-Segment the image from the camera in order to find the region of interest, with a color given as parameter.
+Contains nodes for the color and shape based segmentation. The two of them can be set as parameters (default ones are red and strawberry).
   3. [Benchmarking](sr_object_benchmarking/)
 Benchmarking package for the different segmentation algorithms.
   4. [Visualization](sr_gui_servoing/)
@@ -27,7 +27,7 @@ You can find the architecture diagram below for a closer look at how this works.
 
 
 ## Usage
-For the segmentation, different colors are available : red, blue, green, yellow.
+For the segmentation, different colors are available : red, blue, green, yellow. As well as different shape models : circle, rectangle, star, strawberry, banana, leaf. See the segmentation doc to add personnalize shapes.
 
 ### With a Kinect
 `roslaunch sr_object_tracking tracking_kinect.launch color:=<color>`

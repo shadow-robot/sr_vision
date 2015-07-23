@@ -3,6 +3,8 @@
 import rospy
 
 from cv_bridge import CvBridge, CvBridgeError
+import numpy as np
+import cv2
 
 from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
 from geometry_msgs.msg import Pose
@@ -81,7 +83,7 @@ class Utils(object):
 
         return ps
 
-    def publish_box(self, box):
+    def box_to_roi(self, box):
         """
         Publish the region of interest as a RegionOfInterest message (2D box)
         """
@@ -99,22 +101,58 @@ class Utils(object):
         return roi
 
     @staticmethod
-    def box_to_rect(roi):
+    def box_to_rect(box):
         """
         Convert a region of interest as box format into a rect format
         @param roi - region of interest (box format)
         @return - region of interest (rect format)
         """
         try:
-            if len(roi) == 3:
-                (center, size, _) = roi
+            if len(box) == 3:
+                (center, size, _) = box
                 pt1 = (
                     int(center[0] - size[0] / 2), int(center[1] - size[1] / 2))
                 pt2 = (
                     int(center[0] + size[0] / 2), int(center[1] + size[1] / 2))
                 rect = [pt1[0], pt1[1], pt2[0] - pt1[0], pt2[1] - pt1[1]]
             else:
-                rect = list(roi)
+                rect = list(box)
         except (IndexError, TypeError, ValueError):
             return [0, 0, 0, 0]
         return rect
+
+    def hsv_transform(self, img, color):
+        """
+        Convert an RGB image into an HSV unique color one
+        @param img - input image to be formatted
+        @param color - color wanted
+        @return - output image with black background and "color" segments
+        highlighted
+        """
+
+        boundaries = {
+            'red': ([163, 52, 0], [255, 255, 255]),
+            'blue': ([100, 110, 0], [125, 255, 255]),
+            'green': ([30, 115, 0], [65, 255, 255]),
+            'yellow': ([10, 80, 150], [20, 255, 255])
+        }
+        (lower, upper) = boundaries[color]
+        lower = np.array(lower, dtype="uint8")
+        upper = np.array(upper, dtype="uint8")
+
+        (lower_blue, upper_blue) = boundaries['blue']
+        lower_blue = np.array(lower_blue, dtype="uint8")
+        upper_blue = np.array(upper_blue, dtype="uint8")
+
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        img_thresh = cv2.inRange(img_hsv, lower, upper)
+        img_thresh_blue = cv2.inRange(img_hsv, lower_blue, upper_blue)
+        img_thresh = cv2.subtract(img_thresh, img_thresh_blue)
+
+        img_col = cv2.bitwise_and(img, img, mask=img_thresh)
+
+        kernel = np.ones((5, 5), np.uint8)
+        opening = cv2.morphologyEx(img_col, cv2.MORPH_OPEN, kernel)
+        closing = cv2.morphologyEx(opening, cv2.MORPH_CLOSE, kernel)
+
+        return closing

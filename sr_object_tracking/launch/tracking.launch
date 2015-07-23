@@ -13,10 +13,15 @@
   <arg name="color" default="$(arg color)" />
 
   <arg name="saturation_min" default="150" />
-  <arg name="size" default="75" />
+  <arg name="size" default="2500" />
+
+  <!-- specify the shape model file for the segmentation -->
+  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/strawberry.npy" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  >
     <param name="color" value="$(arg color)" />
+    <param name="shape" type="string" value="$(arg shape_model_file)" />
+    <param name="size" value="$(arg size)" />
   </node>
 
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  >
