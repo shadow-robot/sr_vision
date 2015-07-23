@@ -16,7 +16,7 @@
   <arg name="size" default="2500" />
 
   <!-- specify the shape model file for the segmentation -->
-  <arg name="shape_model_file" default="$(find sr_object_segmentation)/doc/strawberry_shape.npy" />
+  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/strawberry.npy" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  >
     <param name="color" value="$(arg color)" />
