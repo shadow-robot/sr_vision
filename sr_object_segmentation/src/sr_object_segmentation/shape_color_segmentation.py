@@ -37,7 +37,6 @@ class ShapeColorSegmentation(SrObjectSegmentation):
                 self.segmented_box.append(cv2.boundingRect(seg))
                 self.nb_segments = len(self.segmented_box)
 
-
     def match_shapes(self, img):
         """
         Compare the shape of the segments found with a model (loaded from the
