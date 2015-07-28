@@ -10,6 +10,7 @@ from sr_object_tracking.utils import Utils
 from sensor_msgs.msg import Image, RegionOfInterest
 from geometry_msgs.msg import Pose
 from sr_vision_msgs.srv import SegmentationControl
+from sr_vision_msgs.msg import TrackBoxes
 
 
 class Segmentation(object):
@@ -19,14 +20,15 @@ class Segmentation(object):
         self.shape = np.load(rospy.get_param('~shape'))
         self.size = rospy.get_param('~size')
 
-        self.seg = ShapeColorSegmentation(self.color, self.shape, self.size)
-        self.utils = Utils()
+        self.utils = Utils(self.color)
+        self.seg = ShapeColorSegmentation(self.color, self.shape, self.size,
+                                          self.utils)
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
 
-        self.selection_pub = rospy.Publisher("/roi/segmented_box",
-                                             RegionOfInterest, queue_size=1)
+        self.segmentation_pub = rospy.Publisher("/roi/segmented_box",
+                                                TrackBoxes, queue_size=1)
         self.pose_pub = rospy.Publisher("roi/pose",
                                         Pose, queue_size=1)
 
@@ -40,23 +42,30 @@ class Segmentation(object):
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 
-    def segment(self, _):
+    def segment(self, req):
         """
         Launch the segmentation
         @return - Success of the segmentation as a boolean
         """
-
+        self.track_boxes = []
         try:
             self.seg.segmentation(self.frame)
             for i, seg in enumerate(self.seg.segmented_box):
-                roi = self.utils.box_to_roi(seg)
-                self.selection_pub.publish(roi)
+                box = self.utils.roi_to_box(seg, id=i)
+                self.track_boxes.append(box)
 
-                pose = self.utils.publish_pose(seg, moment=self.seg.poses[i])
-                self.pose_pub.publish(pose)
-            return True
+            nb_segments = len(self.track_boxes)
+
+            if req.check_new:
+                return nb_segments
+            elif nb_segments > 0:
+                self.segmentation_pub.publish(self.track_boxes)
+                return nb_segments
+            else:
+                return 0
+
         except (IndexError, TypeError, AttributeError):
-            return False
+            return 0
 
 
 def main():

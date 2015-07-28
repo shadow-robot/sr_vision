@@ -7,7 +7,7 @@ import rospy
 from sr_object_tracking.utils import Utils
 
 from sensor_msgs.msg import RegionOfInterest, Image
-from geometry_msgs.msg import Pose
+from sr_vision_msgs.msg import TrackBoxes
 
 
 class DisplayImage(object):
@@ -23,30 +23,21 @@ class DisplayImage(object):
         self.cv_window_name = 'Video'
 
         # Initialize a number of global variables
-        self.smin = rospy.get_param('~saturation')
         self.hist = None
         self.drag_start = (-1, -1)
-        self.track_box = None
-        self.tracking_state = 0
-        self.track_window = None
-        self.selection = (0, 0, 0, 0)
+        self.track_boxes = []
         self.frame = None
-        self.frame_width = None
-        self.frame_height = None
-        self.frame_size = None
         self.vis = None
 
-        self.utils = Utils()
+        self.utils = Utils(self.color)
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.display)
-        self.roi_sub = rospy.Subscriber("/roi/track_box", RegionOfInterest,
+        self.roi_sub = rospy.Subscriber("/roi/track_box", TrackBoxes,
                                         self.roi_callback)
 
-        self.selection_pub = rospy.Publisher("/roi/selection",
-                                             RegionOfInterest, queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", Pose,
-                                        queue_size=1)
+        self.selection_pub = rospy.Publisher("/roi/segmented_box",
+                                             TrackBoxes, queue_size=1)
 
     def display(self, data):
         """
@@ -54,6 +45,7 @@ class DisplayImage(object):
         the histogram one (Camshift backprojection).
         Draw a rectangle around the tracking box
         """
+
         # Create the main display window and the histogram one
         cv2.namedWindow(self.cv_window_name, cv2.CV_WINDOW_AUTOSIZE)
         if self.hist is not None:
@@ -69,47 +61,17 @@ class DisplayImage(object):
         self.vis = self.frame.copy()
 
         try:
-            # Seems better with a blur
-            self.vis = cv2.blur(self.vis, (5, 5))
-            hsv = cv2.cvtColor(self.vis, cv2.COLOR_BGR2HSV)
-
-            mask = cv2.inRange(hsv, np.array((0., self.smin, 54)),
-                               np.array((180., 255., 255)))
-            if self.selection != (0, 0, 0, 0):
-                x0, y0, x1, y1 = self.selection
-                self.track_window = (x0, y0, x1 - x0, y1 - y0)
-                hsv_roi = hsv[y0:y1, x0:x1]
-                mask_roi = mask[y0:y1, x0:x1]
-                hist = cv2.calcHist([hsv_roi], [0], mask_roi, [16], [0, 180])
-                cv2.normalize(hist, hist, 0, 255, cv2.NORM_MINMAX)
-                self.hist = hist.reshape(-1)
-                self.show_hist()
-
-                vis_roi = self.vis[y0:y1, x0:x1]
-                cv2.bitwise_not(vis_roi, vis_roi)
-                self.vis[mask == 0] = 0
-        except cv2.error:
-            pass
-
-        try:
             roi = self.utils.box_to_roi(self.selection)
-            pose = self.utils.publish_pose(roi=roi)
-
-            self.pose_pub.publish(pose)
             self.selection_pub.publish(roi)
         except (AttributeError, TypeError, IndexError):
             pass
 
-        img = self.utils.hsv_transform(self.vis, self.color)
+        img = self.utils.closing
 
-        # Draw the tracking box, if possible
-        try:
-            cv2.rectangle(self.vis, self.track_box[0], self.track_box[1],
-                          (0, 0, 255), 2)
-            cv2.rectangle(img, self.track_box[0], self.track_box[1],
-                          (0, 0, 255), 2)
-        except (cv2.error, TypeError):
-            pass
+        for box in self.track_boxes:
+            pt1 = (int(box.top_left.x), int(box.top_left.y))
+            pt2 = (int(box.bottom_right.x), int(box.bottom_right.y))
+            cv2.rectangle(self.vis, pt1, pt2, (0, 0, 255), 2)
 
         # Display the main window
         cv2.imshow(self.cv_window_name, np.hstack((self.vis, img)))
@@ -117,18 +79,14 @@ class DisplayImage(object):
 
     def roi_callback(self, data):
         """
-        Convert the sensor_msgs/RegionOfInterest into a tuple of extrema
-        coordinates
+        Get the ROI coordinates to display it
         """
-        pt1 = (data.x_offset, data.y_offset)
-        pt2 = (data.x_offset + data.width, data.y_offset + data.height)
-        self.track_box = (pt1, pt2)
+        self.track_boxes = data.boxes
 
     def on_mouse_click(self, event, x, y, flags, _):
         """
         Select a ROI using the dragging
         """
-
         x, y = np.int16([x, y])
         if event == cv2.EVENT_LBUTTONDOWN:
             self.drag_start = (x, y)
@@ -142,7 +100,11 @@ class DisplayImage(object):
                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
                 self.selection = (0, 0, 0, 0)
                 if x1 - x0 > 0 and y1 - y0 > 0:
-                    self.selection = x0, y0, x1, y1
+                    self.selection = x0, y0, x1-x0, y1-y0
+                    self.track_boxes = []
+                    box = self.utils.roi_to_box(self.selection, id=0)
+                    self.track_boxes.append(box)
+                    self.selection_pub.publish(self.track_boxes)
 
             else:
                 self.drag_start = (-1, -1)

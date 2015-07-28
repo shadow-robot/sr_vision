@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 import rospy
-import numpy as np
+import cv2
 
 from sensor_msgs.msg import Image, RegionOfInterest
-from geometry_msgs.msg import Pose
+from sr_vision_msgs.msg import TrackBoxes
 
 from utils import Utils
 
@@ -14,47 +14,31 @@ class SrObjectTracking(object):
     """
 
     def __init__(self):
-        self.utils = Utils()
-
         # Initialize a number of global variables
-        self.smin = rospy.get_param('~saturation')
         self.size = rospy.get_param('~size')
         self.color = rospy.get_param('~color')
-        self.track_box = None
-        self.track_window = None
-        self.tracking_state = 0
-        self.selection = (0, 0, 0, 0)
+
+        self.utils = Utils(self.color)
+
+        self.track_boxes = []
+        self.seg_boxes = []
+
         self.prev_frame = None
         self.frame = None
         self.next_frame = None
-        self.depth_image = None
+        self.mask = None
         self.vis = None
-        self.hist = None
-
-        boundaries = {
-            'red': ([145, 140, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
-        (self.lower, self.upper) = boundaries[self.color]
-        self.lower = np.array(self.lower, dtype="uint8")
-        self.upper = np.array(self.upper, dtype="uint8")
 
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
-        self.selection_sub = rospy.Subscriber("/roi/segmented_box",
-                                              RegionOfInterest,
-                                              self.selection_callback)
-        self.selection_sub = rospy.Subscriber("/roi/selection",
-                                              RegionOfInterest,
-                                              self.selection_callback)
+        self.segmentation_sub = rospy.Subscriber("/roi/segmented_box",
+                                                 TrackBoxes,
+                                                 self.segmentation_callback)
 
         # Initialize the Region of Interest publishers
-        self.roi_pub = rospy.Publisher("roi/track_box", RegionOfInterest,
+        self.roi_pub = rospy.Publisher("roi/track_box", TrackBoxes,
                                        queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", Pose, queue_size=1)
 
     def image_callback(self, data):
         """
@@ -65,10 +49,65 @@ class SrObjectTracking(object):
         self.frame = self.next_frame
         self.next_frame = self.utils.convert_image(data, "bgr8")
 
-    def selection_callback(self, data):
+    def segmentation_callback(self, data):
         """
         Get the ROI box (selected or segmented)
         """
-        self.selection = (
-            data.x_offset, data.y_offset, data.x_offset + data.width,
-            data.y_offset + data.height)
+        self.seg_boxes = []
+        for segment in data.boxes:
+            box = (int(segment.top_left.x), int(segment.top_left.y),
+                   int(segment.bottom_right.x), int(segment.bottom_right.y))
+            seg = SrObjectTracked(box)
+            self.seg_boxes.append(seg)
+
+    def selection_callback(self, segment):
+        """
+        Get the ROI box (selected or segmented)
+        """
+
+        self.selection = (int(segment.top_left.x), int(segment.top_left.y),
+                          int(segment.bottom_right.x),
+                          int(segment.bottom_right.y))
+
+    def run(self):
+        """
+        Track the object(s) and publish the result
+        @return - Success of the tracking as a booleen
+        """
+        self.track_boxes = []
+
+        self.frame = cv2.blur(self.frame, (5, 5))
+        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+        self.mask = self.utils.mask
+
+        if len(self.seg_boxes) > 0:
+            for i, seg in enumerate(self.seg_boxes):
+                s = self.tracking(seg)
+                if not s:
+                    self.seg_boxes.remove(seg)
+                    break
+                else:
+                    box = self.utils.roi_to_box(s, id=i)
+                    self.track_boxes.append(box)
+                self.roi_pub.publish(self.track_boxes)
+            return True
+        else:
+            return False
+
+    def tracking(self, _):
+        """
+        Tracking main algorithm to be redefined in the child classes
+        """
+        return
+
+
+class SrObjectTracked(object):
+    """
+    Class for tracked object
+    """
+
+    def __init__(self, box):
+        self.selection = box
+        self.hist = None
+        self.tracking_state = 0
+        self.track_window = None

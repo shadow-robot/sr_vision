@@ -12,11 +12,11 @@
   <!-- can be : ['red','blue','green','yellow'] -->
   <arg name="color" default="$(arg color)" />
 
-  <arg name="saturation_min" default="150" />
   <arg name="size" default="2500" />
 
   <!-- specify the shape model file for the segmentation -->
-  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/strawberry.npy" />
+  <arg name="shape" default="strawberry" />
+  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/dataset/$(arg shape).npy" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  >
     <param name="color" value="$(arg color)" />
@@ -25,14 +25,12 @@
   </node>
 
   <node name="tracking" pkg="sr_object_tracking" type="tracking.py"  >
-    <param name="saturation" value="$(arg saturation_min)" />
-    <param name="size" value="$(arg size)" />
     <param name="color" value="$(arg color)" />
+    <param name="size" value="$(arg size)" />
   </node>
 
   <group if="$(arg display)">
     <node name="viewer" pkg="sr_gui_servoing" type="displaying.py" >
-      <param name="saturation" value="$(arg saturation_min)" />
       <param name="color" value="$(arg color)" />
     </node>
   </group>

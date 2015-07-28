@@ -10,13 +10,14 @@ class ShapeColorSegmentation(SrObjectSegmentation):
     Shape and color based segmentation
     """
 
-    def __init__(self, color, shape, size):
+    def __init__(self, color, shape, size, utils):
         SrObjectSegmentation.__init__(self)
         self.name = 'Shape and color based segmentation algorithm'
         self.color = color
         self.shape = shape
         self.shape_threshold = 0.5
         self.size = size
+        self.utils = utils
 
     def segmentation(self, frame):
         """
@@ -24,20 +25,18 @@ class ShapeColorSegmentation(SrObjectSegmentation):
         shape. Update the box attribute.
         @param frame - image to be segmented (numpy format)
         """
+        self.segmented_box = []
         self.frame = frame
 
-        closing = self.utils.hsv_transform(self.frame, self.color)
+        closing = self.utils.closing
         closing_gray = cv2.cvtColor(closing, cv2.COLOR_BGR2GRAY)
 
         seg_cnts = self.match_shapes(closing_gray)
-
         if seg_cnts:
             for seg in seg_cnts:
                 self.segmented_box.append(cv2.boundingRect(seg))
-                M = cv2.moments(seg)
-                centroid = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
-                self.poses.append(centroid)
                 self.nb_segments = len(self.segmented_box)
+
 
     def match_shapes(self, img):
         """
