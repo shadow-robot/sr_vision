@@ -64,5 +64,5 @@ class SequentialTracking(SrObjectTracking):
             diff_frame = cv2.cvtColor(diff_frame, cv2.COLOR_BGR2GRAY)
 
             return diff_frame + img
-        except:
+        except cv2.error:
             return img

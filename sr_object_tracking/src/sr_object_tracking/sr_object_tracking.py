@@ -2,7 +2,7 @@
 import rospy
 import cv2
 
-from sensor_msgs.msg import Image, RegionOfInterest
+from sensor_msgs.msg import Image
 from sr_vision_msgs.msg import TrackBoxes
 
 from utils import Utils
@@ -94,7 +94,7 @@ class SrObjectTracking(object):
         else:
             return False
 
-    def tracking(self, _):
+    def tracking(self):
         """
         Tracking main algorithm to be redefined in the child classes
         """

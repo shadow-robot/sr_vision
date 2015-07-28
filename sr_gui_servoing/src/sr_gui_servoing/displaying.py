@@ -6,7 +6,7 @@ import rospy
 
 from sr_object_tracking.utils import Utils
 
-from sensor_msgs.msg import RegionOfInterest, Image
+from sensor_msgs.msg import Image
 from sr_vision_msgs.msg import TrackBoxes
 
 

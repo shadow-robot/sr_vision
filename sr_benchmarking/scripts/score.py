@@ -28,7 +28,7 @@ class TestObjectSegmentation(object):
         self.algo = algo(image)
 
         # Get the theoretic segmentation
-        self.ref = SrObjectSegmentation(image, ref_seg)
+        self.ref = SrObjectSegmentation()
 
     def test_number(self):
         """

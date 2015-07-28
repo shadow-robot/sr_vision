@@ -6,7 +6,7 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import cv2
 
-from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
+from sensor_msgs.msg import Image, CameraInfo
 from geometry_msgs.msg import Pose, Point
 from sr_vision_msgs.msg import Box
 
@@ -65,12 +65,12 @@ class Utils(object):
         except CvBridgeError, e:
             print e
 
-    def roi_to_box(self, roi, moment=None, id=0):
+    def roi_to_box(self, roi, moment=None, i=0):
 
         rect = self.box_to_rect(roi)
 
         box = Box()
-        box.id = id
+        box.id = i
         box.top_left = Point(rect[0], rect[1], 0)
         box.bottom_right = Point(rect[0] + rect[2], rect[1] + rect[3], 0)
         box.centroid = self.centroid_to_pose(rect, moment)

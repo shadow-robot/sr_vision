@@ -7,7 +7,7 @@ from sr_object_segmentation.shape_color_segmentation import \
     ShapeColorSegmentation
 from sr_object_tracking.utils import Utils
 
-from sensor_msgs.msg import Image, RegionOfInterest
+from sensor_msgs.msg import Image
 from geometry_msgs.msg import Pose
 from sr_vision_msgs.srv import SegmentationControl
 from sr_vision_msgs.msg import TrackBoxes

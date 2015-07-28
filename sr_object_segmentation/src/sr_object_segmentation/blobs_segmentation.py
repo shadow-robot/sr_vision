@@ -26,14 +26,14 @@ class BlobsSegmentation(SrObjectSegmentation):
         @return - dictionnary of segments found with points coordinates
         """
 
-        img = sCV.Image(image)
-        blobs = img.findBlobs()
+        image = sCV.Image(image)
+        blobs = image.findBlobs()
 
         if blobs:
             blobs.draw()
             blobs.show(width=2)
-            img.addDrawingLayer(img.dl())
-            img.show()
+            image.addDrawingLayer(image.dl())
+            image.show()
 
             # Return the whole of points from each blob as a dictionary
             blobs = blobs.sortArea()[::-1]
