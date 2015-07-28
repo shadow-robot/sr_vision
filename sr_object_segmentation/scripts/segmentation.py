@@ -51,7 +51,7 @@ class Segmentation(object):
         try:
             self.seg.segmentation(self.frame)
             for i, seg in enumerate(self.seg.segmented_box):
-                box = self.utils.roi_to_box(seg, id=i)
+                box = self.utils.roi_to_box(seg, num=i)
                 self.track_boxes.append(box)
 
             nb_segments = len(self.track_boxes)

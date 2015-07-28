@@ -65,12 +65,12 @@ class Utils(object):
         except CvBridgeError, e:
             print e
 
-    def roi_to_box(self, roi, moment=None, i=0):
+    def roi_to_box(self, roi, moment=None, num=0):
 
         rect = self.box_to_rect(roi)
 
         box = Box()
-        box.id = i
+        box.id = num
         box.top_left = Point(rect[0], rect[1], 0)
         box.bottom_right = Point(rect[0] + rect[2], rect[1] + rect[3], 0)
         box.centroid = self.centroid_to_pose(rect, moment)

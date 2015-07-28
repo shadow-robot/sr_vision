@@ -100,9 +100,9 @@ class DisplayImage(object):
                 x1, y1 = np.minimum([w, h], np.maximum([xo, yo], [x, y]))
                 self.selection = (0, 0, 0, 0)
                 if x1 - x0 > 0 and y1 - y0 > 0:
-                    self.selection = x0, y0, x1-x0, y1-y0
+                    self.selection = x0, y0, x1 - x0, y1 - y0
                     self.track_boxes = []
-                    box = self.utils.roi_to_box(self.selection, id=0)
+                    box = self.utils.roi_to_box(self.selection, num=0)
                     self.track_boxes.append(box)
                     self.selection_pub.publish(self.track_boxes)
 

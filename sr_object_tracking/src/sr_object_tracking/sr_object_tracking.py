@@ -87,14 +87,14 @@ class SrObjectTracking(object):
                     self.seg_boxes.remove(seg)
                     break
                 else:
-                    box = self.utils.roi_to_box(s, id=i)
+                    box = self.utils.roi_to_box(s, num=i)
                     self.track_boxes.append(box)
                 self.roi_pub.publish(self.track_boxes)
             return True
         else:
             return False
 
-    def tracking(self):
+    def tracking(self, _):
         """
         Tracking main algorithm to be redefined in the child classes
         """
