@@ -8,7 +8,6 @@ from sr_object_segmentation.shape_color_segmentation import \
 from sr_object_tracking.utils import Utils
 
 from sensor_msgs.msg import Image
-from geometry_msgs.msg import Pose
 from sr_vision_msgs.srv import SegmentationControl
 from sr_vision_msgs.msg import TrackBoxes
 
@@ -29,8 +28,6 @@ class Segmentation(object):
 
         self.segmentation_pub = rospy.Publisher("/roi/segmented_box",
                                                 TrackBoxes, queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose",
-                                        Pose, queue_size=1)
 
         self.server = rospy.Service('~start', SegmentationControl,
                                     self.segment)
