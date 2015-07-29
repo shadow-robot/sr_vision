@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 
 import cv2
+import numpy as np
 from sr_object_tracking import SrObjectTracking
 
 
@@ -26,7 +27,8 @@ class SequentialTracking(SrObjectTracking):
             x0, y0, x1, y1 = segment.selection
             segment.track_window = (x0, y0, x1 - x0, y1 - y0)
             hsv_roi = self.hsv[y0:y1, x0:x1]
-            mask_roi = self.mask[y0:y1, x0:x1]
+            mask_roi = cv2.inRange(hsv_roi, np.array((0., 60., 32.)),
+                                   np.array((180., 255., 255.)))
             hist = cv2.calcHist([hsv_roi], [0], mask_roi, [16], [0, 180])
             cv2.normalize(hist, hist, 0, 255, cv2.NORM_MINMAX)
             segment.hist = hist.reshape(-1)
@@ -39,7 +41,7 @@ class SequentialTracking(SrObjectTracking):
             prob = prob + seq
             prob &= self.mask
             term_crit = (
-                cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
+                cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 0.011)
             nb_iter = cv2.meanShift(prob, segment.track_window, term_crit)[0]
             if nb_iter != 0:
                 segment.track_box, segment.track_window = \
@@ -55,8 +57,8 @@ class SequentialTracking(SrObjectTracking):
         consecutive frames
         @return - processed image
         """
-        img = cv2.bitwise_and(self.frame, self.frame, self.mask)
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = self.utils.mask
+
         try:
             d1 = cv2.absdiff(self.next_frame, self.frame)
             d2 = cv2.absdiff(self.frame, self.prev_frame)

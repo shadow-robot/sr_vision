@@ -78,7 +78,6 @@ class SrObjectTracking(object):
 
         self.frame = cv2.blur(self.frame, (5, 5))
         self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
-        self.mask = self.utils.mask
 
         if len(self.seg_boxes) > 0:
             for i, seg in enumerate(self.seg_boxes):
