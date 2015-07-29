@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import rospy
-import math
 
 from sensor_msgs.msg import Image
 from sr_vision_msgs.msg import TrackBoxes
@@ -95,7 +94,7 @@ class SrObjectTracking(object):
         """
         # Check the size
         rect = self.utils.box_to_rect(box)
-        x, y, width, height = rect
+        _, _, width, height = rect
         size = width * height
 
         if size < 1000:
