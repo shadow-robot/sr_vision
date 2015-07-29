@@ -12,7 +12,7 @@
   <!-- can be : ['red','blue','green','yellow'] -->
   <arg name="color" default="$(arg color)" />
 
-  <arg name="size" default="2500" />
+  <arg name="size" default="2000" />
 
   <!-- specify the shape model file for the segmentation -->
   <arg name="shape" default="strawberry" />

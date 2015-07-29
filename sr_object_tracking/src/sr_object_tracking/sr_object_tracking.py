@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import rospy
-import cv2
+import math
 
 from sensor_msgs.msg import Image
 from sr_vision_msgs.msg import TrackBoxes
@@ -60,30 +60,19 @@ class SrObjectTracking(object):
             seg = SrObjectTracked(box)
             self.seg_boxes.append(seg)
 
-    def selection_callback(self, segment):
-        """
-        Get the ROI box (selected or segmented)
-        """
-
-        self.selection = (int(segment.top_left.x), int(segment.top_left.y),
-                          int(segment.bottom_right.x),
-                          int(segment.bottom_right.y))
-
     def run(self):
         """
         Track the object(s) and publish the result
         @return - Success of the tracking as a booleen
         """
+        self.temp_track_boxes = self.track_boxes
         self.track_boxes = []
-
-        self.frame = cv2.blur(self.frame, (5, 5))
-        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
 
         if len(self.seg_boxes) > 0:
             for i, seg in enumerate(self.seg_boxes):
                 s = self.tracking(seg)
-                if not s:
-                    self.seg_boxes.remove(seg)
+                if not s or not self.checking(s):
+                    self.seg_boxes.pop(i)
                     break
                 else:
                     box = self.utils.roi_to_box(s, num=i)
@@ -99,6 +88,20 @@ class SrObjectTracking(object):
         """
         return
 
+    def checking(self, box):
+        """
+        Checks if the box returned by the Camshift tracking seems correct
+        @param box - tracked box
+        """
+        # Check the size
+        rect = self.utils.box_to_rect(box)
+        x, y, width, height = rect
+        size = width * height
+
+        if size < 1000:
+            return False
+        return True
+
 
 class SrObjectTracked(object):
     """
@@ -107,6 +110,7 @@ class SrObjectTracked(object):
 
     def __init__(self, box):
         self.selection = box
+        self.track_box = None
         self.hist = None
         self.tracking_state = 0
         self.track_window = None

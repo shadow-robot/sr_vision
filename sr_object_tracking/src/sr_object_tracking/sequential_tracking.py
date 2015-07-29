@@ -15,6 +15,8 @@ class SequentialTracking(SrObjectTracking):
         Initialize the tracking object
         """
         SrObjectTracking.__init__(self)
+        self.hsv = None
+        self.mask = None
 
     def tracking(self, segment):
         """
@@ -23,6 +25,10 @@ class SequentialTracking(SrObjectTracking):
         @return - False if the tracking fails, and the new coordinates of the
          tracked object otherwise.
         """
+        self.frame = cv2.blur(self.frame, (5, 5))
+        self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+        self.mask = self.utils.mask
+
         if segment.selection != (0, 0, 0, 0):
             x0, y0, x1, y1 = segment.selection
             segment.track_window = (x0, y0, x1 - x0, y1 - y0)
