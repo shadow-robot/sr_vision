@@ -20,7 +20,8 @@ class Segmentation(object):
         self.shape_threshold = rospy.get_param('~shape_threshold')
         self.size = rospy.get_param('~size')
 
-        self.seg = ShapeColorSegmentation(self.color, self.shape, self.size)
+        self.seg = ShapeColorSegmentation(self.color, self.shape,
+                                          self.shape_threshold, self.size)
         self.utils = Utils()
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
