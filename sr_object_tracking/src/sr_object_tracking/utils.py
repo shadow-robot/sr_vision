@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import os
 import rospy
+import yaml
 
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
@@ -104,7 +106,7 @@ class Utils(object):
     def box_to_rect(box):
         """
         Convert a region of interest as box format into a rect format
-        @param roi - region of interest (box format)
+        @param box - region of interest (box format)
         @return - region of interest (rect format)
         """
         try:
@@ -121,7 +123,8 @@ class Utils(object):
             return [0, 0, 0, 0]
         return rect
 
-    def hsv_transform(self, img, color):
+    @staticmethod
+    def hsv_transform(img, color, boundaries=None):
         """
         Convert an RGB image into an HSV unique color one
         @param img - input image to be formatted
@@ -129,25 +132,28 @@ class Utils(object):
         @return - output image with black background and "color" segments
         highlighted
         """
+        if boundaries:
+            (lower, upper) = boundaries
+        else:
+            boundaries = {
+                'red': ([0, 120, 0], [83, 255, 255]),
+                'blue': ([100, 110, 0], [125, 255, 255]),
+                'green': ([30, 115, 0], [65, 255, 255]),
+                'yellow': ([10, 80, 150], [20, 255, 255])
+            }
+            if color == 'custom':
+                path = os.path.dirname(os.path.dirname(os.path.dirname(
+                    os.path.realpath(__file__)))) + '/config/boundaries.yaml'
+                with open(path, 'r') as param:
+                    boundaries['custom'] = yaml.load(param)
 
-        boundaries = {
-            'red': ([163, 52, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
-        (lower, upper) = boundaries[color]
+            (lower, upper) = boundaries[color]
+
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
 
-        (lower_blue, upper_blue) = boundaries['blue']
-        lower_blue = np.array(lower_blue, dtype="uint8")
-        upper_blue = np.array(upper_blue, dtype="uint8")
-
         img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         img_thresh = cv2.inRange(img_hsv, lower, upper)
-        img_thresh_blue = cv2.inRange(img_hsv, lower_blue, upper_blue)
-        img_thresh = cv2.subtract(img_thresh, img_thresh_blue)
 
         img_col = cv2.bitwise_and(img, img, mask=img_thresh)
 

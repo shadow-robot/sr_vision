@@ -9,14 +9,14 @@
   <arg name="display" default="true" />
 
   <!-- set the color parameter for the segmentation -->
-  <!-- can be : ['red','blue','green','yellow'] -->
+  <!-- can be : ['red','blue','green','yellow', 'custom'] -->
   <arg name="color" default="$(arg color)" />
 
   <arg name="saturation_min" default="150" />
   <arg name="size" default="2500" />
 
   <!-- specify the shape model file for the segmentation -->
-  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/strawberry.npy" />
+  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/dataset/strawberry.npy" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  >
     <param name="color" value="$(arg color)" />
