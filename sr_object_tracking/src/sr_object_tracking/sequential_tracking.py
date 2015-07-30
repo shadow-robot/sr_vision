@@ -72,7 +72,7 @@ class SequentialTracking(SrObjectTracking):
         diff_frame = cv2.bitwise_and(d1, d2)
         diff_frame = cv2.cvtColor(diff_frame, cv2.COLOR_BGR2GRAY)
 
-        img = self.utils.hsv_transform(self.frame, self.color)
+        img = self.utils.hsv_transform(self.frame, self.color, None)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         return diff_frame + img

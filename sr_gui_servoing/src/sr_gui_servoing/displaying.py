@@ -100,7 +100,7 @@ class DisplayImage(object):
         except (AttributeError, TypeError, IndexError):
             pass
 
-        img = self.utils.hsv_transform(self.vis, self.color)
+        img = self.utils.hsv_transform(self.vis, self.color, None)
 
         # Draw the tracking box, if possible
         try:
