@@ -1,0 +1,16 @@
+<launch>
+  <!-- the camera has to be launched (value = true) for an independant usage -->
+  <arg name="camera" default="True" />
+
+  <!-- set the device type (Kinect=True or False) in order to launch the right driver node -->
+  <arg name="kinect" default="false" />
+
+  <group if="$(arg camera)">
+    <include file="$(find sr_object_tracking)/launch/camera.launch">
+      <arg name="kinect" value="$(arg kinect)" />
+    </include>
+  </group>
+
+  <node name="viewer" pkg="sr_object_tracking" type="calibration.py"  />
+
+</launch>

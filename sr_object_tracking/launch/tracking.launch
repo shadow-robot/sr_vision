@@ -9,7 +9,7 @@
   <arg name="display" default="true" />
 
   <!-- set the color parameter for the segmentation -->
-  <!-- can be : ['red','blue','green','yellow'] -->
+  <!-- can be : ['red','blue','green','yellow', 'custom'] -->
   <arg name="color" default="$(arg color)" />
 
   <arg name="saturation_min" default="150" />

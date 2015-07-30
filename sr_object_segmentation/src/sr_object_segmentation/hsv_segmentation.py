@@ -26,7 +26,7 @@ class HSVSegmentation(SrObjectSegmentation):
         """
         self.frame = frame
 
-        closing = self.utils.hsv_transform(self.img, self.color)
+        closing = self.utils.hsv_transform(self.img, self.color, None)
 
         labeled_array, num_features = label(closing)
         objects = find_objects(labeled_array)

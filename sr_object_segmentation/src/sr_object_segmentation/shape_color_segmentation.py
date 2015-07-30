@@ -26,7 +26,7 @@ class ShapeColorSegmentation(SrObjectSegmentation):
         """
         self.frame = frame
 
-        closing = self.utils.hsv_transform(self.frame, self.color)
+        closing = self.utils.hsv_transform(self.frame, self.color, None)
         closing_gray = cv2.cvtColor(closing, cv2.COLOR_BGR2GRAY)
 
         seg_cnts = self.match_shapes(closing_gray)

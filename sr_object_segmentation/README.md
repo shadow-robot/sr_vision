@@ -8,6 +8,7 @@ Custom ones can be added using the [shape_creation](shapes/shape_creation.py) fi
 
 The matching is controlled with a threshold parameter which can be set in the launchfile (shape_threshold). Notice that lower is more restrictive.
 
+
 ####Usage
 `python shape_creation.py -n [name] -i [image file path]`
 

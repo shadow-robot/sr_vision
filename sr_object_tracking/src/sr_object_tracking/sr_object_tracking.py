@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 import rospy
-import numpy as np
 
 from sensor_msgs.msg import Image, RegionOfInterest
 from geometry_msgs.msg import Pose
@@ -30,16 +29,6 @@ class SrObjectTracking(object):
         self.depth_image = None
         self.vis = None
         self.hist = None
-
-        boundaries = {
-            'red': ([145, 140, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
-        (self.lower, self.upper) = boundaries[self.color]
-        self.lower = np.array(self.lower, dtype="uint8")
-        self.upper = np.array(self.upper, dtype="uint8")
 
         # Subscribe to the image topic and set the appropriate callback
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
