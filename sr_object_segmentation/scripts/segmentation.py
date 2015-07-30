@@ -17,6 +17,7 @@ class Segmentation(object):
 
         self.color = rospy.get_param('~color')
         self.shape = np.load(rospy.get_param('~shape'))
+        self.shape_threshold = rospy.get_param('~shape_threshold')
         self.size = rospy.get_param('~size')
 
         self.seg = ShapeColorSegmentation(self.color, self.shape, self.size)
