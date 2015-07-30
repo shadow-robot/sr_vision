@@ -124,7 +124,7 @@ class Utils(object):
         return rect
 
     @staticmethod
-    def hsv_transform(img, color, boundaries=None):
+    def hsv_transform(img, color, boundaries=[]):
         """
         Convert an RGB image into an HSV unique color one
         @param img - input image to be formatted
