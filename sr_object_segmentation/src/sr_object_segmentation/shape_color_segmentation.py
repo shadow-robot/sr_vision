@@ -15,7 +15,7 @@ class ShapeColorSegmentation(SrObjectSegmentation):
         self.name = 'Shape and color based segmentation algorithm'
         self.color = color
         self.shape = shape
-        self.shape_threshold = 0.5
+        self.shape_threshold = 0.1
         self.size = size
         self.utils = utils
 
