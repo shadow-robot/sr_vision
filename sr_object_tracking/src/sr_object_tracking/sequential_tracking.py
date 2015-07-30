@@ -38,8 +38,7 @@ class SequentialTracking(SrObjectTracking):
 
         if self.tracking_state == 1:
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
-            seq = self.sequential_process()
-            prob = prob + seq
+            prob = prob + self.sequential_process()
             prob &= mask
             term_crit = (
                 cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
