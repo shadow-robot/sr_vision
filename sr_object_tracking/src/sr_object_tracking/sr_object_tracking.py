@@ -16,12 +16,8 @@ class SrObjectTracking(object):
 
     def __init__(self):
         # Initialize a number of global variables
-        '''
         self.size = rospy.get_param('~size')
         self.color = rospy.get_param('~color')
-        '''
-        self.size = 2000
-        self.color = 'red'
 
         self.utils = Utils(self.color)
 
