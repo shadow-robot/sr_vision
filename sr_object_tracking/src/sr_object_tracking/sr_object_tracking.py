@@ -1,5 +1,7 @@
 #!/usr/bin/env python
+
 import rospy
+import math
 
 from sensor_msgs.msg import Image
 from sr_vision_msgs.msg import TrackBoxes
@@ -14,8 +16,12 @@ class SrObjectTracking(object):
 
     def __init__(self):
         # Initialize a number of global variables
+        '''
         self.size = rospy.get_param('~size')
         self.color = rospy.get_param('~color')
+        '''
+        self.size = 2000
+        self.color = 'red'
 
         self.utils = Utils(self.color)
 
@@ -89,16 +95,26 @@ class SrObjectTracking(object):
 
     def checking(self, box):
         """
-        Checks if the box returned by the Camshift tracking seems correct
+        Checks if the box returned by the Camshift tracking seems correct and
+         avoid the duplicates
         @param box - tracked box
         """
         # Check the size
         rect = self.utils.box_to_rect(box)
-        _, _, width, height = rect
+        x, y, width, height = rect
         size = width * height
-
         if size < 1000:
             return False
+
+        # Check the duplication
+        for box in self.temp_track_boxes:
+            pt1 = (int(box.top_left.x), int(box.top_left.y))
+            pt2 = (int(box.bottom_right.x), int(box.bottom_right.y))
+            x2, y2 = int((pt2[0] - pt1[0]) / 2), int((pt2[0] - pt1[0]) / 2)
+            distance = math.hypot(x2 - x, y2 - y)
+            if distance < 100:
+                return False
+
         return True
 
 
