@@ -27,7 +27,8 @@ class SequentialTracking(SrObjectTracking):
         """
         self.frame = cv2.blur(self.frame, (5, 5))
         self.hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
-        self.mask = self.utils.mask
+        self.mask = cv2.inRange(self.hsv, np.array((0., 150, 54)),
+                                np.array((180., 255., 255)))
 
         if segment.selection != (0, 0, 0, 0):
             x0, y0, x1, y1 = segment.selection

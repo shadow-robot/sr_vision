@@ -131,7 +131,7 @@ class Utils(object):
         @return - Mask corresponding to the color
         """
         boundaries = {
-            'red': ([0, 120, 0], [83, 255, 255]),
+            'red': ([0, 120, 0], [255, 255, 255]),
             'blue': ([100, 110, 0], [125, 255, 255]),
             'green': ([30, 115, 0], [65, 255, 255]),
             'yellow': ([10, 80, 150], [20, 255, 255])
