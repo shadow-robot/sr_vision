@@ -38,8 +38,7 @@ class SequentialTracking(SrObjectTracking):
 
         if self.tracking_state == 1:
             prob = cv2.calcBackProject([hsv], [0], self.hist, [0, 180], 1)
-            seq = self.sequential_process(hsv)
-            prob = prob + seq
+            prob = prob + self.sequential_process()
             prob &= mask
             term_crit = (
                 cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 10, 1)
@@ -63,7 +62,7 @@ class SequentialTracking(SrObjectTracking):
         self.roi_pub.publish(roi)
         return True
 
-    def sequential_process(self, hsv):
+    def sequential_process(self):
 
         # Motion detection using a differential image calculated from three
         # consecutive frames
@@ -72,8 +71,7 @@ class SequentialTracking(SrObjectTracking):
         diff_frame = cv2.bitwise_and(d1, d2)
         diff_frame = cv2.cvtColor(diff_frame, cv2.COLOR_BGR2GRAY)
 
-        img_thresh = cv2.inRange(hsv, self.lower, self.upper)
-        img = cv2.bitwise_and(self.frame, self.frame, mask=img_thresh)
+        img = self.utils.hsv_transform(self.frame, self.color, None)
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
         return diff_frame + img

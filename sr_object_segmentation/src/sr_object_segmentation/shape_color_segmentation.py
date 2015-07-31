@@ -10,12 +10,12 @@ class ShapeColorSegmentation(SrObjectSegmentation):
     Shape and color based segmentation
     """
 
-    def __init__(self, color, shape, size):
+    def __init__(self, color, shape, shape_threshold, size):
         SrObjectSegmentation.__init__(self)
         self.name = 'Shape and color based segmentation algorithm'
         self.color = color
         self.shape = shape
-        self.shape_threshold = 0.5
+        self.shape_threshold = shape_threshold
         self.size = size
 
     def segmentation(self, frame):
@@ -26,7 +26,7 @@ class ShapeColorSegmentation(SrObjectSegmentation):
         """
         self.frame = frame
 
-        closing = self.utils.hsv_transform(self.frame, self.color)
+        closing = self.utils.hsv_transform(self.frame, self.color, None)
         closing_gray = cv2.cvtColor(closing, cv2.COLOR_BGR2GRAY)
 
         seg_cnts = self.match_shapes(closing_gray)

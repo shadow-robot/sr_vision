@@ -27,12 +27,21 @@ You can find the architecture diagram below for a closer look at how this works.
 
 
 ## Usage
-For the segmentation, different colors are available : red, blue, green, yellow. As well as different shape models : circle, rectangle, star, strawberry, banana, leaf. See the segmentation doc to add personnalize shapes.
+For the segmentation, different colors are available : red, blue, green, yellow. A custom one can be added with the calibration script (see below for usage). Furthermore, different shape models : circle, rectangle, star, strawberry, banana, leaf. See the segmentation doc to add personnalize shapes.
 
 ### With a Kinect
 `roslaunch sr_object_tracking tracking_kinect.launch color:=<color>`
 
 ### With an UVC camera
 `roslaunch sr_object_tracking tracking.launch color:=<color>`
+
+## Adding a custom color
+To set the proper boundaries in order to process the image (which can be variable according to the luminosity, the camera, etc.) exists a [calibration script](src/sr_object_tracking/calibration.py).
+
+### Usage
+`roslaunch sr_object_tracking calibration.launch`
+
+The original image is displayed on the left, and the mask on the right. Hue, Saturation and Value boundaries on which this one is based upon can be changed as convenience with the track bars. Finally, these values can be saved in a yaml file with the switch track bar at the bottom. To use it in the tracking, specify a 'custom' color argument. 
+
 
 
