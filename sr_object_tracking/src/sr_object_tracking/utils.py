@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
-import os
 import rospy
-import yaml
 
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
