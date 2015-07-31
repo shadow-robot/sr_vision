@@ -16,7 +16,7 @@ class CamshiftTracking(SrObjectTracking):
         """
         SrObjectTracking.__init__(self)
 
-    def tracking(self):
+    def tracking(self, _):
         """
         Track the RegionOfInterest and return the track box as attribute
         @return - Success of the tracking as a booleen

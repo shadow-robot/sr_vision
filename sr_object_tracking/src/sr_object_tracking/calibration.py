@@ -30,7 +30,7 @@ class DisplayImage(object):
         self.frame_size = None
         self.vis = None
 
-        self.utils = Utils()
+        self.utils = Utils('custom')
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.display)
@@ -72,7 +72,8 @@ class DisplayImage(object):
         self.boundaries = [[self.h_min, self.s_min, self.v_min],
                            [self.h_max, self.s_max, self.v_max]]
 
-        img = self.utils.hsv_transform(self.vis, 'custom', self.boundaries)
+        mask = self.utils.get_mask('custom', self.boundaries)
+        img = self.utils.get_closing(mask)
 
         save = cv2.getTrackbarPos(self.switch, 'Parameters')
         if save:

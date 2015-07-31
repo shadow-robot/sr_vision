@@ -8,14 +8,20 @@ from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
 import cv2
 
-from sensor_msgs.msg import Image, RegionOfInterest, CameraInfo
-from geometry_msgs.msg import Pose
+from sensor_msgs.msg import Image, CameraInfo
+from geometry_msgs.msg import Pose, Point
+from sr_vision_msgs.msg import Box
 
 from image_geometry import PinholeCameraModel
 
 
 class Utils(object):
-    def __init__(self):
+    """
+    Utils methods for the sr_vision package
+    """
+
+    def __init__(self, color):
+        self.color = color
 
         self.bridge = CvBridge()
         self.depth = None
@@ -26,15 +32,34 @@ class Utils(object):
         with open(path, 'r') as param:
             self.boundaries = yaml.load(param)
 
+        self.image_sub = rospy.Subscriber('camera/image_raw', Image,
+                                          self.image_callback)
         self.depth_sub = rospy.Subscriber('camera/depth/image_rect_raw', Image,
                                           self.depth_callback)
         self.cam_info = rospy.Subscriber('camera/camera_info', CameraInfo,
                                          self.cam_info_callback)
 
-        # Initialize the Region of Interest publishers
-        self.roi_pub = rospy.Publisher("roi/track_box", RegionOfInterest,
-                                       queue_size=1)
-        self.pose_pub = rospy.Publisher("roi/pose", Pose, queue_size=1)
+    def depth_callback(self, data):
+        """
+        Convert the ROS image to OpenCV format using a cv_bridge helper
+        function and make a copy
+        """
+        self.depth = self.convert_image(data, "passthrough")
+
+    def image_callback(self, data):
+        """
+        Convert the ROS image to OpenCV format using a cv_bridge helper
+        function and make a copy
+        """
+        self.frame = self.convert_image(data, "bgr8")
+        self.mask = self.get_mask(self.color, boundaries=None)
+        self.closing = self.get_closing(self.mask)
+
+    def cam_info_callback(self, data):
+        """
+        Get the camera information from its calibration
+        """
+        self.cam_info = data
 
     def convert_image(self, ros_image, encode):
         """
@@ -47,31 +72,27 @@ class Utils(object):
         except CvBridgeError, e:
             print e
 
-    def depth_callback(self, data):
-        """
-        Convert the ROS image to OpenCV format using a cv_bridge helper
-        function and make a copy
-        """
+    def roi_to_box(self, roi, moment=None, num=0):
 
-        self.depth = self.convert_image(data, "passthrough")
+        rect = self.box_to_rect(roi)
 
-    def cam_info_callback(self, data):
-        """
-        Get the camera information from its calibration
-        """
-        self.cam_info = data
+        box = Box()
+        box.id = num
+        box.top_left = Point(rect[0], rect[1], 0)
+        box.bottom_right = Point(rect[0] + rect[2], rect[1] + rect[3], 0)
+        box.centroid = self.centroid_to_pose(rect, moment)
 
-    def publish_pose(self, roi=None, moment=None):
+        return box
+
+    def centroid_to_pose(self, rect, moment):
         """
         Publish the region of interest as a geometry_msgs/Pose message from
         the ROI or the center of mass coordinates
-        @param roi - sensor_msgs/RegionOfInterest
+        @param rect - sensor_msgs/RegionOfInterest
         @param moment - object's center of mass
         """
         if not moment:
-            moment = (roi.x_offset + int(roi.width / 2),
-                      roi.y_offset + int(roi.height / 2))
-
+            moment = (int(rect[0] + rect[2] / 2), int(rect[1] + rect[3] / 2))
         u, v = int(moment[0]), int(moment[1])
 
         ps = Pose()
@@ -89,23 +110,6 @@ class Utils(object):
         ps.position.z = z
 
         return ps
-
-    def box_to_roi(self, box):
-        """
-        Publish the region of interest as a RegionOfInterest message (2D box)
-        """
-        roi_box = self.box_to_rect(box)
-
-        # Watch out for negative offsets
-        roi_box[0] = max(0, roi_box[0])
-        roi_box[1] = max(0, roi_box[1])
-
-        roi = RegionOfInterest()
-        roi.x_offset = int(roi_box[0])
-        roi.y_offset = int(roi_box[1])
-        roi.width = int(roi_box[2])
-        roi.height = int(roi_box[3])
-        return roi
 
     @staticmethod
     def box_to_rect(box):
@@ -128,26 +132,33 @@ class Utils(object):
             return [0, 0, 0, 0]
         return rect
 
-    def hsv_transform(self, img, color, boundaries):
-        """
-        Convert an RGB image into an HSV unique color one
-        @param img - input image to be formatted
-        @param color - color wanted
-        @return - output image with black background and "color" segments
-        highlighted
-        """
 
+    def get_mask(self, color, boundaries):
+        """
+        @param color - Color wanted
+        @return - Mask corresponding to the color
+        """
         if boundaries:
             (lower, upper) = boundaries
         else:
             (lower, upper) = self.boundaries[color]
+
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
 
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        img_thresh = cv2.inRange(img_hsv, lower, upper)
+        hsv = cv2.cvtColor(self.frame, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, lower, upper)
 
-        img_col = cv2.bitwise_and(img, img, mask=img_thresh)
+        return mask
+
+    def get_closing(self, mask):
+        """
+        Color closing image processing
+        @param mask - color of interest mask
+        @return - output image with black background and "color" segments
+        highlighted
+        """
+        img_col = cv2.bitwise_and(self.frame, self.frame, mask=mask)
 
         kernel = np.ones((5, 5), np.uint8)
         opening = cv2.morphologyEx(img_col, cv2.MORPH_OPEN, kernel)
