@@ -132,7 +132,6 @@ class Utils(object):
             return [0, 0, 0, 0]
         return rect
 
-
     def get_mask(self, color, boundaries):
         """
         @param color - Color wanted
