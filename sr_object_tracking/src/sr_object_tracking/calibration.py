@@ -83,10 +83,16 @@ class DisplayImage(object):
         cv2.waitKey(1)
 
     def save_parameters(self):
+        """
+        Switch command. Save the chosen values in the yaml configuration file,
+         updating the 'custom' ones.
+        """
+        boundaries = self.utils.boundaries
+        boundaries['custom'] = self.boundaries
         path = os.path.dirname(os.path.dirname(os.path.dirname(
             os.path.realpath(__file__)))) + '/config/boundaries.yaml'
         with open(path, 'w') as outfile:
-            outfile.write(yaml.dump(self.boundaries, default_flow_style=True))
+            outfile.write(yaml.dump(boundaries, default_flow_style=True))
 
     # Set the callbacks for the slider controls
     def set_hmin(self, pos):

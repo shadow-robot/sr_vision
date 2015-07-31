@@ -21,6 +21,11 @@ class Utils(object):
         self.depth = None
         self.cam_info = None
 
+        path = os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__)))) + '/config/boundaries.yaml'
+        with open(path, 'r') as param:
+            self.boundaries = yaml.load(param)
+
         self.depth_sub = rospy.Subscriber('camera/depth/image_rect_raw', Image,
                                           self.depth_callback)
         self.cam_info = rospy.Subscriber('camera/camera_info', CameraInfo,
@@ -123,8 +128,7 @@ class Utils(object):
             return [0, 0, 0, 0]
         return rect
 
-    @staticmethod
-    def hsv_transform(img, color, boundaries):
+    def hsv_transform(self, img, color, boundaries):
         """
         Convert an RGB image into an HSV unique color one
         @param img - input image to be formatted
@@ -132,23 +136,11 @@ class Utils(object):
         @return - output image with black background and "color" segments
         highlighted
         """
+
         if boundaries:
             (lower, upper) = boundaries
         else:
-            boundaries = {
-                'red': ([0, 120, 0], [83, 255, 255]),
-                'blue': ([100, 110, 0], [125, 255, 255]),
-                'green': ([30, 115, 0], [65, 255, 255]),
-                'yellow': ([10, 80, 150], [20, 255, 255])
-            }
-            if color == 'custom':
-                path = os.path.dirname(os.path.dirname(os.path.dirname(
-                    os.path.realpath(__file__)))) + '/config/boundaries.yaml'
-                with open(path, 'r') as param:
-                    boundaries['custom'] = yaml.load(param)
-
-            (lower, upper) = boundaries[color]
-
+            (lower, upper) = self.boundaries[color]
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
 
