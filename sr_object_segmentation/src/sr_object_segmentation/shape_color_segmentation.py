@@ -10,12 +10,12 @@ class ShapeColorSegmentation(SrObjectSegmentation):
     Shape and color based segmentation
     """
 
-    def __init__(self, color, shape, size, utils):
+    def __init__(self, color, shape, shape_threshold, size, utils):
         SrObjectSegmentation.__init__(self)
         self.name = 'Shape and color based segmentation algorithm'
         self.color = color
         self.shape = shape
-        self.shape_threshold = 0.1
+        self.shape_threshold = shape_threshold
         self.size = size
         self.utils = utils
 
