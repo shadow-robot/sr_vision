@@ -1,6 +1,6 @@
 <launch>
   <!-- the camera has to be launched (value = true) for an independant usage -->
-  <arg name="camera" default="True" />
+  <arg name="camera" default="true" />
 
   <!-- set the device type (Kinect=True or False) in order to launch the right driver node -->
   <arg name="kinect" default="false" />

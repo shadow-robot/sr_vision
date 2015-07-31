@@ -9,18 +9,21 @@
   <arg name="display" default="true" />
 
   <!-- set the color parameter for the segmentation -->
-  <!-- can be : ['red','blue','green','yellow', 'custom'] -->
+  <!-- can be : ['red','blue','green','yellow','custom'] -->
   <arg name="color" default="$(arg color)" />
 
   <arg name="saturation_min" default="150" />
   <arg name="size" default="2500" />
 
-  <!-- specify the shape model file for the segmentation -->
-  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/dataset/strawberry.npy" />
+  <!-- specify the shape model file for the segmentation as well as the threshold (lower is more restrictive) -->
+  <arg name="shape" default="strawberry" />
+  <arg name="shape_model_file" default="$(find sr_object_segmentation)/shapes/dataset/$(arg shape).npy" />
+  <arg name="shape_threshold" default="0.1" />
 
   <node name="segmentation" pkg="sr_object_segmentation" type="segmentation.py"  >
     <param name="color" value="$(arg color)" />
     <param name="shape" type="string" value="$(arg shape_model_file)" />
+    <param name="shape_threshold" type="float" value="$(arg shape_threshold)" />
     <param name="size" value="$(arg size)" />
   </node>
 
