@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 
+import os
 import rospy
+import yaml
 
 from cv_bridge import CvBridge, CvBridgeError
 import numpy as np
@@ -25,6 +27,11 @@ class Utils(object):
         self.depth = None
         self.cam_info = None
 
+        path = os.path.dirname(os.path.dirname(os.path.dirname(
+            os.path.realpath(__file__)))) + '/config/boundaries.yaml'
+        with open(path, 'r') as param:
+            self.boundaries = yaml.load(param)
+
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
         self.depth_sub = rospy.Subscriber('camera/depth/image_rect_raw', Image,
@@ -45,7 +52,7 @@ class Utils(object):
         function and make a copy
         """
         self.frame = self.convert_image(data, "bgr8")
-        self.mask = self.get_mask(self.color)
+        self.mask = self.get_mask(self.color, boundaries=None)
         self.closing = self.get_closing(self.mask)
 
     def cam_info_callback(self, data):
@@ -125,19 +132,16 @@ class Utils(object):
             return [0, 0, 0, 0]
         return rect
 
-    def get_mask(self, color):
+    def get_mask(self, color, boundaries):
         """
         @param color - Color wanted
         @return - Mask corresponding to the color
         """
-        boundaries = {
-            'red': ([0, 120, 0], [255, 255, 255]),
-            'blue': ([100, 110, 0], [125, 255, 255]),
-            'green': ([30, 115, 0], [65, 255, 255]),
-            'yellow': ([10, 80, 150], [20, 255, 255])
-        }
+        if boundaries:
+            (lower, upper) = boundaries
+        else:
+            (lower, upper) = self.boundaries[color]
 
-        (lower, upper) = boundaries[color]
         lower = np.array(lower, dtype="uint8")
         upper = np.array(upper, dtype="uint8")
 
