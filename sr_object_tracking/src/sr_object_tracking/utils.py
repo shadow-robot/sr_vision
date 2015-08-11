@@ -80,7 +80,7 @@ class Utils(object):
         box.id = num
         box.top_left = Point(rect[0], rect[1], 0)
         box.bottom_right = Point(rect[0] + rect[2], rect[1] + rect[3], 0)
-        box.centroid = self.centroid_to_pose(rect, moment)
+        box.ray_to_centroid = self.centroid_to_pose(rect, moment)
 
         return box
 
