@@ -7,5 +7,5 @@ geometry_msgs/Point top_left
 # Bottom-right point coordinates of the box
 geometry_msgs/Point bottom_right
 
-# Centroid coordinates
-geometry_msgs/Pose centroid
+# 3D ray to centre of object
+geometry_msgs/Pose ray_to_centroid
