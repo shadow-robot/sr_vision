@@ -1,13 +1,10 @@
 language: python
-build_image: shippableimages/ubuntu1404_python
 python:
   - 2.7
 
 #codecov token (encrypted)
 env:
   - secure: pyMEMuamj7By74Ap/DRXLreOKuZfs6jEeMsLLFH4Mr2YjT3O7zzccKURrVoyhBDoZKKMj/MxE2iTRo1C80lHM3XG2tgzteBnPk0kN8zk9Abmd9bZYL0Pz/dga08sbo0Fy3k4dMlw4lzo4zzF1oGNtmP19g/YbEVo6WQngZdHFad9W2MNk+cemdzF+eEiEmLJEDgqrABHaRANx8pwDcrp4lddtLk7H4LuWDJ/O7etK/6t0z0eYxe8qmEBMWiUa0VKufLa919X9X3asrThUZEkMOAAtud93CAmBCkmhyt+zpF+VsQ7mJznS/JsNSezpKP6o6NhkBavA45Gyn/ImsoTOQ==
-
-cache: true
 
 install:
   - sudo apt-get update
