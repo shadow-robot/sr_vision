@@ -144,7 +144,7 @@ catkin_package(
 
 ## Mark other files for installation (e.g. launch and bag files, etc.)
 install(FILES
-  tracking.launch
+  launch/tracking.launch
   DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}
 )
 
