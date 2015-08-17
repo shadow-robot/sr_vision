@@ -1,31 +1,35 @@
 #!/usr/bin/env python
 
 import rospy
+import numpy as np
 
-from sr_object_segmentation.hsv_segmentation import HSVSegmentation
+from sr_object_segmentation.shape_color_segmentation import \
+    ShapeColorSegmentation
 from sr_object_tracking.utils import Utils
 
-from sensor_msgs.msg import Image, RegionOfInterest
-from geometry_msgs.msg import Pose
+from sensor_msgs.msg import Image
 from sr_vision_msgs.srv import SegmentationControl
+from sr_vision_msgs.msg import TrackBoxes
 
 
 class Segmentation(object):
     def __init__(self):
 
         self.color = rospy.get_param('~color')
+        self.shape = np.load(rospy.get_param('~shape'))
+        self.shape_threshold = rospy.get_param('~shape_threshold')
+        self.size = rospy.get_param('~size')
 
-        self.seg = HSVSegmentation(self.color)
-        self.utils = Utils()
+        self.utils = Utils(self.color)
+        self.seg = ShapeColorSegmentation(self.color, self.shape,
+                                          self.shape_threshold, self.size,
+                                          self.utils)
 
         self.image_sub = rospy.Subscriber('camera/image_raw', Image,
                                           self.image_callback)
 
-        self.pose_pub = rospy.Publisher("roi/pose",
-                                        Pose, queue_size=1)
-
-        self.selection_pub = rospy.Publisher("roi/segmented_box",
-                                             RegionOfInterest, queue_size=1)
+        self.segmentation_pub = rospy.Publisher("/roi/segmented_box",
+                                                TrackBoxes, queue_size=1)
 
         self.server = rospy.Service('~start', SegmentationControl,
                                     self.segment)
@@ -37,23 +41,30 @@ class Segmentation(object):
         """
         self.frame = self.utils.convert_image(data, "bgr8")
 
-    def segment(self, _):
+    def segment(self, req):
         """
         Launch the segmentation
         @return - Success of the segmentation as a boolean
         """
+        self.track_boxes = []
         try:
             self.seg.segmentation(self.frame)
+            for i, seg in enumerate(self.seg.segmented_box):
+                box = self.utils.roi_to_box(seg, num=i)
+                self.track_boxes.append(box)
 
-            roi = self.utils.publish_box(self.seg.segmented_box)
-            pose = self.utils.publish_pose(moment=self.seg.poses)
+            nb_segments = len(self.track_boxes)
 
-            self.selection_pub.publish(roi)
-            self.pose_pub.publish(pose)
+            if req.check_new:
+                return nb_segments
+            elif nb_segments > 0:
+                self.segmentation_pub.publish(self.track_boxes)
+                return nb_segments
+            else:
+                return 0
 
-            return True
         except (IndexError, TypeError, AttributeError):
-            return False
+            return 0
 
 
 def main():

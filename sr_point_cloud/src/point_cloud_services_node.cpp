@@ -25,12 +25,11 @@
 #include "sr_vision_msgs/PclTransform.h"
 #include "sr_vision_msgs/PclFilter.h"
 
-namespace sr_point_cloud 
+namespace sr_point_cloud
 {
 
-class PointCloudServicesNode 
+class PointCloudServicesNode
 {
-
 public:
     typedef pcl::PointXYZRGB PointType;
     typedef pcl::PointCloud<PointType> Cloud;
@@ -65,7 +64,8 @@ protected:
 
 
     bool
-    transform_cloud_(sr_vision_msgs::PclTransform::Request  &req, sr_vision_msgs::PclTransform::Response &res)
+    transform_cloud_(sr_vision_msgs::PclTransform::Request  &req,  // NOLINT(runtime/references)
+                     sr_vision_msgs::PclTransform::Response &res)  // NOLINT(runtime/references)
     {
       // If an output frame has been specified, we convert the cloud to that frame
       if (!req.output_frame_id.empty())
@@ -79,23 +79,24 @@ protected:
     }
 
     void
-    gridSample (const CloudConstPtr &cloud, Cloud &result, double leaf_size = 0.01)
+    gridSample(const CloudConstPtr &cloud, Cloud *result, double leaf_size = 0.01)
     {
       pcl::VoxelGrid<PointType> grid;
       grid.setLeafSize(leaf_size, leaf_size, leaf_size);
       grid.setInputCloud(cloud);
-      grid.filter(result);
+      grid.filter(*result);
     }
 
     bool
-    filter_cloud_(sr_vision_msgs::PclFilter::Request  &req, sr_vision_msgs::PclFilter::Response &res)
+    filter_cloud_(sr_vision_msgs::PclFilter::Request  &req,  // NOLINT(runtime/references)
+                  sr_vision_msgs::PclFilter::Response &res)  // NOLINT(runtime/references)
     {
       Cloud downsampled_cloud;
       CloudPtr input_cloud (new Cloud);
 
       pcl::fromROSMsg(req.point_cloud, *input_cloud);
 
-      gridSample(input_cloud, downsampled_cloud, req.downsampling_grid_size);
+      gridSample(input_cloud, &downsampled_cloud, req.downsampling_grid_size);
 
       pcl::toROSMsg(downsampled_cloud, res.point_cloud);
 
@@ -105,7 +106,7 @@ protected:
 
 }  // namespace sr_point_cloud
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "point_cloud_transformer");
   sr_point_cloud::PointCloudServicesNode node;

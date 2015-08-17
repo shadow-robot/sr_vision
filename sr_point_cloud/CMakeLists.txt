@@ -20,6 +20,8 @@ find_package(catkin REQUIRED COMPONENTS
   object_recognition_msgs
 )
 
+find_package(sr_vision_msgs REQUIRED)
+
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 find_package(Boost REQUIRED COMPONENTS system)
@@ -103,7 +105,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   #LIBRARIES
-  CATKIN_DEPENDS message_runtime
+  CATKIN_DEPENDS message_runtime sr_vision_msgs
   DEPENDS boost orocos_kdl
 )
 
@@ -210,6 +212,7 @@ add_executable(cloud_services
 
 add_dependencies(cloud_services
   sr_grasp_msgs_gencpp
+  sr_vision_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
 
@@ -274,7 +277,6 @@ target_link_libraries(cloud_services
 add_rostest(test/cloud_tracker.test)
 add_rostest(test/cluster_segmentor.test)
 #add_rostest(test/cloud_services.test)
-add_rostest(test/cloud_cropping.test)
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)

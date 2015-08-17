@@ -1,4 +1,4 @@
-[![Build Status](https://api.shippable.com/projects/5551c20fedd7f2c052e9809d/badge?branchName=indigo-devel)](https://app.shippable.com/projects/5551c20fedd7f2c052e9809d) [![Code Health](https://landscape.io/github/shadow-robot/sr_vision/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr_vision/indigo-devel) [![codecov.io](http://codecov.io/github/shadow-robot/sr_vision/coverage.svg?branch=indigo-devel)](http://codecov.io/github/shadow-robot/sr_vision?branch=indigo-devel)
+[![Build Status](https://api.shippable.com/projects/5551c20fedd7f2c052e9809d/badge?branchName=indigo-devel)](https://app.shippable.com/projects/5551c20fedd7f2c052e9809d) [![Documentation Status](https://readthedocs.org/projects/sr-vision/badge/?version=latest)](http://sr-vision.readthedocs.org/) [![Code Health](https://landscape.io/github/shadow-robot/sr_vision/indigo-devel/landscape.svg?style=flat)](https://landscape.io/github/shadow-robot/sr_vision/indigo-devel) [![codecov.io](http://codecov.io/github/shadow-robot/sr_vision/coverage.svg?branch=indigo-devel)](http://codecov.io/github/shadow-robot/sr_vision?branch=indigo-devel)
 
 sr_vision
 ------------
@@ -9,7 +9,7 @@ Contains our vision related algorithm (segmentation, tracking, recognition, etc.
   1. [Tracking](sr_object_tracking/)
 This package contains the tracker executable. The launch file starts the video acquisition as well as the tracking node and the visualization one. A color parameter is necessary to process the segmentation.
   2. [Segmentation](sr_object_segmentation/)
-Segment the image from the camera in order to find the region of interest, with a color given as parameter.
+Contains nodes for the color and shape based segmentation. The two of them can be set as parameters (default ones are red and strawberry).
   3. [Benchmarking](sr_object_benchmarking/)
 Benchmarking package for the different segmentation algorithms.
   4. [Visualization](sr_gui_servoing/)
@@ -27,12 +27,21 @@ You can find the architecture diagram below for a closer look at how this works.
 
 
 ## Usage
-For the segmentation, different colors are available : red, blue, green, yellow.
+For the segmentation, different colors are available : red, blue, green, yellow. A custom one can be added with the calibration script (see below for usage). Furthermore, different shape models : circle, rectangle, star, strawberry, banana, leaf. See the segmentation doc to add personnalize shapes.
 
 ### With a Kinect
 `roslaunch sr_object_tracking tracking_kinect.launch color:=<color>`
 
 ### With an UVC camera
 `roslaunch sr_object_tracking tracking.launch color:=<color>`
+
+## Adding a custom color
+To set the proper boundaries in order to process the image (which can be variable according to the luminosity, the camera, etc.) exists a [calibration script](src/sr_object_tracking/calibration.py).
+
+### Usage
+`roslaunch sr_object_tracking calibration.launch`
+
+The original image is displayed on the left, and the mask on the right. Hue, Saturation and Value boundaries on which this one is based upon can be changed as convenience with the track bars. Finally, these values can be saved in a yaml file with the switch track bar at the bottom. To use it in the tracking, specify a 'custom' color argument. 
+
 
 

@@ -39,11 +39,13 @@ namespace sr_point_cloud
 {
 
 using std::vector;
-using namespace object_recognition_msgs;
+using object_recognition_msgs::ObjectRecognitionAction;
+using object_recognition_msgs::RecognizedObjectArray;
+using object_recognition_msgs::ObjectRecognitionResult;
+using object_recognition_msgs::RecognizedObject;
 
-class ClusterSegmentorNode 
+class ClusterSegmentorNode
 {
-
 public:
     typedef pcl::PointXYZ PointType;
     typedef pcl::PointCloud<PointType> Cloud;
@@ -56,7 +58,7 @@ public:
     ClusterSegmentorNode()
       : nh_("~")
       , remove_nan_(true)
-      , recognize_objects_as_(nh_, "recognize_objects", 
+      , recognize_objects_as_(nh_, "recognize_objects",
 boost::bind(&ClusterSegmentorNode::recognize_objects_execute_cb_, this, _1), false)
     {
         config_server_.setCallback(boost::bind(&ClusterSegmentorNode::config_cb_, this, _1, _2));
@@ -93,7 +95,7 @@ protected:
     std::string output_frame_;
     tf::TransformListener tf_listener_;
 
-    void config_cb_(sr_point_cloud::ClusterSegmentorConfig &config, uint32_t level)
+    void config_cb_(const sr_point_cloud::ClusterSegmentorConfig &config, uint32_t level)
     {
       cluster_segmentor_.setUseConvexHull(config.use_convex_hull);
       cluster_segmentor_.setClusterTolerance(config.cluster_tolerance);
@@ -125,12 +127,12 @@ protected:
     {
       ObjectRecognitionResult res;
       RecognizedObjectArray objs;
-      extract_(objs, goal->use_roi, goal->filter_limits);
+      extract_(&objs, goal->use_roi, goal->filter_limits);
       res.recognized_objects = objs;
       recognize_objects_as_.setSucceeded(res);
     }
 
-    void extract_(RecognizedObjectArray &out, bool use_roi, const std::vector<float> & filter_limits)
+    void extract_(RecognizedObjectArray *out, bool use_roi, const std::vector<float> & filter_limits)
     {
       if (input_cloud_->points.empty())
         return;
@@ -175,7 +177,7 @@ protected:
         cluster_segmentor_.setInputCloud(input_cloud_);
 
       ROS_INFO("Segmenting cloud...");
-      cluster_segmentor_.extract(clusters);
+      cluster_segmentor_.extract(&clusters);
       ROS_INFO("... found %i clusters", static_cast<int>(clusters.size()));
 
       std_msgs::Header head = pcl_conversions::fromPCL(input_cloud_->header);
@@ -211,14 +213,14 @@ protected:
         obj.pose.pose.pose.position.x = centroid.x();
         obj.pose.pose.pose.position.y = centroid.y();
         obj.pose.pose.pose.position.z = centroid.z();
-        out.objects.push_back(obj);
+        out->objects.push_back(obj);
       }
     }
 };
 
 }  // namespace sr_point_cloud
 
-int main (int argc, char** argv)
+int main(int argc, char** argv)
 {
   ros::init(argc, argv, "cluster_segmentor");
   sr_point_cloud::ClusterSegmentorNode node;
