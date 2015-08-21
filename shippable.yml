@@ -11,8 +11,16 @@ install:
   - sudo apt-get install curl -y
 
 script:
-  - export toolset_branch="master"
-  - export server_type="shippable"
-  - export used_modules="build_pr_only,check_cache,install,create_workspace,codecov_tool"
-  - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
-  - curl -s "$( echo "$remote_shell_script" | sed 's/#/%23/g' )" | bash /dev/stdin "$toolset_branch" $server_type $used_modules
+  - env
+#  - export toolset_branch="master"
+#  - export server_type="shippable"
+#  - export used_modules="build_pr_only,check_cache,install,create_workspace,codecov_tool"
+#  - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
+#  - curl -s "$( echo "$remote_shell_script" | sed 's/#/%23/g' )" | bash /dev/stdin "$toolset_branch" $server_type $used_modules
+
+after_failure:
+  - cd ~/
+  - rm -rf ~/sample-slack-notifications
+  - git clone https://github.com/shippableSamples/sample-slack-notifications.git
+  - cd ~/sample-slack-notifications
+#  - python slack_notifier.py --project $PROJECT --org "shadow-robot" --token $SLACK_TOKEN
