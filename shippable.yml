@@ -12,15 +12,15 @@ python:
 
 
 # codecov token  and slack web hook URL (encrypted)
-env:
-  - secure: Z4h1Rh4I8BbeTUkpTTrOVF1XbKPbUye/JmCiBIG8nnVT8tJHtrBoAOwLKH102XwrfMQAuw+ZjajpUIR0/dLpSddM7JAkyUToNalK+UXFMmHcfe2oIltNdt5LQfmYFIUq5yB0ONLAHcyVmduZBOOggOmwYpUBazia+xH2zOXITFfrOXdUZfnrfxgzigscq1NbUTwNyGRJvKkgauwDiLqQu3oo7qFfeP1lZbA+0kVJwtWUgZ3OQq5Gg0VZMhjWOiCfhi057n7L59eBL18TNU1Y1FgCy0ucjaTCFjbsKDpHh/6SQOppCRFGWbs+hxkE19X7vNJcP1MZbG+VMkHihu5sWA==
+#env:
+#  - secure: Z4h1Rh4I8BbeTUkpTTrOVF1XbKPbUye/JmCiBIG8nnVT8tJHtrBoAOwLKH102XwrfMQAuw+ZjajpUIR0/dLpSddM7JAkyUToNalK+UXFMmHcfe2oIltNdt5LQfmYFIUq5yB0ONLAHcyVmduZBOOggOmwYpUBazia+xH2zOXITFfrOXdUZfnrfxgzigscq1NbUTwNyGRJvKkgauwDiLqQu3oo7qFfeP1lZbA+0kVJwtWUgZ3OQq5Gg0VZMhjWOiCfhi057n7L59eBL18TNU1Y1FgCy0ucjaTCFjbsKDpHh/6SQOppCRFGWbs+hxkE19X7vNJcP1MZbG+VMkHihu5sWA==
 
-install:
-  - sudo apt-get update
-  - sudo apt-get install curl -y
+#install:
+#  - sudo apt-get update
+#  - sudo apt-get install curl -y
 
 script:
   - env
 
-after_failure:
-  - curl -X POST --data-urlencode 'payload={"channel": "#bots", "username": "webhookbot", "text": "Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH", "icon_emoji": ":monkey_face:"}' $SLACK_WEB_HOOK_URL
+#after_failure:
+#  - curl -X POST --data-urlencode 'payload={"channel": "#bots", "username": "webhookbot", "text": "Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH", "icon_emoji": ":monkey_face:"}' $SLACK_WEB_HOOK_URL
