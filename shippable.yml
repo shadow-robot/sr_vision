@@ -2,6 +2,15 @@ language: python
 python:
   - 2.7
 
+#  - false
+# test
+#  - export toolset_branch="master"
+#  - export server_type="shippable"
+#  - export used_modules="build_pr_only,check_cache,install,create_workspace,codecov_tool"
+#  - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
+#  - curl -s "$( echo "$remote_shell_script" | sed 's/#/%23/g' )" | bash /dev/stdin "$toolset_branch" $server_type $used_modules
+
+
 # codecov token  and slack web hook URL (encrypted)
 env:
   - secure: Z4h1Rh4I8BbeTUkpTTrOVF1XbKPbUye/JmCiBIG8nnVT8tJHtrBoAOwLKH102XwrfMQAuw+ZjajpUIR0/dLpSddM7JAkyUToNalK+UXFMmHcfe2oIltNdt5LQfmYFIUq5yB0ONLAHcyVmduZBOOggOmwYpUBazia+xH2zOXITFfrOXdUZfnrfxgzigscq1NbUTwNyGRJvKkgauwDiLqQu3oo7qFfeP1lZbA+0kVJwtWUgZ3OQq5Gg0VZMhjWOiCfhi057n7L59eBL18TNU1Y1FgCy0ucjaTCFjbsKDpHh/6SQOppCRFGWbs+hxkE19X7vNJcP1MZbG+VMkHihu5sWA==
@@ -12,13 +21,6 @@ install:
 
 script:
   - env
-  - false
-# test
-#  - export toolset_branch="master"
-#  - export server_type="shippable"
-#  - export used_modules="build_pr_only,check_cache,install,create_workspace,codecov_tool"
-#  - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
-#  - curl -s "$( echo "$remote_shell_script" | sed 's/#/%23/g' )" | bash /dev/stdin "$toolset_branch" $server_type $used_modules
 
 after_failure:
   - curl -X POST --data-urlencode 'payload={"channel": "#bots", "username": "webhookbot", "text": "Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH", "icon_emoji": ":monkey_face:"}' $SLACK_WEB_HOOK_URL
