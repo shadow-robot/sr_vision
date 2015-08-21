@@ -2,8 +2,6 @@ language: python
 python:
   - 2.7
 
-#  - false
-# test
 #  - export toolset_branch="master"
 #  - export server_type="shippable"
 #  - export used_modules="build_pr_only,check_cache,install,create_workspace,codecov_tool"
@@ -21,6 +19,7 @@ install:
 
 script:
   - env
+  - false
 
 after_failure:
-  - curl -X POST --data-urlencode "payload={'channel':'#bots', 'username':'webhookbot', 'text':'Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH', 'icon_emoji':':monkey_face:'}" $SLACK_WEB_HOOK_URL
+  - curl -X POST --data-urlencode "payload={\"channel\":\"#bots\", \"username\":\"webhookbot\", \"text\":\"Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH\", \"icon_emoji\":\":monkey_face:\"}" $SLACK_WEB_HOOK_URL
