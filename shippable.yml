@@ -22,5 +22,4 @@ script:
   - false
 
 after_failure:
-  - curl -X POST --data-urlencode "payload={\"channel\":\"#bots\", \"username\":\"shippable\", \"text\":\"[$SHIPPABLE_REPO_SLUG branch $BRANCH] <$BUILD_URL|Build #$SHIPPABLE_BUILD_NUMBER> failed\", \"icon_emoji\":\":monkey_face:\"}" $SLACK_WEB_HOOK_URL
-  - echo "payload={\"channel\":\"#bots\", \"username\":\"shippable\", \"text\":\"[$SHIPPABLE_REPO_SLUG branch $BRANCH] <$BUILD_URL|Build #$SHIPPABLE_BUILD_NUMBER> failed\", \"icon_emoji\":\":monkey_face:\"}"
+  - curl -X POST --data-urlencode "payload={\"channel\":\"#bots\", \"username\":\"shippable\", \"text\":\"[$SHIPPABLE_REPO_SLUG branch $BRANCH] <$BUILD_URL|Build $SHIPPABLE_BUILD_NUMBER> failed\", \"icon_emoji\":\":monkey_face:\"}" $SLACK_WEB_HOOK_URL
