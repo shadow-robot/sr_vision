@@ -12,7 +12,7 @@ install:
 
 script:
   - env
-  - exit 1
+  - false
 # test
 #  - export toolset_branch="master"
 #  - export server_type="shippable"
