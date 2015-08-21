@@ -2,9 +2,9 @@ language: python
 python:
   - 2.7
 
-#codecov token (encrypted)
+# codecov token  and slack web hook URL (encrypted)
 env:
-  - secure: pyMEMuamj7By74Ap/DRXLreOKuZfs6jEeMsLLFH4Mr2YjT3O7zzccKURrVoyhBDoZKKMj/MxE2iTRo1C80lHM3XG2tgzteBnPk0kN8zk9Abmd9bZYL0Pz/dga08sbo0Fy3k4dMlw4lzo4zzF1oGNtmP19g/YbEVo6WQngZdHFad9W2MNk+cemdzF+eEiEmLJEDgqrABHaRANx8pwDcrp4lddtLk7H4LuWDJ/O7etK/6t0z0eYxe8qmEBMWiUa0VKufLa919X9X3asrThUZEkMOAAtud93CAmBCkmhyt+zpF+VsQ7mJznS/JsNSezpKP6o6NhkBavA45Gyn/ImsoTOQ==
+  - secure: Z4h1Rh4I8BbeTUkpTTrOVF1XbKPbUye/JmCiBIG8nnVT8tJHtrBoAOwLKH102XwrfMQAuw+ZjajpUIR0/dLpSddM7JAkyUToNalK+UXFMmHcfe2oIltNdt5LQfmYFIUq5yB0ONLAHcyVmduZBOOggOmwYpUBazia+xH2zOXITFfrOXdUZfnrfxgzigscq1NbUTwNyGRJvKkgauwDiLqQu3oo7qFfeP1lZbA+0kVJwtWUgZ3OQq5Gg0VZMhjWOiCfhi057n7L59eBL18TNU1Y1FgCy0ucjaTCFjbsKDpHh/6SQOppCRFGWbs+hxkE19X7vNJcP1MZbG+VMkHihu5sWA==
 
 install:
   - sudo apt-get update
@@ -13,6 +13,9 @@ install:
 script:
   - export toolset_branch="master"
   - export server_type="shippable"
-  - export used_modules="check_cache,install,create_workspace,code_style_check,unit_tests,codecov_tool"
+  - export used_modules="build_pr_only,check_cache,install,create_workspace,codecov_tool"
   - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
   - curl -s "$( echo "$remote_shell_script" | sed 's/#/%23/g' )" | bash /dev/stdin "$toolset_branch" $server_type $used_modules
+
+after_failure:
+  - curl -X POST --data-urlencode "payload={\"channel\":\"#bots\", \"username\":\"shippable\", \"text\":\"[$SHIPPABLE_REPO_SLUG branch $BRANCH] <$BUILD_URL|Build $SHIPPABLE_BUILD_NUMBER> failed\", \"icon_emoji\":\":monkey_face:\"}" $SLACK_WEB_HOOK_URL
