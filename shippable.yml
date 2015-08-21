@@ -23,4 +23,4 @@ script:
   - env
 
 after_failure:
-  - curl -X POST --data-urlencode "payload={'channel': '#bots', 'username': 'webhookbot', 'text': 'Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH', 'icon_emoji': ':monkey_face:'}" $SLACK_WEB_HOOK_URL
+  - curl -X POST --data-urlencode "payload={'channel':'#bots', 'username':'webhookbot', 'text':'Shippable build failed for project $SHIPPABLE_REPO_SLUG branch $BRANCH', 'icon_emoji':':monkey_face:'}" $SLACK_WEB_HOOK_URL
