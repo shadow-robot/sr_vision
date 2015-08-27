@@ -1,7 +1,8 @@
 #!/usr/bin/env python
 
 import rospy
-from tf2_ros import TransformListener, Buffer, LookupException, ConnectivityException, ExtrapolationException
+from tf2_ros import TransformListener, Buffer, LookupException, \
+    ConnectivityException, ExtrapolationException
 
 
 class CameraTransformConfig(object):
