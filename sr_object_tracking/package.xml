@@ -22,9 +22,11 @@
 
   <build_depend>cv_bridge</build_depend>
   <build_depend>rospy</build_depend>
+  <build_depend>freenect_launch</build_depend>
 
   <run_depend>cv_bridge</run_depend>
   <run_depend>rospy</run_depend>
+  <run_depend>freenect_launch</run_depend>
 
 
 
