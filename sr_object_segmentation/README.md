@@ -12,5 +12,5 @@ The matching is controlled with a threshold parameter which can be set in the la
 ####Usage
 `python shape_creation.py -n [name] -i [image file path]`
 
-Finally, the new shape description file (.npy) has to be specified as parameter in the [launch file](sr_object_tracking/launch/tracking.launch)
+Finally, the new shape description file (.npy) has to be specified as parameter in the [launch file](../sr_object_tracking/launch/tracking.launch)
 
