@@ -30,7 +30,7 @@ You can find the architecture diagram below for a closer look at how this works.
 For the segmentation, different colors are available : red, blue, green, yellow. A custom one can be added with the calibration script (see below for usage). Furthermore, different shape models : circle, rectangle, star, strawberry, banana, leaf. See the segmentation doc to add personnalize shapes.
 
 ### With a Kinect
-`roslaunch sr_object_tracking tracking_kinect.launch color:=<color>`
+`roslaunch sr_object_tracking tracking.launch kinect:=true color:=<color>`
 
 ### With an UVC camera
 `roslaunch sr_object_tracking tracking.launch color:=<color>`
