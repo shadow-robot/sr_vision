@@ -5,7 +5,7 @@
 
 	<arg name="arg" default="-z 2.5 -c 5" doc="Additional arguments as stated in the library. For help arg:=-h. "/>
 
-	<node pkg="sr_recognizer_test" type="recognizer_server" name="recognizer_server" output="screen">
+	<node pkg="sr_recognizer" type="recognizer_server" name="recognizer_server" output="screen">
 		<param name="models_dir" value="$(arg m)" />
                 <param name="config" value="$(arg con)" />
                 <param name="test_file" value="$(arg t)" />

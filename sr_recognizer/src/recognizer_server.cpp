@@ -1,6 +1,8 @@
 ﻿#include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sr_recognizer/RecognizerAction.h>
+#include <sensor_msgs/PointCloud2.h>
+#include <std_msgs/String.h>
 
 #include <v4r/common/miscellaneous.h>  // to extract Pose intrinsically stored in pcd file
 
@@ -18,6 +20,8 @@
 #include <pcl/visualization/cloud_viewer.h>
 
 #include <pcl/io/openni_grabber.h>
+#include <pcl_conversions/pcl_conversions.h>
+
 #include <v4r/apps/ObjectRecognizer.h>
 
 #include <sstream>
@@ -25,9 +29,7 @@
 
 typedef pcl::PointXYZRGB PointT;
 
-// class openNIGrabber is needed to extract a picture from the kinect and store it in a pcl point cloud
-// TODO: creat header file
-//       access kinect via extra node (freenect, openni...)
+
 class openNIGrabber
  {
    public:
@@ -90,6 +92,10 @@ protected:
 
 private:
   std::vector<std::string> arguments;
+  pcl::PointCloud<PointT>::Ptr kinectCloudPtr;
+  std::string topic_;
+  bool KINECT_OK_;
+
 
 public:
 
@@ -104,11 +110,35 @@ public:
   {
   }
 
+  void checkCloudArrive (const sensor_msgs::PointCloud2::ConstPtr& msg)
+  {
+      kinectCloudPtr.reset(new pcl::PointCloud<PointT>());
+      pcl::fromROSMsg (*msg, *kinectCloudPtr);
+      KINECT_OK_ = true;
+  }
+
+  bool checkKinect ()
+  {
+      ros::Subscriber sub_pc = nh_.subscribe (topic_, 1, &RecognizerAction::checkCloudArrive, this);
+      ros::Rate loop_rate (1);
+      size_t kinect_trials_ = 0;
+
+
+      while (!KINECT_OK_ && ros::ok () && kinect_trials_ < 30)
+      {
+          std::cout << "Checking kinect status..." << std::endl;
+          ros::spinOnce ();
+          loop_rate.sleep ();
+          kinect_trials_++;
+      }
+      return KINECT_OK_;
+  }
+
 
   bool initialize() {
 
       std::string models_dir;
-      if( nh_.getParam ( "recognizer_server/models_dir", models_dir ))
+      if( nh_.getParam ( "recognizer_server/models_dir", models_dir )  && !models_dir.empty() )
       {
           arguments.push_back("-m");
           arguments.push_back(models_dir);
@@ -138,18 +168,41 @@ public:
 
   void executeCB(const sr_recognizer::RecognizerGoalConstPtr &goal)
   {
- 
+
       ROS_INFO("Executing");
 
       pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
 
       std::string test_file;
 
-      if(nh_.getParam ( "recognizer_server/test_file", test_file ))
+      if(nh_.getParam ( "recognizer_server/test_file", test_file )  && !test_file.empty() )
           pcl::io::loadPCDFile (test_file, *inputCloudPtr);
       else {
-          openNIGrabber g;
-          g.save2cloud(inputCloudPtr, true);
+
+          if(!nh_.getParam ( "topic", topic_ ))
+          {
+              topic_ = "/camera/depth_registered/points";
+          }
+          std::cout << "Trying to connect to camera on topic " <<
+                       topic_ << ". You can change the topic with param topic or " <<
+                       " test pcd files from a directory by specifying param directory. " << std::endl;
+
+          KINECT_OK_ = false;
+          if ( checkKinect() )
+          {
+
+              std::cout << "Camera (topic: " << topic_ << ") is up and running." << std::endl;
+//              ros::Subscriber sub_pc = nh_->subscribe (topic_, 1, &RecognizerAction::callSvRecognizerUsingCam, this);
+//              ros::spin();
+          }
+          else
+          {
+              std::cerr << "Camera (topic: " << topic_ << ") is not working." << std::endl;
+              return ;
+          }
+
+         // openNIGrabber g;
+         // g.save2cloud(inputCloudPtr, true);
       }
 
       std::string recognizer_config;
@@ -164,7 +217,9 @@ public:
    //v.cloudPublicPtr->sensor_orientation_ = Eigen::Quaternionf::Identity();
    //v.cloudPublicPtr->sensor_origin_ = Eigen::Vector4f::Zero(4);
 
-   
+
+      inputCloudPtr = kinectCloudPtr;
+      pcl::io::savePCDFile ("/home/thomas/DA/test_pcd.pcd", *inputCloudPtr, 1);
 
       std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = r.recognize(inputCloudPtr);
 
