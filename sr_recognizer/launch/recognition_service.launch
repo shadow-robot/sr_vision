@@ -1,7 +1,7 @@
 <launch>
 	<arg name="m" default="/home/user/shared_docker_host/data/models_2opt" doc="Models directory"  />
         <arg name="con" default="$(find sr_recognizer)cfg/multipipeline_config.xml" doc="Recognizer config file"  />
-        <arg name="t" default="/home/user/shared_docker_host/data/scenes_test/photo1.pcd" doc="Test file"  />
+        <arg name="t" default="" doc="Test file"  />
 
 	<arg name="arg" default="-z 2.5 -c 5" doc="Additional arguments as stated in the library. For help arg:=-h. "/>
 

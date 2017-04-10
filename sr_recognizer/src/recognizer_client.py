@@ -9,7 +9,7 @@ import actionlib
 
 # Brings in the messages used by the fibonacci action, including the
 # goal message and the result message.
-import recognizer.msg
+import sr_recognizer.msg
 
 def recognizer_client():
     # Creates the SimpleActionClient, passing the type of the action
