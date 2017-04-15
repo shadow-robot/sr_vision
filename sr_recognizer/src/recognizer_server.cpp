@@ -47,28 +47,20 @@ bool RecognizerROS::initialize() {
     }
 
 
-    std::cout << "Initializing recognizer with: " << std::endl;
-    for( auto arg : arguments )
-        std::cout << arg << " ";
-    std::cout << std::endl;
-
     std::string recognizer_config;
     nh_.getParam ( "recognizer_server/config", recognizer_config);
 
     v4r::apps::ObjectRecognizerParameter param(recognizer_config);
-    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
-    rec->initialize(arguments);
+    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
 
-    std::cout << "Initialized recognizer with: " << std::endl;
-    for( auto arg : arguments )
-        std::cout << arg << " ";
-    std::cout << std::endl;
+    //rec->initialize(arguments); TODO: doesnt work here, find out why
 
     return true;
 }
 
 void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal)
 {
+    static bool init = true;
 
     ROS_INFO("Executing");
 
@@ -102,6 +94,18 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         inputCloudPtr = kinectCloudPtr;
     }
 
+    if(init) { //work around
+      std::cout << "Initialized recognizer with: " << std::endl;
+    	for( auto arg : arguments )
+        	std::cout << arg << " ";
+    		std::cout << std::endl;
+
+      rec->initialize(arguments);
+      init = false;
+    }
+
+    
+	
     //pcl::io::savePCDFile ("/home/thomas/DA/test_pcd.pcd", *inputCloudPtr, 1);
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
 
