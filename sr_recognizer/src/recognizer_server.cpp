@@ -38,6 +38,43 @@ bool RecognizerROS::initialize() {
         return false;
     }
 
+	std::string hv_config_xml;
+        if( nh_.getParam ( "recognizer_server/hv_config_xml", hv_config_xml ) )
+        {
+            arguments.push_back("--hv_config_xml");
+            arguments.push_back(hv_config_xml);
+        }
+        std::string sift_config_xml;
+        if( nh_.getParam ( "recognizer_server/sift_config_xml", sift_config_xml ) )
+        {
+            arguments.push_back("--sift_config_xml");
+            arguments.push_back(sift_config_xml);
+        }
+        std::string shot_config_xml;
+        if( nh_.getParam ( "recognizer_server/shot_config_xml", shot_config_xml ) )
+        {
+            arguments.push_back("--shot_config_xml");
+            arguments.push_back(shot_config_xml);
+        }
+        std::string esf_config_xml;
+        if( nh_.getParam ( "recognizer_server/esf_config_xml", esf_config_xml ) )
+        {
+            arguments.push_back("--esf_config_xml");
+            arguments.push_back(esf_config_xml);
+        }
+        std::string alexnet_config_xml;
+        if( nh_.getParam ( "recognizer_server/alexnet_config_xml", alexnet_config_xml ) )
+        {
+            arguments.push_back("--alexnet_config_xml");
+            arguments.push_back(alexnet_config_xml);
+        }
+        std::string camera_xml;
+        if( nh_.getParam ( "recognizer_server/camera_xml", camera_xml ) )
+        {
+            arguments.push_back("--camera_xml");
+            arguments.push_back(camera_xml);
+        }
+
     std::string additional_arguments;
     if( nh_.getParam ( "recognizer_server/arg", additional_arguments ) )
     {
@@ -48,12 +85,20 @@ bool RecognizerROS::initialize() {
 
 
     std::string recognizer_config;
-    nh_.getParam ( "recognizer_server/config", recognizer_config);
+    nh_.getParam ( "recognizer_server/multipipeline_config_xml", recognizer_config);
+
+	std::cout << recognizer_config << std::endl;
+
+	 std::cout << "Initialized recognizer with: " << std::endl;
+    	for( auto arg : arguments ) {
+        	std::cout << arg << " ";
+    		std::cout << std::endl;
+	}
 
     v4r::apps::ObjectRecognizerParameter param(recognizer_config);
     rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
 
-    //rec->initialize(arguments); TODO: doesnt work here, find out why
+    //rec->initialize(arguments); //TODO: doesnt work here, find out why
 
     return true;
 }
@@ -95,20 +140,23 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     }
 
     if(init) { //work around
+
+      rec->initialize(arguments);
       std::cout << "Initialized recognizer with: " << std::endl;
     	for( auto arg : arguments )
         	std::cout << arg << " ";
     		std::cout << std::endl;
 
-      rec->initialize(arguments);
+      
       init = false;
     }
 
     
-	
+    std::cout << "Start Reocognition" << std::endl;
     //pcl::io::savePCDFile ("/home/thomas/DA/test_pcd.pcd", *inputCloudPtr, 1);
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
-
+    std::cout << "Finished Reocognition" << std::endl;
+    
     result_.ids.clear();
     result_.transforms.clear();
 
