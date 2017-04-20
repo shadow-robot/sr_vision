@@ -1,12 +1,10 @@
 #!/usr/bin/env python
-
-PKG = 'sr_point_cloud'
-
 import unittest
 import rospy
 from sr_grasp_msgs.srv import PclTransform, PclFilter
 from sensor_msgs.msg import PointCloud2
 
+PKG = 'sr_point_cloud'
 
 class TestCloudServices(unittest.TestCase):
     def setUp(self):
