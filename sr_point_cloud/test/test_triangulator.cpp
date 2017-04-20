@@ -23,7 +23,7 @@ void done_cb(const actionlib::SimpleClientGoalState& state,
   ROS_INFO("Finished in state [%s]", state.toString().c_str());
 
   const pcl_msgs::PolygonMesh &pcl_mesh = result->pcl_mesh;
-  const shape_msgs::Mesh &shape_mesh =result-> shape_mesh;
+  const shape_msgs::Mesh &shape_mesh = result-> shape_mesh;
 
   EXPECT_GT(pcl_mesh.polygons.size(), 0);
   EXPECT_GT(shape_mesh.triangles.size(), 0);
