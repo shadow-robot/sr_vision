@@ -7,6 +7,7 @@ from sensor_msgs.msg import PointCloud2, RegionOfInterest
 PKG = 'sr_point_cloud'
 NAME = 'test_cloud_tracker'
 
+
 class TestCloudCropping(unittest.TestCase):
     # Util methods
     ###############

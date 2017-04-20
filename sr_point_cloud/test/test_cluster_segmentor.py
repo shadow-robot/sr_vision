@@ -6,6 +6,7 @@ from object_recognition_msgs.msg import *
 
 PKG = 'sr_point_cloud'
 
+
 class TestClusterSegmentor(unittest.TestCase):
     def test_recognise_action(self):
         """Test starting tracker on centered object."""

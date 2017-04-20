@@ -13,6 +13,7 @@ from sr_point_cloud.msg import *
 PKG = 'sr_point_cloud'
 NAME = 'test_cloud_tracker'
 
+
 class TestCloudTracker(unittest.TestCase):
     # Util methods
     ###############
