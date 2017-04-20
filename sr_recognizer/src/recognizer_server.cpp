@@ -1,4 +1,4 @@
-﻿/* Copyright 2017 ShadowRobot */
+/* Copyright 2017 ShadowRobot */
 
 #include "recognizer/recognizer_ros.h"
 #include <vector>
@@ -16,7 +16,6 @@ bool RecognizerROS::checkKinect()
     ros::Subscriber sub_pc = nh_.subscribe(topic_, 1, &RecognizerROS::checkCloudArrive, this);
     ros::Rate loop_rate(1);
     size_t kinect_trials_ = 0;
-
 
     while (!KINECT_OK_ && ros::ok () && kinect_trials_ < 30)
     {
@@ -42,6 +41,43 @@ bool RecognizerROS::initialize()
         return false;
     }
 
+	std::string hv_config_xml;
+        if( nh_.getParam ( "recognizer_server/hv_config_xml", hv_config_xml ) )
+        {
+            arguments.push_back("--hv_config_xml");
+            arguments.push_back(hv_config_xml);
+        }
+        std::string sift_config_xml;
+        if( nh_.getParam ( "recognizer_server/sift_config_xml", sift_config_xml ) )
+        {
+            arguments.push_back("--sift_config_xml");
+            arguments.push_back(sift_config_xml);
+        }
+        std::string shot_config_xml;
+        if( nh_.getParam ( "recognizer_server/shot_config_xml", shot_config_xml ) )
+        {
+            arguments.push_back("--shot_config_xml");
+            arguments.push_back(shot_config_xml);
+        }
+        std::string esf_config_xml;
+        if( nh_.getParam ( "recognizer_server/esf_config_xml", esf_config_xml ) )
+        {
+            arguments.push_back("--esf_config_xml");
+            arguments.push_back(esf_config_xml);
+        }
+        std::string alexnet_config_xml;
+        if( nh_.getParam ( "recognizer_server/alexnet_config_xml", alexnet_config_xml ) )
+        {
+            arguments.push_back("--alexnet_config_xml");
+            arguments.push_back(alexnet_config_xml);
+        }
+        std::string camera_xml;
+        if( nh_.getParam ( "recognizer_server/camera_xml", camera_xml ) )
+        {
+            arguments.push_back("--camera_xml");
+            arguments.push_back(camera_xml);
+        }
+
     std::string additional_arguments;
     if (nh_.getParam ( "recognizer_server/arg", additional_arguments))
     {
@@ -50,29 +86,27 @@ bool RecognizerROS::initialize()
         arguments.insert(arguments.end(), strs.begin(), strs.end());
     }
 
-
-    std::cout << "Initializing recognizer with: " << std::endl;
-    for (auto arg : arguments)
-        std::cout << arg << " ";
-    std::cout << std::endl;
-
     std::string recognizer_config;
-    nh_.getParam("recognizer_server/config", recognizer_config);
-
-    v4r::apps::ObjectRecognizerParameter param(recognizer_config);
-    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
-    rec->initialize(arguments);
+    nh_.getParam ( "recognizer_server/multipipeline_config_xml", recognizer_config);
 
     std::cout << "Initialized recognizer with: " << std::endl;
-    for (auto arg : arguments)
-        std::cout << arg << " ";
-    std::cout << std::endl;
+    std::cout << "--multipipeline_config_xml" << std::endl;
+    std::cout << recognizer_config << std::endl;
+    for( auto arg : arguments ) {
+       std::cout << arg << " ";
+       std::cout << std::endl;
+    }
+
+    v4r::apps::ObjectRecognizerParameter param(recognizer_config);
+    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
 
     return true;
 }
 
 void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal)
 {
+    static bool init = true;
+
     ROS_INFO("Executing");
 
     pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
@@ -105,9 +139,17 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         inputCloudPtr = kinectCloudPtr;
     }
 
-    //  pcl::io::savePCDFile ("/home/thomas/DA/test_pcd.pcd", *inputCloudPtr, 1);
+    if(init) { //work around
+      rec->initialize(arguments);
+      init = false;
+    }
+
+    std::cout << "Start Reocognition" << std::endl;
+
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
 
+    std::cout << "Finished Reocognition" << std::endl;
+    
     result_.ids.clear();
     result_.transforms.clear();
 
@@ -138,7 +180,6 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     ROS_INFO("%s: Succeeded", action_name_.c_str());
     as_.setSucceeded(result_);
 }  //  end recognizer_cb
-
 
 int main(int argc, char** argv)
 {
