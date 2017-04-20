@@ -1,4 +1,6 @@
-﻿#include "recognizer/recognizer_ros.h"
+﻿/* Copyright 2017 ShadowRobot */
+
+#include "recognizer/recognizer_ros.h"
 #include <vector>
 #include <string>
 
@@ -124,7 +126,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         tt.translation.y = trans(1, 3);
         tt.translation.z = trans(2, 3);
 
-        Eigen::Matrix3f rotation = trans.block<3, 3>(0,0);
+        Eigen::Matrix3f rotation = trans.block<3, 3>(0, 0);
         Eigen::Quaternionf q(rotation);
         tt.rotation.x = q.x();
         tt.rotation.y = q.y();
@@ -135,7 +137,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 
     ROS_INFO("%s: Succeeded", action_name_.c_str());
     as_.setSucceeded(result_);
-} //  end recognizer_cb
+}  //  end recognizer_cb
 
 
 int main(int argc, char** argv)

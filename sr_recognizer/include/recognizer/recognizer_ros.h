@@ -1,3 +1,8 @@
+/* Copyright 2017 ShadowRobot */
+
+#ifndef RECOGNIZER_RECOGNIZER_ROS_H
+#define RECOGNIZER_RECOGNIZER_ROS_H
+
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sr_recognizer/RecognizerAction.h>
@@ -36,7 +41,7 @@ private:
     bool KINECT_OK_;
 
 public:
-    RecognizerROS(std::string name):
+    explicit RecognizerROS(std::string name):
         as_(nh_, name, boost::bind(&RecognizerROS::recognize_cb, this, _1), false),
         action_name_(name)
     {
@@ -53,4 +58,4 @@ public:
     void recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal);
 };
 
-
+#endif
