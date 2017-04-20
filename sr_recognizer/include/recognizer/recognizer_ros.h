@@ -58,4 +58,4 @@ public:
     void recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal);
 };
 
-#endif
+#endif  // RECOGNIZER_RECOGNIZER_ROS_H
