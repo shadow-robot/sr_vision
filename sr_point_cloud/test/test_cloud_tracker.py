@@ -1,8 +1,4 @@
 #!/usr/bin/env python
-
-PKG = 'sr_point_cloud'
-NAME = 'test_cloud_tracker'
-
 import os
 import unittest
 import rospy
@@ -13,6 +9,9 @@ import actionlib
 from sensor_msgs.msg import *
 from geometry_msgs.msg import *
 from sr_point_cloud.msg import *
+
+PKG = 'sr_point_cloud'
+NAME = 'test_cloud_tracker'
 
 
 class TestCloudTracker(unittest.TestCase):
