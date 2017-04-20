@@ -34,8 +34,8 @@ private:
     sr_recognizer::RecognizerFeedback feedback_;
     sr_recognizer::RecognizerResult result_;
 
-    boost::shared_ptr<v4r::apps::ObjectRecognizer<PointT>> rec;
-    std::vector<std::string> arguments;
+    
+    
     pcl::PointCloud<PointT>::Ptr kinectCloudPtr;
     std::string topic_;
     bool KINECT_OK_;
@@ -52,8 +52,11 @@ public:
     {
     }
 
-    void checkCloudArrive(const sensor_msgs::PointCloud2::ConstPtr& msg);
-    bool checkKinect();
+    std::vector<std::string> arguments;
+    boost::shared_ptr<v4r::apps::ObjectRecognizer<PointT>> rec;
+
+    void checkCloudArrive (const sensor_msgs::PointCloud2::ConstPtr& msg);
+    bool checkKinect ();
     bool initialize();
     void recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal);
 };
