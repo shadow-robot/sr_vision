@@ -14,9 +14,8 @@
 		<item>2208</item>
 	</global_feature_types_>
 	<classification_methods_>
-		<count>1</count>
+		<count>0</count>
 		<item_version>0</item_version>
-		<item>2</item>
 	</classification_methods_>
 	<shot_keypoint_extractor_method_>1</shot_keypoint_extractor_method_>
 	<normal_computation_method_>2</normal_computation_method_>

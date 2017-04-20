@@ -13,7 +13,6 @@ bool RecognizerROS::checkKinect ()
     ros::Rate loop_rate (1);
     size_t kinect_trials_ = 0;
 
-
     while (!KINECT_OK_ && ros::ok () && kinect_trials_ < 30)
     {
         std::cout << "Checking kinect status..." << std::endl;
@@ -83,22 +82,19 @@ bool RecognizerROS::initialize() {
         arguments.insert( arguments.end(), strs.begin(), strs.end() );
     }
 
-
     std::string recognizer_config;
     nh_.getParam ( "recognizer_server/multipipeline_config_xml", recognizer_config);
 
-	std::cout << recognizer_config << std::endl;
-
-	 std::cout << "Initialized recognizer with: " << std::endl;
-    	for( auto arg : arguments ) {
-        	std::cout << arg << " ";
-    		std::cout << std::endl;
-	}
+    std::cout << "Initialized recognizer with: " << std::endl;
+    std::cout << "--multipipeline_config_xml" << std::endl;
+    std::cout << recognizer_config << std::endl;
+    for( auto arg : arguments ) {
+       std::cout << arg << " ";
+       std::cout << std::endl;
+    }
 
     v4r::apps::ObjectRecognizerParameter param(recognizer_config);
     rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
-
-    //rec->initialize(arguments); //TODO: doesnt work here, find out why
 
     return true;
 }
@@ -140,19 +136,14 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     }
 
     if(init) { //work around
-
       rec->initialize(arguments);
-      std::cout << "Initialized recognizer with: " << std::endl;
-    	for( auto arg : arguments )
-        	std::cout << arg << " ";
-    		std::cout << std::endl;
       init = false;
     }
 
-    
     std::cout << "Start Reocognition" << std::endl;
     
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
+
     std::cout << "Finished Reocognition" << std::endl;
     
     result_.ids.clear();
@@ -186,7 +177,6 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     as_.setSucceeded(result_);
 
 } //end recognizer_cb
-
 
 int main(int argc, char** argv)
 {
