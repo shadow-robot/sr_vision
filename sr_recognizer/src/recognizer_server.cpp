@@ -146,14 +146,12 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     	for( auto arg : arguments )
         	std::cout << arg << " ";
     		std::cout << std::endl;
-
-      
       init = false;
     }
 
     
     std::cout << "Start Reocognition" << std::endl;
-    //pcl::io::savePCDFile ("/home/thomas/DA/test_pcd.pcd", *inputCloudPtr, 1);
+    
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
     std::cout << "Finished Reocognition" << std::endl;
     
