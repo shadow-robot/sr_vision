@@ -6,6 +6,7 @@ from sensor_msgs.msg import PointCloud2
 
 PKG = 'sr_point_cloud'
 
+
 class TestCloudServices(unittest.TestCase):
     def setUp(self):
         self.messages = []
