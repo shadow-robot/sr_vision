@@ -1,11 +1,10 @@
 #!/usr/bin/env python
-
-PKG = 'sr_point_cloud'
-
 import unittest
 import rospy
 import actionlib
 from object_recognition_msgs.msg import *
+
+PKG = 'sr_point_cloud'
 
 
 class TestClusterSegmentor(unittest.TestCase):

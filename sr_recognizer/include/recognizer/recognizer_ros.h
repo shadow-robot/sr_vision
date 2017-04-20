@@ -1,3 +1,8 @@
+/* Copyright 2017 ShadowRobot */
+
+#ifndef RECOGNIZER_RECOGNIZER_ROS_H
+#define RECOGNIZER_RECOGNIZER_ROS_H
+
 #include <ros/ros.h>
 #include <actionlib/server/simple_action_server.h>
 #include <sr_recognizer/RecognizerAction.h>
@@ -5,6 +10,8 @@
 #include <std_msgs/String.h>
 
 #include <iostream>
+#include <vector>
+#include <string>
 
 #include <pcl/point_cloud.h>
 #include <pcl/point_types.h>
@@ -20,9 +27,8 @@ typedef pcl::PointXYZRGB PointT;
 class RecognizerROS
 {
 private:
-
-    ros::NodeHandle nh_;
-    actionlib::SimpleActionServer<sr_recognizer::RecognizerAction> as_; // NodeHandle instance must be created before this line. Otherwise strange error occurs.
+    ros::NodeHandle nh_;  // NodeHandle instance must be created before next line. Otherwise strange error occurs.
+    actionlib::SimpleActionServer<sr_recognizer::RecognizerAction> as_;
     std::string action_name_;
     // create messages that are used to published feedback/result
     sr_recognizer::RecognizerFeedback feedback_;
@@ -35,7 +41,7 @@ private:
     bool KINECT_OK_;
 
 public:
-    RecognizerROS(std::string name) :
+    explicit RecognizerROS(std::string name):
         as_(nh_, name, boost::bind(&RecognizerROS::recognize_cb, this, _1), false),
         action_name_(name)
     {
@@ -46,11 +52,10 @@ public:
     {
     }
 
-    void checkCloudArrive (const sensor_msgs::PointCloud2::ConstPtr& msg);
-    bool checkKinect ();
+    void checkCloudArrive(const sensor_msgs::PointCloud2::ConstPtr& msg);
+    bool checkKinect();
     bool initialize();
     void recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal);
-
 };
 
-
+#endif  // RECOGNIZER_RECOGNIZER_ROS_H
