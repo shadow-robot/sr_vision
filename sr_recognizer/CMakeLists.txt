@@ -59,15 +59,3 @@ add_dependencies(
   ${sr_recognizer_EXPORTED_TARGETS}
 )
 
-add_executable(recognizer_client src/recognizer_client.cpp)
-
-target_link_libraries( 
-  recognizer_client
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  recognizer_client
-  ${sr_recognizer_EXPORTED_TARGETS}
-)
-
