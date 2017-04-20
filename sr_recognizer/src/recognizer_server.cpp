@@ -1,32 +1,36 @@
-﻿#include "recognizer/recognizer_ros.h"
+/* Copyright 2017 ShadowRobot */
 
-void RecognizerROS::checkCloudArrive (const sensor_msgs::PointCloud2::ConstPtr& msg)
+#include "recognizer/recognizer_ros.h"
+#include <vector>
+#include <string>
+
+void RecognizerROS::checkCloudArrive(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
     kinectCloudPtr.reset(new pcl::PointCloud<PointT>());
-    pcl::fromROSMsg (*msg, *kinectCloudPtr);
+    pcl::fromROSMsg(*msg, *kinectCloudPtr);
     KINECT_OK_ = true;
 }
 
-bool RecognizerROS::checkKinect ()
+bool RecognizerROS::checkKinect()
 {
-    ros::Subscriber sub_pc = nh_.subscribe (topic_, 1, &RecognizerROS::checkCloudArrive, this);
-    ros::Rate loop_rate (1);
+    ros::Subscriber sub_pc = nh_.subscribe(topic_, 1, &RecognizerROS::checkCloudArrive, this);
+    ros::Rate loop_rate(1);
     size_t kinect_trials_ = 0;
 
     while (!KINECT_OK_ && ros::ok () && kinect_trials_ < 30)
     {
         std::cout << "Checking kinect status..." << std::endl;
-        ros::spinOnce ();
-        loop_rate.sleep ();
+        ros::spinOnce();
+        loop_rate.sleep();
         kinect_trials_++;
     }
     return KINECT_OK_;
 }
 
-bool RecognizerROS::initialize() {
-
+bool RecognizerROS::initialize()
+{
     std::string models_dir;
-    if( nh_.getParam ( "recognizer_server/models_dir", models_dir )  && !models_dir.empty() )
+    if (nh_.getParam("recognizer_server/models_dir", models_dir)  && !models_dir.empty())
     {
         arguments.push_back("-m");
         arguments.push_back(models_dir);
@@ -75,11 +79,11 @@ bool RecognizerROS::initialize() {
         }
 
     std::string additional_arguments;
-    if( nh_.getParam ( "recognizer_server/arg", additional_arguments ) )
+    if (nh_.getParam ( "recognizer_server/arg", additional_arguments))
     {
         std::vector<std::string> strs;
-        boost::split( strs, additional_arguments, boost::is_any_of("\t ") );
-        arguments.insert( arguments.end(), strs.begin(), strs.end() );
+        boost::split(strs, additional_arguments, boost::is_any_of("\t "));
+        arguments.insert(arguments.end(), strs.begin(), strs.end());
     }
 
     std::string recognizer_config;
@@ -107,13 +111,13 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 
     pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
 
-    //if path in the launch file for test_file is set, Recognizer uses the .pcd file instead the Kinect
+    //  if path in the launch file for test_file is set, Recognizer uses the .pcd file instead the Kinect
     std::string test_file;
-    if(nh_.getParam ( "recognizer_server/test_file", test_file )  && !test_file.empty() )
-        pcl::io::loadPCDFile (test_file, *inputCloudPtr);
-    else {
-
-        if(!nh_.getParam ( "topic", topic_ ))
+    if (nh_.getParam ("recognizer_server/test_file", test_file )  && !test_file.empty())
+        pcl::io::loadPCDFile(test_file, *inputCloudPtr);
+    else
+    {
+        if (!nh_.getParam ("topic", topic_ ))
         {
             topic_ = "/camera/depth_registered/points";
         }
@@ -129,7 +133,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         else
         {
             std::cerr << "Camera (topic: " << topic_ << ") is not working." << std::endl;
-            return ;
+            return;
         }
 
         inputCloudPtr = kinectCloudPtr;
@@ -141,7 +145,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     }
 
     std::cout << "Start Reocognition" << std::endl;
-    
+
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
 
     std::cout << "Finished Reocognition" << std::endl;
@@ -149,7 +153,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     result_.ids.clear();
     result_.transforms.clear();
 
-    for(size_t m_id=0; m_id<ohs.size(); m_id++)
+    for (size_t m_id = 0; m_id < ohs.size(); m_id++)
     {
         std::cout << "************   " << ohs[m_id]->model_id_ << "   ************" << std::endl
                   << ohs[m_id]->transform_ << std::endl << std::endl;
@@ -160,11 +164,11 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 
         Eigen::Matrix4f trans = ohs[m_id]->transform_;
         geometry_msgs::Transform tt;
-        tt.translation.x = trans(0,3);
-        tt.translation.y = trans(1,3);
-        tt.translation.z = trans(2,3);
+        tt.translation.x = trans(0, 3);
+        tt.translation.y = trans(1, 3);
+        tt.translation.z = trans(2, 3);
 
-        Eigen::Matrix3f rotation = trans.block<3,3>(0,0);
+        Eigen::Matrix3f rotation = trans.block<3, 3>(0, 0);
         Eigen::Quaternionf q(rotation);
         tt.rotation.x = q.x();
         tt.rotation.y = q.y();
@@ -175,12 +179,11 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 
     ROS_INFO("%s: Succeeded", action_name_.c_str());
     as_.setSucceeded(result_);
-
-} //end recognizer_cb
+}  //  end recognizer_cb
 
 int main(int argc, char** argv)
 {
-    ros::init (argc, argv, "recognizer_server");
+    ros::init(argc, argv, "recognizer_server");
     RecognizerROS recognizer("recognizer");
 
     recognizer.initialize();
