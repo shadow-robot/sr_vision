@@ -98,7 +98,7 @@ bool RecognizerROS::initialize()
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
     std::cout << recognizer_config << std::endl;
-    for(auto arg : arguments)
+    for (auto arg : arguments)
     {
        std::cout << arg << " ";
        std::cout << std::endl;
