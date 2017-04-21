@@ -9,7 +9,7 @@
 	<arg name="alexnet_config_xml" default="$(find sr_recognizer)/cfg/alexnet_config.xml" doc="Filename of Alexnet XML configuration file"/>
 	<arg name="camera_xml" default="$(find sr_recognizer)/cfg/camera.xml" doc="Filename of Camera Parameter XML configuration file"/>
 file"/>
-	<arg name="arg" default="-z 3.0 -c 5 -g 0.01 -v" doc="Additional arguments as stated in the library. For help arg:=-h. "/>
+	<arg name="arg" default="-z 3.0 -c 5 -g 0.01" doc="Additional arguments as stated in the library. For help arg:=-h. "/>
 
 	<node pkg="sr_recognizer" type="recognizer_server" name="recognizer_server" output="screen">
 		<param name="models_dir" value="$(arg m)" />
