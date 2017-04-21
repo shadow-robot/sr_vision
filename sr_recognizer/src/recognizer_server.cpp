@@ -76,7 +76,7 @@ bool RecognizerROS::initialize()
         arguments.push_back("--alexnet_config_xml");
         arguments.push_back(alexnet_config_xml);
     }
-    
+
     std::string camera_xml;
     if (nh_.getParam("recognizer_server/camera_xml", camera_xml))
     {
