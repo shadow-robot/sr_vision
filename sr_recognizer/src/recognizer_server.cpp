@@ -42,42 +42,47 @@ bool RecognizerROS::initialize()
         return false;
     }
 
-	std::string hv_config_xml;
-        if(nh_.getParam("recognizer_server/hv_config_xml", hv_config_xml))
-        {
-            arguments.push_back("--hv_config_xml");
-            arguments.push_back(hv_config_xml);
-        }
-        std::string sift_config_xml;
-        if(nh_.getParam("recognizer_server/sift_config_xml", sift_config_xml))
-        {
-            arguments.push_back("--sift_config_xml");
-            arguments.push_back(sift_config_xml);
-        }
-        std::string shot_config_xml;
-        if(nh_.getParam("recognizer_server/shot_config_xml", shot_config_xml))
-        {
-            arguments.push_back("--shot_config_xml");
-            arguments.push_back(shot_config_xml);
-        }
-        std::string esf_config_xml;
-        if(nh_.getParam("recognizer_server/esf_config_xml", esf_config_xml))
-        {
-            arguments.push_back("--esf_config_xml");
-            arguments.push_back(esf_config_xml);
-        }
-        std::string alexnet_config_xml;
-        if(nh_.getParam("recognizer_server/alexnet_config_xml", alexnet_config_xml))
-        {
-            arguments.push_back("--alexnet_config_xml");
-            arguments.push_back(alexnet_config_xml);
-        }
-        std::string camera_xml;
-        if(nh_.getParam("recognizer_server/camera_xml", camera_xml))
-        {
-            arguments.push_back("--camera_xml");
-            arguments.push_back(camera_xml);
-        }
+    std::string hv_config_xml;
+    if (nh_.getParam("recognizer_server/hv_config_xml", hv_config_xml))
+    {
+        arguments.push_back("--hv_config_xml");
+        arguments.push_back(hv_config_xml);
+    }
+
+    std::string sift_config_xml;
+    if (nh_.getParam("recognizer_server/sift_config_xml", sift_config_xml))
+    {
+        arguments.push_back("--sift_config_xml");
+        arguments.push_back(sift_config_xml);
+    }
+
+    std::string shot_config_xml;
+    if (nh_.getParam("recognizer_server/shot_config_xml", shot_config_xml))
+    {
+        arguments.push_back("--shot_config_xml");
+        arguments.push_back(shot_config_xml);
+    }
+
+    std::string esf_config_xml;
+    if (nh_.getParam("recognizer_server/esf_config_xml", esf_config_xml))
+    {
+        arguments.push_back("--esf_config_xml");
+        arguments.push_back(esf_config_xml);
+    }
+
+    std::string alexnet_config_xml;
+    if (nh_.getParam("recognizer_server/alexnet_config_xml", alexnet_config_xml))
+    {
+        arguments.push_back("--alexnet_config_xml");
+        arguments.push_back(alexnet_config_xml);
+    }
+    
+    std::string camera_xml;
+    if (nh_.getParam("recognizer_server/camera_xml", camera_xml))
+    {
+        arguments.push_back("--camera_xml");
+        arguments.push_back(camera_xml);
+    }
 
     std::string additional_arguments;
     if (nh_.getParam("recognizer_server/arg", additional_arguments))
@@ -93,14 +98,14 @@ bool RecognizerROS::initialize()
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
     std::cout << recognizer_config << std::endl;
-    for(auto arg : arguments) 
+    for(auto arg : arguments)
     {
        std::cout << arg << " ";
        std::cout << std::endl;
     }
 
     v4r::apps::ObjectRecognizerParameter param(recognizer_config);
-    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
+    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
 
     return true;
 }
@@ -141,7 +146,8 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         inputCloudPtr = kinectCloudPtr;
     }
 
-    if(init) { //work around
+    if (init)
+    {  //  work around
       rec->initialize(arguments);
       init = false;
     }
@@ -151,7 +157,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
 
     std::cout << "Finished Reocognition" << std::endl;
-    
+
     result_.ids.clear();
     result_.transforms.clear();
 
