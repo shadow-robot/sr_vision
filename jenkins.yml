@@ -4,8 +4,8 @@ settings:
   ros:
     release: indigo
   docker:
-    image: shadowrobot/build-tools
-    tag: trusty-indigo
+    image: shadowrobot/dexterous-hand
+    tag: recognizer
   toolset:
     template_job_name: template_unit_tests_and_code_coverage
     modules:
