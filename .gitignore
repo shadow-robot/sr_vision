@@ -32,7 +32,3 @@
 
 #PyCharm
 .idea
-
-sr_recognizer/CMakeLists_debug\.txt
-
-sr_recognizer/src/recognizer_client\.cpp
