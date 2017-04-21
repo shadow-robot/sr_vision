@@ -24,7 +24,6 @@ bool RecognizerROS::checkKinect()
         loop_rate.sleep();
         kinect_trials_++;
     }
-
     return KINECT_OK_;
 }
 
@@ -98,6 +97,7 @@ bool RecognizerROS::initialize()
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
     std::cout << recognizer_config << std::endl;
+    
     for (auto arg : arguments)
     {
        std::cout << arg << " ";
@@ -106,16 +106,14 @@ bool RecognizerROS::initialize()
 
     v4r::apps::ObjectRecognizerParameter param(recognizer_config);
     rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
-
+    
     return true;
 }
 
 void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &goal)
 {
     static bool init = true;
-
     ROS_INFO("Executing");
-
     pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
 
     //  if path in the launch file for test_file is set, Recognizer uses the .pcd file instead the Kinect
@@ -131,7 +129,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         std::cout << "Trying to connect to camera on topic " <<
                      topic_ << ". You can change the topic with param topic or " <<
                      " test pcd files from a directory by specifying param directory. " << std::endl;
-
+                     
         KINECT_OK_ = false;
         if (checkKinect())
         {
@@ -142,12 +140,11 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
             std::cerr << "Camera (topic: " << topic_ << ") is not working." << std::endl;
             return;
         }
-
         inputCloudPtr = kinectCloudPtr;
     }
 
     if (init)
-    {  //  work around
+    {
       rec->initialize(arguments);
       init = false;
     }
@@ -187,7 +184,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 
     ROS_INFO("%s: Succeeded", action_name_.c_str());
     as_.setSucceeded(result_);
-}  //  end recognizer_cb
+}
 
 int main(int argc, char** argv)
 {
