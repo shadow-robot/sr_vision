@@ -4,7 +4,6 @@ int32 start
 #result definition
 std_msgs/String[] ids
 geometry_msgs/Transform[] transforms
-
 ---
 #feedback
 std_msgs/String[] ids
