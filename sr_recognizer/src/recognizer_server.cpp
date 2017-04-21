@@ -97,7 +97,7 @@ bool RecognizerROS::initialize()
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
     std::cout << recognizer_config << std::endl;
-    
+
     for (auto arg : arguments)
     {
        std::cout << arg << " ";
@@ -106,7 +106,7 @@ bool RecognizerROS::initialize()
 
     v4r::apps::ObjectRecognizerParameter param(recognizer_config);
     rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
-    
+
     return true;
 }
 
@@ -129,7 +129,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         std::cout << "Trying to connect to camera on topic " <<
                      topic_ << ". You can change the topic with param topic or " <<
                      " test pcd files from a directory by specifying param directory. " << std::endl;
-                     
+
         KINECT_OK_ = false;
         if (checkKinect())
         {
