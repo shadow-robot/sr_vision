@@ -21,7 +21,7 @@ trunks:
       ros:
         release: kinetic
       docker:
-        tag: xenial-kinetic
+        tag: recognizer
 
 branch:
   parent: kinetic-devel
