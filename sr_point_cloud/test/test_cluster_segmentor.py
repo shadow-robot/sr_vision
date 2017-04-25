@@ -11,7 +11,7 @@ class TestClusterSegmentor(unittest.TestCase):
     def test_recognise_action(self):
         """Test starting tracker on centered object."""
         # Send goal to the action server
-        timeout = rospy.Duration.from_sec(20.0)
+        timeout = rospy.Duration.from_sec(180.0)
         client = actionlib.SimpleActionClient(
             'cluster_segmentor/recognize_objects', ObjectRecognitionAction)
         goal = ObjectRecognitionGoal()
