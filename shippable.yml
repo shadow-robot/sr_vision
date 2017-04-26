@@ -8,8 +8,8 @@ env:
 
 build:
   pre_ci_boot:
-    image_name: shadowrobot/build-tools
-    image_tag: xenial-kinetic
+    image_name: shadowrobot/dexterous-hand
+    image_tag: recognizer
     pull: true
   ci:
     - sudo apt-get update
