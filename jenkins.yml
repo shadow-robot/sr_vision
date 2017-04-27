@@ -4,8 +4,8 @@ settings:
   ros:
     release: indigo
   docker:
-    image: shadowrobot/dexterous-hand
-    tag: recognizer
+    image: shadowrobot/build-tools
+    tag: trusty-indigo
   toolset:
     template_job_name: template_unit_tests_and_code_coverage
     modules:
@@ -21,6 +21,7 @@ trunks:
       ros:
         release: kinetic
       docker:
+        image: shadowrobot/dexterous-hand
         tag: recognizer
 
 branch:
