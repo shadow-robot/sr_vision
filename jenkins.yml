@@ -21,7 +21,8 @@ trunks:
       ros:
         release: kinetic
       docker:
-        tag: xenial-kinetic
+        image: shadowrobot/dexterous-hand
+        tag: recognizer
 
 branch:
   parent: kinetic-devel
