@@ -42,42 +42,56 @@ bool RecognizerROS::initialize()
         return false;
     }
 
-	std::string hv_config_xml;
-        if(nh_.getParam("recognizer_server/hv_config_xml", hv_config_xml))
-        {
-            arguments.push_back("--hv_config_xml");
-            arguments.push_back(hv_config_xml);
-        }
-        std::string sift_config_xml;
-        if(nh_.getParam("recognizer_server/sift_config_xml", sift_config_xml))
-        {
-            arguments.push_back("--sift_config_xml");
-            arguments.push_back(sift_config_xml);
-        }
-        std::string shot_config_xml;
-        if(nh_.getParam("recognizer_server/shot_config_xml", shot_config_xml))
-        {
-            arguments.push_back("--shot_config_xml");
-            arguments.push_back(shot_config_xml);
-        }
-        std::string esf_config_xml;
-        if(nh_.getParam("recognizer_server/esf_config_xml", esf_config_xml))
-        {
-            arguments.push_back("--esf_config_xml");
-            arguments.push_back(esf_config_xml);
-        }
-        std::string alexnet_config_xml;
-        if(nh_.getParam("recognizer_server/alexnet_config_xml", alexnet_config_xml))
-        {
-            arguments.push_back("--alexnet_config_xml");
-            arguments.push_back(alexnet_config_xml);
-        }
-        std::string camera_xml;
-        if(nh_.getParam("recognizer_server/camera_xml", camera_xml))
-        {
-            arguments.push_back("--camera_xml");
-            arguments.push_back(camera_xml);
-        }
+    std::string cfg_path;
+    if(!nh_.getParam("recognizer_server/cfg", cfg_path) && !cfg_path.empty())
+    {
+        ROS_ERROR("Config files Folder is not set. Must be set with param \"cfg\"!");
+        return false;
+    }
+
+    int recognizer_param;
+    if(!nh_.getParam("recognizer_server/recParam", recognizer_param))
+    {
+         ROS_ERROR("Recognizer Parameter is not set. Must be set with param \"recParam\"!");
+         return false;
+    }
+
+    switch(recognizer_param) 
+    {
+    case 0 : 
+            cfg_path.append("/manual/");
+            break;       
+    case 1 : 
+            cfg_path.append("/auto/auto1/");
+            break;
+    case 2 :
+            cfg_path.append("/auto/auto2/");
+            break;
+    case 3 :
+            cfg_path.append("/auto/auto3/");
+            break;
+    default:
+            ROS_ERROR("Invalid value for recognizer parameter!");
+            return false;
+    }
+
+    arguments.push_back("--hv_config_xml");
+    arguments.push_back(cfg_path + "hv_config.xml");
+
+    arguments.push_back("--sift_config_xml");
+    arguments.push_back(cfg_path + "sift_config.xml");
+
+    arguments.push_back("--shot_config_xml");
+    arguments.push_back(cfg_path + "shot_config.xml");
+
+    arguments.push_back("--esf_config_xml");
+    arguments.push_back(cfg_path + "esf_config.xml");
+
+    arguments.push_back("--alexnet_config_xml");
+    arguments.push_back(cfg_path + "alexnet_config.xml");
+
+    arguments.push_back("--camera_xml");
+    arguments.push_back(cfg_path + "camera.xml");
 
     std::string additional_arguments;
     if (nh_.getParam("recognizer_server/arg", additional_arguments))
@@ -87,19 +101,16 @@ bool RecognizerROS::initialize()
         arguments.insert(arguments.end(), strs.begin(), strs.end());
     }
 
-    std::string recognizer_config;
-    nh_.getParam("recognizer_server/multipipeline_config_xml", recognizer_config);
-
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
-    std::cout << recognizer_config << std::endl;
+    std::cout << cfg_path + "multipipeline_config.xml" << std::endl;
     for(auto arg : arguments) 
     {
        std::cout << arg << " ";
        std::cout << std::endl;
     }
 
-    v4r::apps::ObjectRecognizerParameter param(recognizer_config);
+    v4r::apps::ObjectRecognizerParameter param(cfg_path + "multipipeline_config.xml");
     rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
 
     return true;
