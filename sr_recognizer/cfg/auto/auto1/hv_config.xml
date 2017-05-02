@@ -2,12 +2,12 @@
 <!DOCTYPE boost_serialization>
 <boost_serialization signature="serialization::archive" version="10">
 <paramHV class_id="0" tracking_level="0" version="0">
-	<resolution_mm_>5</resolution_mm_>
-	<inliers_threshold_>0.0099999998</inliers_threshold_>
+	<resolution_mm_>20</resolution_mm_>
+	<inliers_threshold_>0.03</inliers_threshold_>
 	<inliers_surface_angle_thres_dotp_>0.8</inliers_surface_angle_thres_dotp_>
 	<occlusion_thres_>0.0099999998</occlusion_thres_>
 	<smoothing_radius_>2</smoothing_radius_>
-	<do_smoothing_>1</do_smoothing_>
+	<do_smoothing_>0</do_smoothing_>
 	<do_erosion_>1</do_erosion_>
 	<erosion_radius_>4</erosion_radius_>
 	<icp_iterations_>10</icp_iterations_>
@@ -36,5 +36,5 @@
 	<min_ratio_cluster_explained_>0.5</min_ratio_cluster_explained_>
 	<z_adaptive_>1</z_adaptive_>
 	<min_pts_smooth_cluster_to_be_epxlained_>50</min_pts_smooth_cluster_to_be_epxlained_>
-	<min_fitness_>0.1</min_fitness_>
+	<min_fitness_>0.3</min_fitness_>
 </paramHV>
