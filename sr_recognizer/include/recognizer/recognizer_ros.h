@@ -29,6 +29,7 @@ class RecognizerROS
 private:
     ros::NodeHandle nh_;  // NodeHandle instance must be created before next line. Otherwise strange error occurs.
     actionlib::SimpleActionServer<sr_recognizer::RecognizerAction> as_;
+    ros::Publisher vis_pc_pub_;
     std::string action_name_;
     // create messages that are used to published feedback/result
     sr_recognizer::RecognizerFeedback feedback_;
