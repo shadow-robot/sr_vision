@@ -113,6 +113,9 @@ bool RecognizerROS::initialize()
     v4r::apps::ObjectRecognizerParameter param(cfg_path + "multipipeline_config.xml");
     rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
 
+    //Additionally the point clouds of all recognized Objects get published.
+    vis_pc_pub_ = nh_.advertise<sensor_msgs::PointCloud2>( "recognizer/recognized_objects", 1 );
+
     return true;
 }
 
@@ -121,7 +124,8 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     static bool init = true;
 
     ROS_INFO("Executing");
-
+    
+    pcl::PointCloud<PointT>::Ptr pRecognizedModels (new pcl::PointCloud<PointT>());
     pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
 
     //  if path in the launch file for test_file is set, Recognizer uses the .pcd file instead the Kinect
@@ -165,6 +169,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     
     result_.ids.clear();
     result_.transforms.clear();
+    result_.model_cloud.clear();
 
     for (size_t m_id = 0; m_id < ohs.size(); m_id++)
     {
@@ -188,7 +193,26 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         tt.rotation.z = q.z();
         tt.rotation.w = q.w();
         result_.transforms.push_back(tt);
-    }
+    
+
+        typename pcl::PointCloud<PointT>::ConstPtr model_cloud = rec->getModel( ohs[m_id]->model_id_, 5 );
+        typename pcl::PointCloud<PointT>::Ptr model_aligned (new pcl::PointCloud<PointT>);
+        pcl::transformPointCloud (*model_cloud, *model_aligned, ohs[m_id]->transform_);
+        *pRecognizedModels += *model_aligned;
+        sensor_msgs::PointCloud2 rec_model;
+        pcl::toROSMsg(*model_aligned, rec_model);
+        result_.model_cloud.push_back(rec_model);
+     }
+
+    sensor_msgs::PointCloud2 inputCloudRos;
+    pcl::toROSMsg (*inputCloudPtr, inputCloudRos);
+    inputCloudRos.header.frame_id = inputCloudPtr->header.frame_id;
+    result_.input_scene = inputCloudRos;
+
+    sensor_msgs::PointCloud2 recognizedModelsRos;
+    pcl::toROSMsg (*pRecognizedModels, recognizedModelsRos);
+    recognizedModelsRos.header.frame_id = inputCloudPtr->header.frame_id;
+    vis_pc_pub_.publish(recognizedModelsRos);
 
     ROS_INFO("%s: Succeeded", action_name_.c_str());
     as_.setSucceeded(result_);

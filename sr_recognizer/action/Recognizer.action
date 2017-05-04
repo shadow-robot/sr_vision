@@ -5,8 +5,20 @@ int32 start
 std_msgs/String[] ids
 geometry_msgs/Transform[] transforms
 
+# point cloud of the recognized objects transformed into camera coordinates
+sensor_msgs/PointCloud2[] model_cloud
+
+# point cloud of input scene
+sensor_msgs/PointCloud2 input_scene
+
 ---
 #feedback
 std_msgs/String[] ids
 geometry_msgs/Transform[] transforms
+
+# point cloud of the model transformed into camera coordinates
+sensor_msgs/PointCloud2[] model_cloud
+
+# point cloud of input scene
+sensor_msgs/PointCloud2 input_scene
 
