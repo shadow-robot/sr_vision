@@ -1,8 +1,8 @@
 <launch>
 	<arg name="m" default="$(find sr_recognizer)data/models_2opt" doc="Models directory"  />
-	<arg name="t" default="$(find sr_recognizer)data/photo1.pcd" doc="Test file"  />
+	<arg name="t" default="" doc="Test file"  />
         <arg name="cfg" default="$(find sr_recognizer)/cfg" doc="Folder containing config files"/>
-	<arg name="recParam" default="3" doc="Parameter for Recognizer: (0)manual (1-3)auto "/>
+	<arg name="recParam" default="1" doc="Parameter for Recognizer: (0)manual (1-3)auto "/>
 	<arg name="arg" default="-z 3.0 -c 5 -g 0.01" doc="Additional arguments as stated in the library. For help arg:=-h. "/>
 
 	<node pkg="sr_recognizer" type="recognizer_server" name="recognizer_server" output="screen">
