@@ -50,6 +50,10 @@ bool visualizer_init(int argc, char ** argv)
         vis_->createViewPort(0  , 0.5, 1   , 1  , vp2_);
     }
 
+    vis_->addText("recognized objects (no data)", 10, 10, 20, 1, 1, 1, "input_text_vp1b", vp1b_);
+    vis_->addText("input cloud for recognizer (no data)", 10, 10, 20, 1, 1, 1, "input_text_vp1a", vp1a_);
+    vis_->addText("live camera point cloud", 10, 10, 20, 1, 1, 1, "input_test_vp2", vp2_);
+
     vis_->setCameraPosition(0, 0, 0, 0, 0, 1, 0, -1, 0);
     vis_->resetCamera();
 
