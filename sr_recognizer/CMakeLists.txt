@@ -45,9 +45,8 @@ include_directories(include
  ${V4R_INCLUDE_DIRS}
  ${OpenCV_INCLUDE_DIRS}
 )
-###
-add_executable(recognizer_server src/recognizer_server.cpp)
 
+add_executable(recognizer_server src/recognizer_server.cpp)
 target_link_libraries(
   recognizer_server
   ${catkin_LIBRARIES}
@@ -55,28 +54,13 @@ target_link_libraries(
   ${OpenCV_LIBS}
   ${V4R_LIBS}
 )
-
 add_dependencies(
   recognizer_server
   ${sr_recognizer_EXPORTED_TARGETS}
 )
 
-###
-add_executable(recognizer_client src/recognizer_client.cpp)
 
-target_link_libraries( 
-  recognizer_client
-  ${catkin_LIBRARIES}
-)
-
-add_dependencies(
-  recognizer_client
-  ${sr_recognizer_EXPORTED_TARGETS}
-)
-
-###
 add_executable(recognizer_visualizer src/recognizer_visualizer.cpp)
-
 target_link_libraries( 
   recognizer_visualizer
   ${catkin_LIBRARIES}
@@ -84,7 +68,6 @@ target_link_libraries(
   ${OpenCV_LIBS}
   ${V4R_LIBS}
 )
-
 add_dependencies(
   recognizer_visualizer
   ${sr_recognizer_EXPORTED_TARGETS}
