@@ -1,11 +1,11 @@
 <launch>
-  <arg name="models_dir" default="$(find sr_recognizer)data/models_2opt" doc="Models directory"  />
-  <arg name="test_file" default="$(find sr_recognizer)data/photo1.pcd" doc="Test file"  />
+  <arg name="models_dir" default="$(find sr_recognizer)data/models_2opt" doc="Models directory"/>
+  <arg name="test_file" default="$(find sr_recognizer)data/photo1.pcd" doc="Test file"/>
 
-  <arg name="hv_config_xml" default="$(find sr_recognizer)/cfg/hv_config.xml" doc="Filename of Hypotheses Verification XML configuration file"  />
+  <arg name="hv_config_xml" default="$(find sr_recognizer)/cfg/hv_config.xml" doc="Filename of Hypotheses Verification XML configuration file"/>
   <arg name="multipipeline_config_xml" default="$(find sr_recognizer)/cfg/multipipeline_config.xml" doc="Filename of multipipeline configuration XML configuration file"  />
   <arg name="sift_config_xml" default="$(find sr_recognizer)/cfg/sift_config.xml" doc="Filename of SIFT XML configuration file"/>
-  <arg name="shot_config_xml" default="$(find sr_recognizer)/cfg/shot_config.xml" doc="Filename of SHOT XML configuration file" />
+  <arg name="shot_config_xml" default="$(find sr_recognizer)/cfg/shot_config.xml" doc="Filename of SHOT XML configuration file"/>
   <arg name="esf_config_xml" default="$(find sr_recognizer)/cfg/esf_config.xml" doc="Filename of ESF XML configuration file" />
   <arg name="alexnet_config_xml" default="$(find sr_recognizer)/cfg/alexnet_config.xml" doc="Filename of Alexnet XML configuration file"/>
   <arg name="camera_xml" default="$(find sr_recognizer)/cfg/camera.xml" doc="Filename of Camera Parameter XML configuration file"/>
@@ -13,18 +13,15 @@
   <arg name="arg" default="-z 3.0 -c 5 -g 0.01" doc="Additional arguments as stated in the library. For help arg:=-h. "/>
 
   <node pkg="sr_recognizer" type="recognizer_server" name="recognizer_server" output="screen">
-    <param name="models_dir" value="$(arg models_dir)" />
-    <param name="test_file" value="$(arg test_file)" />
-    <param name="multipipeline_config_xml" value="$(arg multipipeline_config_xml)" />
+    <param name="models_dir" value="$(arg models_dir)"/>
+    <param name="test_file" value="$(arg test_file)"/>
+    <param name="multipipeline_config_xml" value="$(arg multipipeline_config_xml)"/>
     <param name="hv_config_xml" value="$(arg hv_config_xml)" />
-    <param name="sift_config_xml" value="$(arg sift_config_xml)" />
-    <param name="shot_config_xml" value="$(arg shot_config_xml)" />
+    <param name="sift_config_xml" value="$(arg sift_config_xml)"/>
+    <param name="shot_config_xml" value="$(arg shot_config_xml)"/>
     <param name="esf_config_xml" value="$(arg esf_config_xml)" />
-    <param name="alexnet_config_xml" value="$(arg alexnet_config_xml)" />
-    <param name="camera_xml" value="$(arg camera_xml)" />
-    <param name="arg" value="$(arg arg)" />
+    <param name="alexnet_config_xml" value="$(arg alexnet_config_xml)"/>
+    <param name="camera_xml" value="$(arg camera_xml)"/>
+    <param name="arg" value="$(arg arg)"/>
   </node>
 </launch>
-
-
-
