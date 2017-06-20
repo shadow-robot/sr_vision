@@ -138,7 +138,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
                      " test pcd files from a directory by specifying param directory. " << std::endl;
 
         KINECT_OK_ = false;
-        if (checkKinect())
+        if (checkKinect())  // Updates kineticCloudPtr from topic
         {
             std::cout << "Camera (topic: " << topic_ << ") is up and running." << std::endl;
         }
