@@ -164,6 +164,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
     std::cout << "Finished Recognition" << std::endl;
 
     result_.ids.clear();
+    result_.confidences.clear();
     result_.transforms.clear();
 
     for (size_t m_id = 0; m_id < ohs.size(); m_id++)
@@ -174,6 +175,9 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         std_msgs::String ss_tmp;
         ss_tmp.data = ohs[m_id]->model_id_;
         result_.ids.push_back(ss_tmp);
+
+        float confidence = ohs[m_id]->confidence_;
+        result_.confidences.push_back(confidence);
 
         Eigen::Matrix4f trans = ohs[m_id]->transform_;
         geometry_msgs::Transform tt;
