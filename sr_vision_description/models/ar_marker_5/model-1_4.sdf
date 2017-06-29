@@ -1,0 +1,14 @@
+<?xml version="1.0" ?><sdf version="1.4">
+  <model name="ar_marker_5">
+    <static>true</static>
+    <link name="link">
+      <visual name="visual">
+        <geometry>
+          <mesh>
+            <uri>model://ar_marker_5/meshes/ar_marker_5.dae</uri>
+          <scale>0.5 0.5 0.5</scale></mesh>
+        </geometry>
+      </visual>
+    </link>
+  </model>
+</sdf>

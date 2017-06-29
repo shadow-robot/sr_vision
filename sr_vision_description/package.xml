@@ -1,0 +1,13 @@
+<?xml version="1.0"?>
+<package>
+  <name>sr_vision_description</name>
+  <version>0.0.0</version>
+  <description>The sr_vision_description package</description>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
+  <license>Private</license>
+  <url type="repository">https://github.com/shadow-robot/sr_vision</url>
+  <url type="bugtracker">https://github.com/shadow-robot/sr_vision/issues</url>
+
+  <!-- Build tool packages necessary to build this package -->
+  <buildtool_depend>catkin</buildtool_depend>
+</package>
