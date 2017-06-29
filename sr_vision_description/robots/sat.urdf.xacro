@@ -1,0 +1,7 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
+       name="ur10srh" >
+  <xacro:include filename="$(find sr_multi_description)/urdf/right_srhand_ur10_joint_limited.urdf.xacro" />
+  <xacro:include filename="$(find sat_description)/sensors/kinect.urdf.xacro"/>
+  <xacro:include filename="$(find sat_description)/plugins/gazebo_grasp_fix.urdf.xacro"/>
+</robot>
