@@ -55,8 +55,15 @@ class CameraTransformPublisher:
         rospy.loginfo('Waiting for AR marker pose topic...')
         rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
         rospy.loginfo('AR marker pose topic found!')
-        subscriber = rospy.Subscriber(self.ar_marker_topic, AlvarMarkers, self.on_ar_marker_message)
-        rospy.spin()
+        rate = rospy.Rate(1)
+        while not rospy.is_shutdown():
+            try:
+                ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers, timeout=1)
+                self.on_ar_marker_message(ar_track_alvar_markers)
+            except rospy.ROSException, e:
+                pass
+            rate.sleep()
+            rospy.spin()
     
     def on_ar_marker_message(self, ar_track_alvar_markers):
         rospy.loginfo('Recieved AR marker message containing {} recognized markers/bundles.'.format(len(ar_track_alvar_markers.markers)))
