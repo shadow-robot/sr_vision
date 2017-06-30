@@ -7,5 +7,5 @@
         <remap from="~input/points" to="/camera/depth_registered/points" />
     </node>
 
-    <test test-name="test_cluster_segmentor" pkg="sr_point_cloud" type="test_cluster_segmentor.py" time-limit="300.0"/>
+    <test test-name="test_cluster_segmentor" pkg="sr_point_cloud" type="test_cluster_segmentor.py" time-limit="3000.0"/>
 </launch>
