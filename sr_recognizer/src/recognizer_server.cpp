@@ -156,7 +156,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
       init = false;
     }
 
-	// Start recognition on input image (inputCloudPtr)
+    // Start recognition on input image (inputCloudPtr)
     std::cout << "Start Recognition" << std::endl;
 
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
