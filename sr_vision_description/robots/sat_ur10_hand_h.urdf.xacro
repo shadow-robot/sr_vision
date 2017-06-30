@@ -1,7 +1,0 @@
-<?xml version="1.0"?>
-<robot xmlns:xacro="http://www.ros.org/wiki/xacro"
-       name="ursrfh" >
-  <xacro:include filename="$(find fh_2_ur10_moveit_config)/config/fh_v2_ur10_with_hand.urdf.xacro" />
-  <!--<xacro:include filename="$(find sat_description)/sensors/kinect.urdf.xacro"/>-->
-  <!--<xacro:include filename="$(find sat_description)/plugins/gazebo_grasp_fix.urdf.xacro"/>-->
-</robot>

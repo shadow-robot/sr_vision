@@ -4,7 +4,7 @@
 	<arg name="marker_size" default="9.0" />
 	<arg name="max_new_marker_error" default="0.08" />
 	<arg name="max_track_error" default="0.0" />
-	<arg name="bundle_files" default="$(find sr_vision_description)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
+	<arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
 
   <arg if="$(arg depth)" name="cam_image_topic" default="/camera/depth_registered/points" />
   <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth_registered/camera_info" />	
