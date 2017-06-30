@@ -11,7 +11,7 @@ find_package(catkin REQUIRED COMPONENTS
   ar_track_alvar
   ar_track_alvar_msgs
   rospy
-  sr_viosion_description
+  sr_vision_description
 )
 
 ## System dependencies are found with CMake's conventions
