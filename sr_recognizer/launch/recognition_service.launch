@@ -1,7 +1,7 @@
 <launch>
   <arg name="models_dir" default="$(find sr_recognizer)data/models_2opt" doc="Models directory"/>
-  <!--arg name="test_file" default="$(find sr_recognizer)data/photo1.pcd" doc="Test file"/-->
-  <arg name="test_file" default="" doc="Test file"/>
+  <arg name="test_file" default="$(find sr_recognizer)data/photo1.pcd" doc="Test file"/>
+  <!--arg name="test_file" default="" doc="Test file"/-->
 
   <arg name="hv_config_xml" default="$(find sr_recognizer)/cfg/hv_config.xml" doc="Filename of Hypotheses Verification XML configuration file"/>
   <arg name="multipipeline_config_xml" default="$(find sr_recognizer)/cfg/multipipeline_config.xml" doc="Filename of multipipeline configuration XML configuration file"/>
