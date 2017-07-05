@@ -66,28 +66,28 @@ class CameraTransformPublisher:
             # rospy.spin()
     
     def on_ar_marker_message(self, ar_track_alvar_markers):
-        rospy.loginfo('Recieved AR marker message containing {} recognized markers/bundles.'.format(len(ar_track_alvar_markers.markers)))
+        # rospy.loginfo('Recieved AR marker message containing {} recognized markers/bundles.'.format(len(ar_track_alvar_markers.markers)))
         for marker in ar_track_alvar_markers.markers:
             if marker.id in self.marker_ids:
-                rospy.loginfo('Received pose for marker id {}'.format(marker.id))
-                rospy.loginfo('Marker static TF names: {}'.format(self.marker_static_tf_names))
-                rospy.loginfo('Marker ID: {}'.format(marker.id))
+                # rospy.loginfo('Received pose for marker id {}'.format(marker.id))
+                # rospy.loginfo('Marker static TF names: {}'.format(self.marker_static_tf_names))
+                # rospy.loginfo('Marker ID: {}'.format(marker.id))
                 static_marker_frame_index = self.marker_ids.index(marker.id)
-                rospy.loginfo('Index of marker ID: {}'.format(static_marker_frame_index))
+                # rospy.loginfo('Index of marker ID: {}'.format(static_marker_frame_index))
                 static_marker_frame_name = self.marker_static_tf_names[static_marker_frame_index]
-                rospy.loginfo('Static frame: {}'.format(static_marker_frame_name))
+                # rospy.loginfo('Static frame: {}'.format(static_marker_frame_name))
                 try:
                     lens_marker_trans = self.tfBuffer.lookup_transform(self.camera_root_frame, 'ar_marker_{}'.format(marker.id), rospy.Time())
                 except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                     rospy.logerr("Failed to find lens -> AR marker transform.")
                     return
-                rospy.loginfo("Found lens -> AR marker transform.")
+                # rospy.loginfo("Found lens -> AR marker transform.")
                 try:
                     world_marker_trans = self.tfBuffer.lookup_transform(self.desired_camera_parent_frame, static_marker_frame_name, rospy.Time())
                 except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
                     rospy.logerr("Failed to find world -> AR marker ({} -> {})transform.".format(self.desired_camera_parent_frame, static_marker_frame_name))
                     return
-                rospy.loginfo('Found world -> AR marker transform.')
+                # rospy.loginfo('Found world -> AR marker transform.')
                 transform = self.generate_world_camera_tf(lens_marker_trans, world_marker_trans)
                 self.publish_transform(transform)
             else:
@@ -95,11 +95,11 @@ class CameraTransformPublisher:
     
     def generate_world_camera_tf(self, lens_marker_tf, world_marker_tf):
         lens_marker_matrix = matrix_from_transform(lens_marker_tf.transform)
-        rospy.loginfo('Lens -> marker transform matrix:\n{}'.format(lens_marker_matrix))
+        # rospy.loginfo('Lens -> marker transform matrix:\n{}'.format(lens_marker_matrix))
         world_marker_matrix = matrix_from_transform(world_marker_tf.transform)
-        rospy.loginfo('World -> marker transform matrix:\n{}'.format(world_marker_matrix))
+        # rospy.loginfo('World -> marker transform matrix:\n{}'.format(world_marker_matrix))
         world_lens_matrix = np.dot(world_marker_matrix, transformations.inverse_matrix(lens_marker_matrix))
-        rospy.loginfo('World -> lens transform matrix:\n{}'.format(world_lens_matrix))
+        # rospy.loginfo('World -> lens transform matrix:\n{}'.format(world_lens_matrix))
         return transform_from_matrix(world_lens_matrix)
     
     def publish_transform(self, transform):
