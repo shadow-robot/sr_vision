@@ -5,7 +5,7 @@ find_package(catkin REQUIRED COMPONENTS
   roscpp 
   rospy
   actionlib 
-  actionlib_msgs std_msgs geometry_msgs
+  actionlib_msgs std_msgs geometry_msgs sensor_msgs
 )
 
 find_package(Boost REQUIRED COMPONENTS system)
@@ -23,6 +23,7 @@ generate_messages(
   actionlib_msgs 
   std_msgs
   geometry_msgs
+  sensor_msgs
 )
 
 catkin_package(
@@ -31,6 +32,7 @@ catkin_package(
   actionlib_msgs
   std_msgs
   geometry_msgs
+  sensor_msgs
 )
 
 add_definitions(${PCL_DEFINITIONS})
@@ -45,7 +47,6 @@ include_directories(include
 )
 
 add_executable(recognizer_server src/recognizer_server.cpp)
-
 target_link_libraries(
   recognizer_server
   ${catkin_LIBRARIES}
@@ -53,9 +54,22 @@ target_link_libraries(
   ${OpenCV_LIBS}
   ${V4R_LIBS}
 )
-
 add_dependencies(
   recognizer_server
+  ${sr_recognizer_EXPORTED_TARGETS}
+)
+
+
+add_executable(recognizer_visualizer src/recognizer_visualizer.cpp)
+target_link_libraries( 
+  recognizer_visualizer
+  ${catkin_LIBRARIES}
+  ${PCL_LIBRARIES}
+  ${OpenCV_LIBS}
+  ${V4R_LIBS}
+)
+add_dependencies(
+  recognizer_visualizer
   ${sr_recognizer_EXPORTED_TARGETS}
 )
 
