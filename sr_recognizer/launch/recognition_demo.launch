@@ -1,5 +1,7 @@
 <launch>
-        <include file="$(find openni_launch)launch/openni.launch" />
+        <include file="$(find openni_launch)launch/openni.launch" >
+        <arg name="depth_registration" default="true" />
+        </include>
 
 	<arg name="m" default="$(find sr_recognizer)data/models_2opt" doc="Models directory"  />
 	<arg name="t" default="$(find sr_recognizer)data/photo1.pcd" doc="Test file"  />
@@ -26,5 +28,3 @@
 
 
 </launch>
-
-
