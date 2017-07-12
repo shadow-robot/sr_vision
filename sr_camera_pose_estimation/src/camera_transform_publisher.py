@@ -56,7 +56,8 @@ class CameraTransformPublisher(object):
         rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
         rospy.loginfo('AR marker pose topic found!')
         while not rospy.is_shutdown() and (self.continuous or self.counter < self.window_width):
-            ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers, timeout=1)
+            ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers,
+                                                            timeout=1)
             self.on_ar_marker_message(ar_track_alvar_markers)
         self.stop_ar_track_alvar()
         self.counter = 0
@@ -79,8 +80,8 @@ class CameraTransformPublisher(object):
                                                   self.marker_static_tf_name, rospy.Time())
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
                 tf2_ros.ExtrapolationException):
-            rospy.logerr("Failed to find world -> AR marker ({} -> {})transform." \
-            .format(self.desired_camera_parent_frame, self.marker_static_tf_name))
+            rospy.logerr("Failed to find world -> AR marker ({} -> {})transform."
+                         .format(self.desired_camera_parent_frame, self.marker_static_tf_name))
             return
         self.transform = self.generate_world_camera_tf(lens_marker_pose, world_marker_trans)
         self.publish_transform()
@@ -88,7 +89,8 @@ class CameraTransformPublisher(object):
     def generate_world_camera_tf(self, lens_marker_pose, world_marker_tf):
         lens_marker_matrix = matrix_from_pose(lens_marker_pose)
         world_marker_matrix = matrix_from_transform(world_marker_tf.transform)
-        world_lens_matrix = np.dot(world_marker_matrix, transformations.inverse_matrix(lens_marker_matrix))
+        world_lens_matrix = np.dot(world_marker_matrix,
+                                   transformations.inverse_matrix(lens_marker_matrix))
         return transform_from_matrix(world_lens_matrix)
 
     def publish_transform(self):
@@ -118,7 +120,7 @@ class CameraTransformPublisher(object):
             self.alvar_process = launch.launch(node)
 
     def stop_ar_track_alvar(self):
-        if not self.alvar_process is None:
+        if self.alvar_process is not None:
             self.alvar_process.stop()
 
 
