@@ -49,7 +49,6 @@ class CameraTransformPublisher(object):
         self.alvar_med_filt_size = rospy.get_param('~alvar_med_filt_size')
         self.alvar_bundle_files = rospy.get_param('~alvar_bundle_files')
 
-
     def run(self):
         self.start_ar_track_alvar()
         rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
@@ -68,18 +67,20 @@ class CameraTransformPublisher(object):
                 self.on_new_pose(marker.pose.pose)
             else:
                 rospy.loginfo('Ignoring pose for marked id {}'.format(marker.id))
-    
+
     def on_new_pose(self, pose):
         self.counter += 1
         self.publish_camera_pose(self.pose_averager.new_value(pose))
-    
+
     def publish_camera_pose(self, lens_marker_pose):
         try:
-            world_marker_trans = self.transform_buffer.lookup_transform(self.desired_camera_parent_frame,
-                                                                self.marker_static_tf_name, rospy.Time())
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
-            rospy.logerr("Failed to find world -> AR marker ({} -> {})transform.".format(
-                self.desired_camera_parent_frame, self.marker_static_tf_name))
+            world_marker_trans = self.transform_buffer. \
+                                 lookup_transform(self.desired_camera_parent_frame,
+                                                  self.marker_static_tf_name, rospy.Time())
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
+                tf2_ros.ExtrapolationException):
+            rospy.logerr("Failed to find world -> AR marker ({} -> {})transform." \
+            .format(self.desired_camera_parent_frame, self.marker_static_tf_name))
             return
         self.transform = self.generate_world_camera_tf(lens_marker_pose, world_marker_trans)
         self.publish_transform()
@@ -126,15 +127,18 @@ def matrix_from_transform(transform):
     rot = [transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w]
     return matrix_from_trans_rot(trans, rot)
 
+
 def matrix_from_pose(pose):
     trans = [pose.position.x, pose.position.y, pose.position.z]
     rot = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
     return matrix_from_trans_rot(trans, rot)
 
+
 def matrix_from_trans_rot(trans, rot):
     trans_mat = transformations.translation_matrix(trans)
     rot_mat = transformations.quaternion_matrix(rot)
     return transformations.concatenate_matrices(trans_mat, rot_mat)
+
 
 def transform_from_matrix(matrix):
     trans = transformations.translation_from_matrix(matrix)

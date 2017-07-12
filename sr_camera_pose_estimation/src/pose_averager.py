@@ -1,6 +1,7 @@
 #!/usr/bin/python
 from collections import deque
 
+
 class PoseAverager(object):
     def __init__(self, initial_values=[], window_width=5):
         self.values = deque()
