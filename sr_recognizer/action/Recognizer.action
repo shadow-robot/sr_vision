@@ -3,6 +3,7 @@ int32 start
 ---
 #result definition
 std_msgs/String[] ids
+float32[] confidences
 geometry_msgs/Transform[] transforms
 
 # point cloud of the recognized objects transformed into camera coordinates
@@ -14,6 +15,7 @@ sensor_msgs/PointCloud2 input_scene
 ---
 #feedback
 std_msgs/String[] ids
+float32[] confidences
 geometry_msgs/Transform[] transforms
 
 # point cloud of the model transformed into camera coordinates

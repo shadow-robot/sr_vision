@@ -13,6 +13,3 @@
 		<param name="arg" value="$(arg arg)" />
 	</node>
 </launch>
-
-
-
