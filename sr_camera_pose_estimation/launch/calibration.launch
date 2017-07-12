@@ -8,6 +8,9 @@
   <arg name="continuous" default="false" />
   <arg name="window_width" default="100" />
   <arg name="camera_root_frame" default="camera_link" />
+  <arg name="desired_camera_parent_frame" default="ra_base_link" />
+  <arg name="marker_id" default="0" />
+  <arg name="marker_tf_name" default="ar_marker_0_static" />
 
   <arg if="$(arg depth)" name="cam_image_topic" default="/camera/depth_registered/points" />
   <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth_registered/camera_info" />	
@@ -26,10 +29,10 @@
   <node pkg="sr_camera_pose_estimation" type="camera_transform_publisher.py" name="sr_camera_transform_publisher" output="screen" >
     <param name="ar_marker_topic" value="ar_pose_marker" />
     <param name="camera_image_topic" value="$(arg cam_image_topic)" />
-    <param name="marker_static_tf_name" value="ar_marker_0_static" />
-    <param name="marker_id" value="0" />
+    <param name="marker_static_tf_name" value="$(arg marker_tf_name)" />
+    <param name="marker_id" value="$(arg marker_id)" />
     <param name="camera_root_frame" value="$(arg camera_root_frame)" />
-    <param name="desired_camera_parent_frame" value="ra_base_link" />
+    <param name="desired_camera_parent_frame" value="$(arg desired_camera_parent_frame)" />
     <param name="continuous" value="$(arg continuous)" />
     <param name="window_width" value="$(arg window_width)" />
     <param name="alvar_node_type" value="$(arg alvar_node)" />
