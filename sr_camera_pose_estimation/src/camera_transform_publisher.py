@@ -28,6 +28,7 @@ class CameraTransformPublisher(object):
         rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
         self.counter = 0
         self.run()
+        rospy.spin()
 
     def get_params(self):
         self.ar_marker_topic = rospy.get_param('~ar_marker_topic')
