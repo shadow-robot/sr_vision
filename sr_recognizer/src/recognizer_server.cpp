@@ -4,6 +4,9 @@
 #include <vector>
 #include <string>
 
+/*
+ * Sets kineticCloudPtr from ROS message input 
+ */
 void RecognizerROS::checkCloudArrive(const sensor_msgs::PointCloud2::ConstPtr& msg)
 {
     kinectCloudPtr.reset(new pcl::PointCloud<PointT>());
@@ -11,6 +14,10 @@ void RecognizerROS::checkCloudArrive(const sensor_msgs::PointCloud2::ConstPtr& m
     KINECT_OK_ = true;
 }
 
+/*
+ * Creates ROS subscriber  nh_ to recieve message from topic through checkCloudArrive function
+ * and polls for KINECT_OK_ == true
+ */
 bool RecognizerROS::checkKinect()
 {
     ros::Subscriber sub_pc = nh_.subscribe(topic_, 1, &RecognizerROS::checkCloudArrive, this);
@@ -131,7 +138,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
                      " test pcd files from a directory by specifying param directory. " << std::endl;
 
         KINECT_OK_ = false;
-        if (checkKinect())
+        if (checkKinect())  // Updates kineticCloudPtr from topic
         {
             std::cout << "Camera (topic: " << topic_ << ") is up and running." << std::endl;
         }
@@ -149,13 +156,15 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
       init = false;
     }
 
-    std::cout << "Start Reocognition" << std::endl;
+	// Start recognition on input image (inputCloudPtr)
+    std::cout << "Start Recognition" << std::endl;
 
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
 
-    std::cout << "Finished Reocognition" << std::endl;
+    std::cout << "Finished Recognition" << std::endl;
 
     result_.ids.clear();
+    result_.confidences.clear();
     result_.transforms.clear();
 
     for (size_t m_id = 0; m_id < ohs.size(); m_id++)
@@ -166,6 +175,9 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         std_msgs::String ss_tmp;
         ss_tmp.data = ohs[m_id]->model_id_;
         result_.ids.push_back(ss_tmp);
+
+        float confidence = ohs[m_id]->confidence_;
+        result_.confidences.push_back(confidence);
 
         Eigen::Matrix4f trans = ohs[m_id]->transform_;
         geometry_msgs::Transform tt;
