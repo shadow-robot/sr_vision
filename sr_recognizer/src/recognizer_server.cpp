@@ -130,7 +130,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 {
     static bool init = true;
     ROS_INFO("Executing");
-    
+
     pcl::PointCloud<PointT>::Ptr pRecognizedModels(new pcl::PointCloud<PointT>());
     pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
 
