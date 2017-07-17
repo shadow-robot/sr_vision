@@ -1,3 +1,5 @@
+/* Copyright 2017 ShadowRobot */
+
 #include "ros/ros.h"
 #include <sr_recognizer/RecognizerAction.h>
 #include <pcl_conversions/pcl_conversions.h>

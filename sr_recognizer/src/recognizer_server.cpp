@@ -111,14 +111,14 @@ bool RecognizerROS::initialize()
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
     std::cout << cfg_path + "multipipeline_config.xml" << std::endl;
-    for (auto arg : arguments) 
+    for (auto arg : arguments)
     {
        std::cout << arg << " ";
        std::cout << std::endl;
     }
 
     v4r::apps::ObjectRecognizerParameter param(cfg_path + "multipipeline_config.xml");
-    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
+    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
 
     // Additionally the point clouds of all recognized Objects get published.
     vis_pc_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("recognizer/recognized_objects", 1);
