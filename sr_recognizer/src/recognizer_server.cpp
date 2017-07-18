@@ -50,25 +50,25 @@ bool RecognizerROS::initialize()
 
 
     std::string cfg_path;
-    if(!nh_.getParam("recognizer_server/cfg", cfg_path) && !cfg_path.empty())
+    if (!nh_.getParam("recognizer_server/cfg", cfg_path) && !cfg_path.empty())
     {
         ROS_ERROR("Config files Folder is not set. Must be set with param \"cfg\"!");
         return false;
     }
 
     int recognizer_param;
-    if(!nh_.getParam("recognizer_server/recParam", recognizer_param))
+    if (!nh_.getParam("recognizer_server/recParam", recognizer_param))
     {
          ROS_ERROR("Recognizer Parameter is not set. Must be set with param \"recParam\"!");
          return false;
     }
 
-    switch(recognizer_param) 
+    switch (recognizer_param)
     {
-    case 0 : 
+    case 0 :
             cfg_path.append("/manual/");
-            break;       
-    case 1 : 
+            break;
+    case 1 :
             cfg_path.append("/auto/auto1/");
             break;
     case 2 :
@@ -110,21 +110,18 @@ bool RecognizerROS::initialize()
 
     std::cout << "Initialized recognizer with: " << std::endl;
     std::cout << "--multipipeline_config_xml" << std::endl;
-
     std::cout << cfg_path + "multipipeline_config.xml" << std::endl;
-    for(auto arg : arguments) 
-
+    for (auto arg : arguments)
     {
        std::cout << arg << " ";
        std::cout << std::endl;
     }
 
-
     v4r::apps::ObjectRecognizerParameter param(cfg_path + "multipipeline_config.xml");
-    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param)); 
+    rec.reset(new v4r::apps::ObjectRecognizer<PointT>(param));
 
-    //Additionally the point clouds of all recognized Objects get published.
-    vis_pc_pub_ = nh_.advertise<sensor_msgs::PointCloud2>( "recognizer/recognized_objects", 1 );
+    // Additionally the point clouds of all recognized Objects get published.
+    vis_pc_pub_ = nh_.advertise<sensor_msgs::PointCloud2>("recognizer/recognized_objects", 1);
 
     return true;
 }
@@ -133,8 +130,8 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
 {
     static bool init = true;
     ROS_INFO("Executing");
-    
-    pcl::PointCloud<PointT>::Ptr pRecognizedModels (new pcl::PointCloud<PointT>());
+
+    pcl::PointCloud<PointT>::Ptr pRecognizedModels(new pcl::PointCloud<PointT>());
     pcl::PointCloud<PointT>::Ptr inputCloudPtr(new pcl::PointCloud<PointT>());
 
     //  if path in the launch file for test_file is set, Recognizer uses the .pcd file instead the Kinect
@@ -170,7 +167,7 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
       init = false;
     }
 
-	// Start recognition on input image (inputCloudPtr)
+    // Start recognition on input image (inputCloudPtr)
     std::cout << "Start Recognition" << std::endl;
 
     std::vector<typename v4r::ObjectHypothesis<PointT>::Ptr > ohs = rec->recognize(inputCloudPtr);
@@ -207,11 +204,10 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
         tt.rotation.z = q.z();
         tt.rotation.w = q.w();
         result_.transforms.push_back(tt);
-    
 
-        typename pcl::PointCloud<PointT>::ConstPtr model_cloud = rec->getModel( ohs[m_id]->model_id_, 5 );
+        typename pcl::PointCloud<PointT>::ConstPtr model_cloud = rec->getModel(ohs[m_id]->model_id_, 5);
         typename pcl::PointCloud<PointT>::Ptr model_aligned (new pcl::PointCloud<PointT>);
-        pcl::transformPointCloud (*model_cloud, *model_aligned, ohs[m_id]->transform_);
+        pcl::transformPointCloud(*model_cloud, *model_aligned, ohs[m_id]->transform_);
         *pRecognizedModels += *model_aligned;
         sensor_msgs::PointCloud2 rec_model;
         pcl::toROSMsg(*model_aligned, rec_model);
@@ -219,12 +215,12 @@ void RecognizerROS::recognize_cb(const sr_recognizer::RecognizerGoalConstPtr &go
      }
 
     sensor_msgs::PointCloud2 inputCloudRos;
-    pcl::toROSMsg (*inputCloudPtr, inputCloudRos);
+    pcl::toROSMsg(*inputCloudPtr, inputCloudRos);
     inputCloudRos.header.frame_id = inputCloudPtr->header.frame_id;
     result_.input_scene = inputCloudRos;
 
     sensor_msgs::PointCloud2 recognizedModelsRos;
-    pcl::toROSMsg (*pRecognizedModels, recognizedModelsRos);
+    pcl::toROSMsg(*pRecognizedModels, recognizedModelsRos);
     recognizedModelsRos.header.frame_id = inputCloudPtr->header.frame_id;
     vis_pc_pub_.publish(recognizedModelsRos);
 

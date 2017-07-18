@@ -10,6 +10,7 @@ from geometry_msgs.msg import Transform, TransformStamped
 from tf import transformations
 from pose_averager import PoseAverager
 
+
 class CameraTransformPublisher(object):
 
     def __init__(self):
@@ -62,8 +63,6 @@ class CameraTransformPublisher(object):
         self.stop_ar_track_alvar()
         self.counter = 0
 
-            # rospy.spin()
-    
     def on_ar_marker_message(self, ar_track_alvar_markers):
         for marker in ar_track_alvar_markers.markers:
 
@@ -126,6 +125,7 @@ class CameraTransformPublisher(object):
         if self.alvar_process is not None:
             self.alvar_process.stop()
 
+
 def matrix_from_transform(transform):
     trans = [transform.translation.x, transform.translation.y, transform.translation.z]
     rot = [transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w]
@@ -137,10 +137,12 @@ def matrix_from_pose(pose):
     rot = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
     return matrix_from_trans_rot(trans, rot)
 
+
 def matrix_from_trans_rot(trans, rot):
     trans_mat = transformations.translation_matrix(trans)
     rot_mat = transformations.quaternion_matrix(rot)
     return transformations.concatenate_matrices(trans_mat, rot_mat)
+
 
 def transform_from_matrix(matrix):
     trans = transformations.translation_from_matrix(matrix)
@@ -154,6 +156,7 @@ def transform_from_matrix(matrix):
     transform.rotation.z = rot[2]
     transform.rotation.w = rot[3]
     return transform
+
 
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")
