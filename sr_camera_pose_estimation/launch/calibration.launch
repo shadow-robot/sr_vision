@@ -1,34 +1,52 @@
 <launch>
   <arg name="sim" default="false" />
   <arg name="depth" default="false" />
-	<arg name="marker_size" default="9.0" />
-	<arg name="max_new_marker_error" default="0.08" />
-	<arg name="max_track_error" default="0.0" />
-	<arg name="bundle_files" default="$(find sat_description)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
+  <arg name="marker_size" default="9.0" />
+  <arg name="max_new_marker_error" default="0.08" />
+  <arg name="max_track_error" default="0.0" />
+  <arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
+  <arg name="continuous" default="false" />
+  <arg name="window_width" default="100" />
+  <arg name="camera_root_frame" default="camera_link" />
+  <arg name="desired_camera_parent_frame" default="ra_base_link" />
+  <arg name="marker_id" default="0" />
+  <arg name="marker_tf_name" default="ar_marker_0_static" />
 
   <arg if="$(arg depth)" name="cam_image_topic" default="/camera/depth_registered/points" />
   <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth_registered/camera_info" />	
   <arg if="$(arg depth)" name="output_frame" default="camera_depth_optical_frame" />
   <arg if="$(arg depth)" name="alvar_node" default="findMarkerBundles" />
-  <arg if="$(arg depth)" name="med_filt_size" default=" 10" />
+  <arg if="$(arg depth)" name="med_filt_size" default="10" />
   <arg unless="$(arg depth)" name="cam_image_topic" default="/camera/rgb/image_raw" />
   <arg unless="$(arg depth)" name="cam_info_topic" default="/camera/rgb/camera_info" />	
   <arg unless="$(arg depth)" name="output_frame" default="camera_rgb_optical_frame" />
   <arg unless="$(arg depth)" name="alvar_node" default="findMarkerBundlesNoKinect" />
   <arg unless="$(arg depth)" name="med_filt_size" default="" />
   
-  <node name="ar_track_alvar" pkg="ar_track_alvar" type="$(arg alvar_node)" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)$(arg med_filt_size) $(arg bundle_files)" />
+  <!--node name="ar_track_alvar" pkg="ar_track_alvar" type="$(arg alvar_node)" respawn="false" output="screen" args="$(arg marker_size) $(arg max_new_marker_error) $(arg max_track_error) $(arg cam_image_topic) $(arg cam_info_topic) $(arg output_frame)$(arg med_filt_size) $(arg bundle_files)" /-->
 
-  <node if="$(arg sim)" pkg="tf" type="static_transform_publisher" name="ar_bundle_broadcaster" args="-0.5 1.5 0.687 -2.35619449019 0 0 ra_base_link ar_marker_bundle_static 1" />
-  <node unless="$(arg sim)" pkg="tf" type="static_transform_publisher" name="ar_bundle_broadcaster" args="0.1 0.4 0 2.35619449019 0 0 ra_base_link ar_marker_bundle_static 1" />
+<!-- 0.1 0.58 -->
+
+  <node pkg="tf" type="static_transform_publisher" name="ar_bundle_broadcaster" args="0.08 0.58 0 2.35619449019 0 0 ra_base_link ar_marker_bundle_static 1" />
   <node pkg="tf" type="static_transform_publisher" name="ar_tag_0_broadcaster" args="-0.05 0.055 0 0.0 0 0 ar_marker_bundle_static ar_marker_0_static 1" />
   
-  <node pkg="sat_camera_pose_estimation" type="camera_transform_publisher.py" name="sat_camera_transform_publisher" output="screen" >
-    <param name="ar_marker_topic" value="ar_pose_marker" />
+  <node pkg="sr_camera_pose_estimation" type="camera_transform_publisher.py" name="sr_camera_transform_publisher" output="screen" >
+    <param name="ar_maker_topic" value="ar_pose_marker" />
     <param name="camera_image_topic" value="$(arg cam_image_topic)" />
-    <rosparam param="marker_static_tf_names"> ['ar_marker_0_static'] </rosparam>
-    <rosparam param="marker_ids"> [0] </rosparam>
-    <param name="camera_root_frame" value="camera_link" />
-    <param name="desired_camera_parent_frame" value="ra_base_link" />
+    <param name="marker_static_tf_name" value="$(arg marker_tf_name)" />
+    <param name="marker_id" value="$(arg marker_id)" />
+    <param name="camera_root_frame" value="$(arg camera_root_frame)" />
+    <param name="desired_camera_parent_frame" value="$(arg desired_camera_parent_frame)" />
+    <param name="continuous" value="$(arg continuous)" />
+    <param name="window_width" value="$(arg window_width)" />
+    <param name="alvar_node_type" value="$(arg alvar_node)" />
+    <param name="alvar_marker_size" value="$(arg marker_size)" />
+    <param name="alvar_max_new_marker_error" value="$(arg max_new_marker_error)" />
+    <param name="alvar_max_track_error" value="$(arg max_track_error)" />
+    <param name="alvar_cam_image_topic" value="$(arg cam_image_topic)" />
+    <param name="alvar_cam_info_topic" value="$(arg cam_info_topic)" />
+    <param name="alvar_output_frame" value="$(arg camera_root_frame)" />
+    <param name="alvar_med_filt_size" value="$(arg med_filt_size)" />
+    <param name="alvar_bundle_files" value="$(arg bundle_files)" />
   </node>
 </launch>
