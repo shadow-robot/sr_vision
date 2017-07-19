@@ -6,7 +6,6 @@ import rospy
 import tf2_ros
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from geometry_msgs.msg import Transform, TransformStamped
-
 from tf import transformations
 from pose_averager import PoseAverager
 
@@ -65,7 +64,6 @@ class CameraTransformPublisher(object):
 
     def on_ar_marker_message(self, ar_track_alvar_markers):
         for marker in ar_track_alvar_markers.markers:
-
             if marker.id == self.marker_id:
                 self.on_new_pose(marker.pose.pose)
             else:
@@ -156,7 +154,6 @@ def transform_from_matrix(matrix):
     transform.rotation.z = rot[2]
     transform.rotation.w = rot[3]
     return transform
-
 
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")
