@@ -3,7 +3,7 @@
     <arg name="max_new_marker_error" default="0.08" />
     <arg name="max_track_error" default="0.0" />
 
-	<arg name="cam_image_topic" default="/camera/rgb/image_raw" />
+    <arg name="cam_image_topic" default="/camera/rgb/image_raw" />
     <arg name="cam_info_topic" default="/camera/rgb/camera_info" />	
 
     <arg name="output_frame" default="camera_rgb_optical_frame" />
