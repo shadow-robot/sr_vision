@@ -20,7 +20,6 @@ class CameraTransformPublisher(object):
         self.alvar_process = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
         self.ignore_first = 20
-        # self.transform = identity_transform()
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
         rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
@@ -52,7 +51,6 @@ class CameraTransformPublisher(object):
         self.alvar_bundle_files = rospy.get_param('~alvar_bundle_files')
 
     def run(self):
-        # self.publish_transform()
         self.start_ar_track_alvar()
         rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
         rospy.loginfo('Waiting for AR marker pose topic...')
