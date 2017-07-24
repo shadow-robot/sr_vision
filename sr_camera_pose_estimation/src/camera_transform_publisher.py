@@ -19,6 +19,8 @@ class CameraTransformPublisher(object):
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
         self.alvar_process = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
+        self.ignore_first = 5
+        # self.transform = identity_transform()
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
         rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
@@ -50,12 +52,13 @@ class CameraTransformPublisher(object):
         self.alvar_bundle_files = rospy.get_param('~alvar_bundle_files')
 
     def run(self):
+        # self.publish_transform()
         self.start_ar_track_alvar()
         rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
         rospy.loginfo('Waiting for AR marker pose topic...')
         rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
         rospy.loginfo('AR marker pose topic found!')
-        while not rospy.is_shutdown() and (self.continuous or self.counter < self.window_width):
+        while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
             ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers,
                                                             timeout=1)
             self.on_ar_marker_message(ar_track_alvar_markers)
@@ -71,7 +74,10 @@ class CameraTransformPublisher(object):
 
     def on_new_pose(self, pose):
         self.counter += 1
-        self.publish_camera_pose(self.pose_averager.new_value(pose))
+        if self.window_width > 1:
+            self.publish_camera_pose(self.pose_averager.new_value(pose))
+        else:
+            self.publish_camera_pose(pose)
 
     def publish_camera_pose(self, lens_marker_pose):
         try:
@@ -153,6 +159,11 @@ def transform_from_matrix(matrix):
     transform.rotation.y = rot[1]
     transform.rotation.z = rot[2]
     transform.rotation.w = rot[3]
+    return transform
+
+def identity_transform():
+    transform = Transform()
+    transform.rotation.x = 1.0
     return transform
 
 if __name__ == "__main__":
