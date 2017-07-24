@@ -19,7 +19,7 @@ class CameraTransformPublisher(object):
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
         self.alvar_process = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
-        self.ignore_first = 5
+        self.ignore_first = 20
         # self.transform = identity_transform()
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
