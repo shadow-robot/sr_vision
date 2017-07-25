@@ -1,0 +1,6 @@
+<launch>
+  <arg name='recognized_objects_topic' default='recognized_objects'/>
+  <node name='sr_object_manager' pkg='sr_object_manager' type='manager.py' output='screen'>
+    <param name='recognized_objects_topic' value='$(arg recognized_objects_topic)'/>
+  </node>
+</launch>
