@@ -159,11 +159,6 @@ def transform_from_matrix(matrix):
     transform.rotation.w = rot[3]
     return transform
 
-def identity_transform():
-    transform = Transform()
-    transform.rotation.x = 1.0
-    return transform
-
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")
     CameraTransformPublisher()
