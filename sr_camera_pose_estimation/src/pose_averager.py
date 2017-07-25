@@ -1,5 +1,7 @@
 #!/usr/bin/python
 from collections import deque
+from copy import deepcopy
+from geometry_msgs.msg import Pose
 
 
 class PoseAverager(object):
@@ -11,8 +13,11 @@ class PoseAverager(object):
             self.new_value(initial_value)
 
     def new_value(self, new_value):
+        values = []
+        for value in self.values:
+            values.append(value.position.x)
         if not self.average:
-            self.average = new_value
+            self.average = deepcopy(new_value)
             self.values.append(new_value)
         else:
             if len(self.values) >= self.window_width:
@@ -21,6 +26,9 @@ class PoseAverager(object):
                 self.remove_from_average(self.average)
             self.add_to_average(new_value)
             self.values.append(new_value)
+        values = []
+        for value in self.values:
+            values.append(value.position.x)
         return self.average
 
     def remove_from_average(self, pose):
@@ -42,3 +50,12 @@ class PoseAverager(object):
         self.average.orientation.y += pose.orientation.y / average_n
         self.average.orientation.z += pose.orientation.z / average_n
         self.average.orientation.w += pose.orientation.w / average_n
+
+if __name__ == '__main__':
+    test_vector = [1.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0,
+                   0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+    averager = PoseAverager(window_width=10)
+    for value in test_vector:
+        pose = Pose()
+        pose.position.x = value
+        averager.new_value(pose)
