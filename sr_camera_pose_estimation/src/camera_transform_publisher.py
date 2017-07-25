@@ -20,7 +20,7 @@ class CameraTransformPublisher(object):
         self.alvar_process = None
         self.launch = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
-        self.ignore_first = 20
+        self.ignore_first = self.window_width * 2
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
         rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
