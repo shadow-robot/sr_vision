@@ -11,7 +11,6 @@ find_package(catkin REQUIRED COMPONENTS
 find_package( Boost REQUIRED COMPONENTS system )
 find_package( PCL 1.7 REQUIRED )
 find_package( OpenCV 2.4 REQUIRED )
-find_package( V4R REQUIRED COMPONENTS v4r_apps )
 
 add_action_files(
   DIRECTORY action
