@@ -6,5 +6,5 @@ from object_manager import ObjectManager
 
 
 if __name__ == '__main__':
-    rospy.init_node('sr_object_manager')
+    rospy.init_node('sr_object_manager', log_level=rospy.DEBUG)
     object_manager = ObjectManager()
