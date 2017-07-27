@@ -18,6 +18,7 @@ class CameraTransformPublisher(object):
         self.listener = tf2_ros.TransformListener(self.transform_buffer)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
         self.alvar_process = None
+        self.launch = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
         self.ignore_first = 20
         rospy.loginfo("Starting camera transform publisher.")
@@ -29,7 +30,8 @@ class CameraTransformPublisher(object):
         rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
         self.counter = 0
         self.run()
-        rospy.spin()
+        while not rospy.is_shutdown():
+            rospy.spin()
 
     def get_params(self):
         self.ar_marker_topic = rospy.get_param('~ar_marker_topic')
@@ -119,13 +121,13 @@ class CameraTransformPublisher(object):
                                                    (executable == 'findMarkerBundles') else '',
                                                    self.alvar_bundle_files)
             node = roslaunch.core.Node(package, executable, args=args)
-            launch = roslaunch.scriptapi.ROSLaunch()
-            launch.start()
-            self.alvar_process = launch.launch(node)
+            self.launch = roslaunch.scriptapi.ROSLaunch()
+            self.launch.start()
+            self.alvar_process = self.launch.launch(node)
 
     def stop_ar_track_alvar(self):
-        if self.alvar_process is not None:
-            self.alvar_process.stop()
+        if self.launch is not None:
+            self.launch.stop()
 
 
 def matrix_from_transform(transform):
