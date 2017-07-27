@@ -3,11 +3,12 @@
 import numpy as np
 import roslaunch
 import rospy
+import sr_vision_common
 import tf2_ros
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from geometry_msgs.msg import Transform, TransformStamped
 from tf import transformations
-from pose_averager import PoseAverager
+from sr_vision_common.pose_averager import PoseAverager
 
 
 class CameraTransformPublisher(object):
