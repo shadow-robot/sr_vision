@@ -18,6 +18,7 @@ build:
     - export ubuntu_version_name="xenial"
     - export used_modules="build_pr_only,check_cache,code_coverage"
     - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
+    - export V4R_DIR="/home/user/v4r/build"
     - apt-get update
     - apt-get install -y --no-install-recommends ca-certificates wget
     - wget -O /tmp/oneliner "$( echo "$remote_shell_script" | sed 's/#/%23/g' )"
