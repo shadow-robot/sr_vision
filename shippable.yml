@@ -5,7 +5,6 @@ python:
 # codecov token and slack web hook URL (encrypted)
 env:
   - secure: Z4h1Rh4I8BbeTUkpTTrOVF1XbKPbUye/JmCiBIG8nnVT8tJHtrBoAOwLKH102XwrfMQAuw+ZjajpUIR0/dLpSddM7JAkyUToNalK+UXFMmHcfe2oIltNdt5LQfmYFIUq5yB0ONLAHcyVmduZBOOggOmwYpUBazia+xH2zOXITFfrOXdUZfnrfxgzigscq1NbUTwNyGRJvKkgauwDiLqQu3oo7qFfeP1lZbA+0kVJwtWUgZ3OQq5Gg0VZMhjWOiCfhi057n7L59eBL18TNU1Y1FgCy0ucjaTCFjbsKDpHh/6SQOppCRFGWbs+hxkE19X7vNJcP1MZbG+VMkHihu5sWA==
-  - V4R_DIR="/home/user/v4r/build"
 build:
   pre_ci_boot:
     image_name: shadowrobot/dexterous-hand
