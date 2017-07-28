@@ -5,7 +5,7 @@ python:
 # codecov token and slack web hook URL (encrypted)
 env:
   - secure: Z4h1Rh4I8BbeTUkpTTrOVF1XbKPbUye/JmCiBIG8nnVT8tJHtrBoAOwLKH102XwrfMQAuw+ZjajpUIR0/dLpSddM7JAkyUToNalK+UXFMmHcfe2oIltNdt5LQfmYFIUq5yB0ONLAHcyVmduZBOOggOmwYpUBazia+xH2zOXITFfrOXdUZfnrfxgzigscq1NbUTwNyGRJvKkgauwDiLqQu3oo7qFfeP1lZbA+0kVJwtWUgZ3OQq5Gg0VZMhjWOiCfhi057n7L59eBL18TNU1Y1FgCy0ucjaTCFjbsKDpHh/6SQOppCRFGWbs+hxkE19X7vNJcP1MZbG+VMkHihu5sWA==
-
+  - V4R_DIR="/home/user/v4r/build"
 build:
   pre_ci_boot:
     image_name: shadowrobot/dexterous-hand
@@ -18,7 +18,6 @@ build:
     - export ubuntu_version_name="xenial"
     - export used_modules="build_pr_only,check_cache,code_coverage"
     - export remote_shell_script="https://raw.githubusercontent.com/shadow-robot/sr-build-tools/$toolset_branch/bin/sr-run-ci-build.sh"
-    - export V4R_DIR="/home/user/v4r/build"
     - apt-get update
     - apt-get install -y --no-install-recommends ca-certificates wget
     - wget -O /tmp/oneliner "$( echo "$remote_shell_script" | sed 's/#/%23/g' )"
