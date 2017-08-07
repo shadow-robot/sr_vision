@@ -22,7 +22,6 @@ build:
     - wget -O /tmp/oneliner "$( echo "$remote_shell_script" | sed 's/#/%23/g' )"
     - chown -R $MY_USERNAME:$MY_USERNAME $SHIPPABLE_BUILD_DIR
     - chmod 755 /tmp/oneliner
-    - cd /tmp
     - export V4R_DIR="/home/user/v4r/build"
     - sudo -u $MY_USERNAME -E tmp/oneliner "$toolset_branch" $server_type $used_modules
   on_failure:
