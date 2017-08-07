@@ -25,6 +25,6 @@ build:
     - cd /tmp
     - export V4R_DIR="/home/user/v4r/build"
     - bash
-    - gosu $MY_USERNAME /tmp/oneliner "$toolset_branch" $server_type $used_modules
+    - sudo -u $MY_USERNAME -E bash -c tmp/oneliner "$toolset_branch" $server_type $used_modules
   on_failure:
     - curl -X POST --data-urlencode "payload={\"channel\":\"#bots\", \"username\":\"shippable\", \"text\":\"[$SHIPPABLE_REPO_SLUG branch $BRANCH] <$BUILD_URL|Build $SHIPPABLE_BUILD_NUMBER> failed\", \"icon_emoji\":\":monkey_face:\"}" $SLACK_WEB_HOOK_URL
