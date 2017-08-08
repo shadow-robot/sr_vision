@@ -11,7 +11,7 @@ build:
     image_tag: recognizer
     pull: true
   ci:
-    - export toolset_branch="master" 
+    - export toolset_branch="master"
     - export server_type="shippable"
     - export ros_release_name="kinetic"
     - export ubuntu_version_name="xenial"
