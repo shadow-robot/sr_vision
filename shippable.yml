@@ -23,6 +23,6 @@ build:
     - chown -R $MY_USERNAME:$MY_USERNAME $SHIPPABLE_BUILD_DIR
     - chmod 755 /tmp/oneliner
     - export V4R_DIR="/home/user/v4r/build"
-    - sudo -u $MY_USERNAME -E /tmp/oneliner "$toolset_branch" $server_type $used_modules
+    - sudo -E -u $MY_USERNAME bash -c /tmp/oneliner "$toolset_branch" $server_type $used_modules
   on_failure:
     - curl -X POST --data-urlencode "payload={\"channel\":\"#bots\", \"username\":\"shippable\", \"text\":\"[$SHIPPABLE_REPO_SLUG branch $BRANCH] <$BUILD_URL|Build $SHIPPABLE_BUILD_NUMBER> failed\", \"icon_emoji\":\":monkey_face:\"}" $SLACK_WEB_HOOK_URL
