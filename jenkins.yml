@@ -22,7 +22,7 @@ trunks:
         release: kinetic
       docker:
         image: shadowrobot/dexterous-hand
-        tag: recognizer
+        tag: kinetic
 
 branch:
   parent: kinetic-devel
