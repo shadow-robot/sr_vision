@@ -13,9 +13,6 @@ class PoseAverager(object):
             self.new_value(initial_value)
 
     def new_value(self, new_value):
-        values = []
-        for value in self.values:
-            values.append(value.position.x)
         if not self.average:
             self.average = deepcopy(new_value)
             self.values.append(new_value)
@@ -26,9 +23,6 @@ class PoseAverager(object):
                 self.remove_from_average(self.average)
             self.add_to_average(new_value)
             self.values.append(new_value)
-        values = []
-        for value in self.values:
-            values.append(value.position.x)
         return self.average
 
     def remove_from_average(self, pose):
