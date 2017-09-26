@@ -1,0 +1,10 @@
+- git:
+    local-name: aruco_ros
+    uri: https://github.com/pal-robotics/aruco_ros
+    version: kinetic-devel
+    
+- git:
+    local-name: easy_handeye
+    uri: https://github.com/marcoesposito1988/easy_handeye
+    version: master
+    
