@@ -43,6 +43,6 @@
         <arg name="robot_velocity_scaling" value="0.5" />
         <arg name="robot_acceleration_scaling" value="0.2" />
         <arg name="translation_delta_meters" value="0.15" />
-        <arg name="rotation_delta_degrees" value="22.5" />
+        <arg name="rotation_delta_degrees" value="20" />
     </include>
 </launch>
