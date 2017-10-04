@@ -32,7 +32,7 @@
     
     <!-- start easy_handeye -->
     <include file="$(find easy_handeye)/launch/calibrate.launch" >
-        <remap from="manipulator" to="right_arm" />
+        <arg name="move_group" value="right_arm" />
         <arg name="namespace_prefix" value="$(arg namespace_prefix)" />
         <arg name="eye_on_hand" value="true" />
         <arg name="tracking_base_frame" value="camera_link" />
