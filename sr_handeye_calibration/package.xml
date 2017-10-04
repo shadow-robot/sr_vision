@@ -3,8 +3,8 @@
   <name>sr_handeye_calibration</name>
   <version>0.0.0</version>
   <description>The sr_handeye_calibrationn package</description>
-  <maintainer email="user@todo.todo">user</maintainer>
-  <license>TODO</license>
+  <maintainer email="software@shadowrobot.com">user</maintainer>
+  <license>Shadow Robot Company</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
