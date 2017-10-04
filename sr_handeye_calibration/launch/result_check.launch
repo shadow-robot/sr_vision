@@ -1,0 +1,7 @@
+<launch>
+    <include file="$(find sr_robot_launch)/launch/sr_ur10arm_box.launch">
+        <arg name="sim" value="false"/>
+    </include>
+
+    <node pkg="tf" type="static_transform_publisher" name="link1_broadcaster" args="0.0216801881196 -0.0767846625209 -0.12729356701 0.997677213484 -0.00244016024351 0.00767335748323 0.0676412810249 ra_ee_link camera_link 100" />
+</launch>
