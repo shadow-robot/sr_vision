@@ -4,25 +4,30 @@
     <arg name="marker_size" default="0.191" doc="Size of the ArUco marker used, in meters" />
     <arg name="marker_id" default="1" doc="The ID of the ArUco marker used" />
 
-	<arg name="camera" default="xtion" doc="The camera used" />
-    <!-- start the camera -->
+    <!-- select camera used -->
+    <arg name="camera" default="xtion" doc="The camera used" />
 
-    <!-- for xtion camera -->
-    
+    <!-- driver for xtion camera -->
     <include file="$(find openni2_launch)/launch/openni2.launch" if="$(eval camera == 'xtion')">
         <arg name="depth_registration" value="true" />
     </include>
     
-    <!-- for deimos camera -->    
-    <include file="$(find uvc_camera)/launch/tara_launch.launch" if="$(eval camera == 'deimos')" >
+    <!-- driver for deimos camera -->    
+    <include file="$(find uvc_camera)/launch/tara_launch.launch" if="$(eval camera == 'deimos')">
     </include>
 
+    <!-- set topics used -->    
+    <!-- xtion -->
+    <arg name="camera_info" value="/camera/rgb/camera_info" doc="Topic used for camera info" if="$(eval camera == 'xtion')"/>
+    <arg name="image" value="/camera/rgb/image_rect_color" doc="Topic used for camera image" if="$(eval camera == 'xtion')"/>
+    <!-- deimos -->    
+    <arg name="camera_info" value="/stereo/left/camera_info" doc="Topic used for camera info" if="$(eval camera == 'deimos')"/>
+    <arg name="image" value="/stereo/left/image_raw" doc="Topic used for camera image" if="$(eval camera == 'deimos')"/>
 
     <!-- start ArUco -->
-
     <node name="aruco_tracker" pkg="aruco_ros" type="single">
-        <remap from="/camera_info" to="/stereo/left/camera_info" />
-        <remap from="/image" to="/stereo/left/image_raw" />
+        <remap from="/camera_info" to="$(arg camera_info)"/>
+        <remap from="/image" to="$(arg image)"/>
         <param name="image_is_rectified" value="true"/>
         <param name="marker_size"        value="$(arg marker_size)"/>
         <param name="marker_id"          value="$(arg marker_id)"/>
