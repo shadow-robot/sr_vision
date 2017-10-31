@@ -4,17 +4,18 @@
     <arg name="marker_size" default="0.191" doc="Size of the ArUco marker used, in meters" />
     <arg name="marker_id" default="1" doc="The ID of the ArUco marker used" />
 
-
+	<arg name="camera" default="xtion" doc="The camera used" />
     <!-- start the camera -->
 
     <!-- for xtion camera -->
-    <!--include file="$(find openni2_launch)/launch/openni2.launch" >
+    
+    <include file="$(find openni2_launch)/launch/openni2.launch" if="$(eval camera == 'xtion')">
         <arg name="depth_registration" value="true" />
-    </include-->
+    </include>
     
     <!-- for deimos camera -->    
-    <!--include file="$(find camera_umd)/launch/tara_launch.launch" >
-    </include-->
+    <include file="$(find uvc_camera)/launch/tara_launch.launch" if="$(eval camera == 'deimos')" >
+    </include>
 
 
     <!-- start ArUco -->
