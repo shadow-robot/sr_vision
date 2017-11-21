@@ -59,8 +59,7 @@ class CameraTransformPublisher(object):
         rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
         rospy.loginfo('AR marker pose topic found!')
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
-            ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers,
-                                                            timeout=1)
+            ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
             self.on_ar_marker_message(ar_track_alvar_markers)
         self.stop_ar_track_alvar()
         self.counter = 0
