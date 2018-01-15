@@ -1,0 +1,47 @@
+<launch>
+  <arg name="depth" default="true"/>
+  <arg name="continuous" default="false"/>
+  <arg name="window_width" default="50"/>
+  <arg name="marker_bundle_tf_name" default="ar_marker_bundle"/>
+  <arg name="marker_tf_name" default="ar_marker_0_fixed"/>
+  <arg name="marker_tf_root" default="ra_base_link"/>
+  <arg name="sim" default="true"/>
+  <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth_registered/camera_info" />
+
+  <!-- If using depth mode, ar_track_alvar reports rotated ar markers, requring some adjustments -->
+  <!-- Transform from bundle to marker 0 -->
+  <arg if="$(arg depth)" name="marker_0_pose" default="0.055 0.05 0.0 0.0 0.0 0.0"/>
+  <arg unless="$(arg depth)" name="marker_0_pose" default="-0.05 0.055 0.0 0.0 0.0 0.0"/>
+  <!-- Transform from marker_tf_root to bundle - in simulation -->
+  <arg if="$(arg depth)" name="bundle_translation_sim" default="0.725 0.17 0.0"/>
+  <arg unless="$(arg depth)" name="bundle_translation_sim" default="0.725 0.17 0"/>
+  <arg if="$(arg depth)" name="bundle_rotation_sim" default="-3.14159265359 0 0"/>
+  <arg unless="$(arg depth)" name="bundle_rotation_sim" default="-1.57079632679 0 0"/>
+  <!-- Transform from marker_tf_root to bundle - in hardware -->  
+  <arg if="$(arg depth)" name="bundle_translation_hw" default="0.725 0.17 0"/>
+  <arg unless="$(arg depth)" name="bundle_translation_hw" default="0.725 0.17 0"/>
+  <arg if="$(arg depth)" name="bundle_rotation_hw" default="-3.14159265359 0.0 0.0"/>
+  <arg unless="$(arg depth)" name="bundle_rotation_hw" default="3.14159265359 0 0.0"/>
+
+  <!-- Bundle pose used in simulation -->
+  <arg if="$(arg sim)" name="bundle_pose" default="$(arg bundle_translation_sim) $(arg bundle_rotation_sim)"/>
+
+  <!-- Bundle pose as taped down in the lab -->
+  <arg unless="$(arg sim)" name="bundle_pose" default="$(arg bundle_translation_hw) $(arg bundle_rotation_hw)"/>
+
+  <arg name="bundle_pose_interactive_marker" default="true"/>
+  <arg if="$(arg bundle_pose_interactive_marker)" name="static_publisher_pkg" value="lcsr_tf_tools"/>
+  <arg if="$(arg bundle_pose_interactive_marker)" name="static_publisher_type" value="interactive_transform_publisher"/>
+  <arg unless="$(arg bundle_pose_interactive_marker)" name="static_publisher_pkg" value="tf"/>
+  <arg unless="$(arg bundle_pose_interactive_marker)" name="static_publisher_type" value="static_transform_publisher"/>
+  
+  <node name="ar_bundle_tf_broadcaster" pkg="$(arg static_publisher_pkg)" type="$(arg static_publisher_type)" args="$(arg bundle_pose) $(arg marker_tf_root) $(arg marker_bundle_tf_name) 0.2"/>
+  <node pkg="tf" type="static_transform_publisher" name="ar_tag_0_tf_broadcaster" args="$(arg marker_0_pose) $(arg marker_bundle_tf_name) $(arg marker_tf_name) 1"/>
+  <include file="$(find sr_camera_pose_estimation)/launch/calibration.launch">
+    <arg name="marker_tf_name" value="$(arg marker_tf_name)"/>
+    <arg name="depth" value="$(arg depth)"/>
+    <arg name="continuous" default="$(arg continuous)"/>
+    <arg name="window_width" default="$(arg window_width)"/>
+    <arg if="$(arg depth)" name="cam_info_topic" default="$(arg cam_info_topic)" />
+  </include>
+</launch>

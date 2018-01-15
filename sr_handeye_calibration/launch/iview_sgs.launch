@@ -1,0 +1,77 @@
+<launch>
+  <arg name="hand" default="hand_h" />
+  <arg name="arm" default="ur10"/>
+  <arg name="sim" default="false" />
+  <arg name="sim_camera" default="$(arg sim)" />
+  
+  <arg name="octomap" default="false" />
+  <arg name="object_recognition" default="false" />
+  
+  <arg name="scene" default="true" />
+  <arg name="grasp_controller" default="true" />
+  
+  <arg name="orbbec_astra" default="false" />
+  <arg name="kinect" default="true" />
+  
+  <arg name="extrinsic_calibration_delay" default="15" />
+  <arg name="initial_z" default="0.7621" />
+  
+  
+  <arg name="start_home" default="$(arg sim)" />
+  
+  <arg name="sat_grasp_controller" default="false" />
+  <arg name="load_sat_grasps" default="true" />
+  
+  <!-- Robot stuff -->
+  <arg if="$(eval arg('arm') + '_' + arg('hand') == 'ur10_hand_h')" name="robot_launch_file"
+       value="$(find fh_robot_launch)/launch/fh_ur10_and_fh2.launch" />
+  <arg if="$(eval arg('arm') + '_' + arg('hand') == 'ur10_hand_e')" name="robot_launch_file"
+       value="$(find sr_robot_launch)/launch/sr_right_ur10arm_hand.launch" />
+  <arg if="$(eval arg('arm') + '_' + arg('hand') == 'iiwa_hand_g')" name="robot_launch_file"
+       value="$(find sat_iiwa_launch)/launch/sr_iiwa.launch" />
+       
+  <arg if="$(eval arg('arm') + '_' + arg('hand') == 'ur10_hand_h')" name="robot_description"
+       value="$(find fh_2_ur10_moveit_config)/config/fh_v2_ur10_with_hand.urdf.xacro" />
+  <arg if="$(eval arg('arm') + '_' + arg('hand') == 'ur10_hand_e')" name="robot_description"
+       default="$(find sr_multi_description)/urdf/right_srhand_ur10_joint_limited.urdf.xacro" />
+  <arg if="$(eval arg('arm') + '_' + arg('hand') == 'iiwa_hand_g')" name="robot_description"
+       value="$(find sat_iiwa_description)/urdf/sat_iiwa.urdf.xacro" />
+            
+  <!-- Set scene for robot after delay to start after moveit - restrains movement -->
+  <arg name="scene_file" default="$(find sr_description_common)/scenes/251_lab_table_full.scene"/>
+  <include file="$(arg robot_launch_file)">
+    <env name="GAZEBO_MODEL_PATH" value="$(find sat_description)/models/" />
+    <env name="GAZEBO_MODEL_DATABASE_URI" value="" />
+    <env name="MESH_WORKSPACE_PATH" value="$(find sat_description)/models/" />
+    <arg name="sim" value="$(arg sim)"/>
+    <arg name="robot_description" value="$(arg robot_description)"/>
+    <arg name="scene" value="$(arg scene)" />
+    <arg name="scene_file" value="$(arg scene_file)" />
+    <arg if="$(eval arg('hand') == 'hand_h')" name="grasp_controller" value="$(arg grasp_controller)" />
+    <arg name="world" default="$(find sr_description_common)/worlds/251_lab_table_full.world" if="$(arg sim)"/>
+    <arg name="initial_z" default="$(arg initial_z)" />
+    <arg name="start_home" default="$(arg start_home)" />
+  </include>
+  
+  <!-- Camera stuff -->
+  <include if="$(arg kinect)" file="$(find sat_vision)/launch/kinect.launch">
+    <arg name="sim" value="$(arg sim_camera)"/>
+    <arg name="extrinsic_calibration_delay" value="$(arg extrinsic_calibration_delay)"/>
+  </include>
+  <include if="$(arg orbbec_astra)" file="$(find sat_vision)/launch/orbbec_astra.launch">
+    <arg name="sim" value="$(arg sim_camera)"/>
+    <arg name="extrinsic_calibration_delay" value="$(arg extrinsic_calibration_delay)"/>
+  </include>
+
+  <!-- Collision stuff -->
+  <rosparam if="$(arg octomap)" command="load" ns="move_group" file="$(find sat_description)/moveit/config/sensors_point_cloud.yaml" />
+
+  <!-- Grasping stuff -->
+  <include file="$(find sr_manipulation_launch)/launch/grasp_selector_with_db.launch">
+    <arg name="object_publisher" default="false" />
+  </include>
+  <node if="$(arg sat_grasp_controller)" name="grasp_controller" pkg="sat_grasp_controller" type="grasp_controller.py"/>
+  <node if="$(arg load_sat_grasps)" pkg="fh_robot_launch" type="timed_roslaunch.sh" args="20 sat_grasp_controller load_grasps.launch" 
+    name="timed_sat_load_grasps" output="screen"/>
+
+</launch>

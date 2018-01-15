@@ -1,0 +1,29 @@
+<launch>
+  <arg name="sim" default="false" />
+  <arg name="extrinsic_calibration" default="true" />
+  <arg name="extrinsic_calibration_depth" default="true" />
+  <arg name="extrinsic_calibration_delay" default="1" />
+
+  <!-- Simulated camera stuff -->
+  <arg if="$(arg sim)" name="x" default="1.5" />
+  <arg if="$(arg sim)" name="y" default="1.5" />
+  <arg if="$(arg sim)" name="z" default="1.4" />
+  <arg if="$(arg sim)" name="R" default="0.0" />
+  <arg if="$(arg sim)" name="P" default="0.6" />
+  <arg if="$(arg sim)" name="Y" default="-2.35" />
+  <!-- If simualating, convert a xacro and put on parameter server -->
+  <param if="$(arg sim)" name="kinect_description" command="$(find xacro)/xacro.py $(find sat_description)/sensors/kinect.urdf.xacro" />
+  <!-- If simualating, spawn a robot into Gazebo -->
+  <node if="$(arg sim)" name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param kinect_description -urdf -model kinect -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)" respawn="false" output="screen" />
+  <!-- If simualating, publish static transforms like the real camera drivers do -->
+  <include if="$(arg sim)" file="$(find rgbd_launch)/launch/kinect_frames.launch" />
+
+  <!-- Real camera stuff -->
+  <include unless="$(arg sim)" file="$(find freenect_launch)/launch/freenect.launch" />
+  <param name="/camera/driver/depth_registration" type="bool" value="true" />
+  <param name="/camera/driver/data_skip" type="int" value="120" />
+
+  <!-- Extrinsic calibration stuff -->
+  <node if="$(arg extrinsic_calibration)" pkg="fh_robot_launch" type="timed_roslaunch.sh" args="$(arg extrinsic_calibration_delay) sat_vision extrinsic_calibration.launch 
+    depth:=$(arg extrinsic_calibration_depth) sim:=$(arg sim) cam_info_topic:=/camera/depth_registered/camera_info cam_image_topic:=/camera/depth_registered/points" name="timed_extrinsic_calibration" output="screen"/>
+</launch>
