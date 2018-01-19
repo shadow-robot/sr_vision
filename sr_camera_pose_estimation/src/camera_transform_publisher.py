@@ -119,6 +119,7 @@ class CameraTransformPublisher(object):
                                                    ' {}'.format(self.alvar_med_filt_size) if
                                                    (executable == 'findMarkerBundles') else '',
                                                    self.alvar_bundle_files)
+            print(args)
             node = roslaunch.core.Node(package, executable, args=args)
             self.launch = roslaunch.scriptapi.ROSLaunch()
             self.launch.start()
