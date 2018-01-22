@@ -7,7 +7,7 @@
   <arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
   <arg name="continuous" default="false" />
   <arg name="window_width" default="100" />
-  <arg name="camera_root_frame" default="camera_bar" />
+  <arg name="camera_root_frame" default="camera_bar" />  <!-- phobos: camera_bar --><!-- kinect: camera_link -->
   <arg name="desired_camera_parent_frame" default="ra_base_link" />
   <arg name="marker_id" default="0" />
   <arg name="marker_tf_name" default="ar_marker_0_static" />
@@ -19,7 +19,7 @@
   <arg if="$(arg depth)" name="med_filt_size" default="10" />
   <arg unless="$(arg depth)" name="cam_image_topic" default="/phobos/left_camera/image_rect" />
   <arg unless="$(arg depth)" name="cam_info_topic" default="/phobos/left_camera/camera_info" />	
-  <arg unless="$(arg depth)" name="output_frame" default="left_cam_broadcaster" /> <!--camera_rgb_optical_frame-->
+  <arg unless="$(arg depth)" name="output_frame" default="left_cam_broadcaster" /> <!-- camera_rgb_optical_frame THIS IS NOT USED-->
   <arg unless="$(arg depth)" name="alvar_node" default="findMarkerBundlesNoKinect" />
   <arg unless="$(arg depth)" name="med_filt_size" default="" />
 

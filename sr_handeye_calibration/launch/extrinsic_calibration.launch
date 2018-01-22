@@ -1,5 +1,5 @@
 <launch>
-  <arg name="depth" default="true"/>
+  <arg name="depth" default="false"/>
   <arg name="continuous" default="false"/>
   <arg name="window_width" default="50"/>
   <arg name="marker_bundle_tf_name" default="ar_marker_bundle"/>
