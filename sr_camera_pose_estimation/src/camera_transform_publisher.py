@@ -13,6 +13,7 @@ from pose_averager import PoseAverager
 class CameraTransformPublisher(object):
 
     def __init__(self):
+        print "intialising CameraTransformPublisher"
         self.get_params()
         self.transform_buffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.transform_buffer)
@@ -20,7 +21,7 @@ class CameraTransformPublisher(object):
         self.alvar_process = None
         self.launch = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
-        self.ignore_first = 20
+        self.ignore_first = 2500
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
         rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
@@ -52,15 +53,38 @@ class CameraTransformPublisher(object):
         self.alvar_med_filt_size = rospy.get_param('~alvar_med_filt_size')
         self.alvar_bundle_files = rospy.get_param('~alvar_bundle_files')
 
+
     def run(self):
+        print "starting ar_track_alvar"
         self.start_ar_track_alvar()
         rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
         rospy.loginfo('Waiting for AR marker pose topic...')
         rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
         rospy.loginfo('AR marker pose topic found!')
+
+        import sys, select, os
+
+        print "Wait for calibration finish or give input to stop when happy..."
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
+            os.system('cls' if os.name == 'nt' else 'clear')
             ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
+            print ar_track_alvar_markers
             self.on_ar_marker_message(ar_track_alvar_markers)
+            if sys.stdin in select.select([sys.stdin], [], [], 0)[0]:
+                line = raw_input()
+                break
+
+        # save transform to file XXX??
+        # with open('/home/user/projects/shadow_robot/base/src/sr_demos/iview_sgs/config/world2camera_tf.txt', 'a') as the_file:
+        #
+        #     the_file.write('Hello\n')
+
+        # while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
+        #     ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
+        #     print ar_track_alvar_markers
+        #     self.on_ar_marker_message(ar_track_alvar_markers)
+
+
         self.stop_ar_track_alvar()
         self.counter = 0
 
@@ -119,7 +143,6 @@ class CameraTransformPublisher(object):
                                                    ' {}'.format(self.alvar_med_filt_size) if
                                                    (executable == 'findMarkerBundles') else '',
                                                    self.alvar_bundle_files)
-            print(args)
             print(args)
             node = roslaunch.core.Node(package, executable, args=args)
             self.launch = roslaunch.scriptapi.ROSLaunch()
