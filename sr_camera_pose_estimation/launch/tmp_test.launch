@@ -1,0 +1,6 @@
+<launch>
+<node pkg="tf" type="static_transform_publisher" name="mock_world" args="-0.2 0.0 0.0 0 0.0 0.0 ar_marker_0 world 1" />
+
+<include file="$(find sr_camera_launch)/launch/kinect.launch" />
+<include file="$(find sr_marker_recognition)/launch/alvar.launch" />
+</launch>
