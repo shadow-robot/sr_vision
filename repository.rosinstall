@@ -4,6 +4,18 @@
     version: kinetic-devel
     
 - git:
+    local-name: ar_track_alvar
+    uri: https://github.com/ros-perception/ar_track_alvar
+    version: kinetic-devel
+    
+- git:
     local-name: easy_handeye
     uri: https://github.com/marcoesposito1988/easy_handeye
     version: master
+    
+- git:
+    local-name: common_resources
+    uri: https://github.com/shadow-robot/common_resources.git
+    version: kinetic-devel
+
+    

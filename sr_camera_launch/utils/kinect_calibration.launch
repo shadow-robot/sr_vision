@@ -1,0 +1,9 @@
+<launch>
+  <arg name="image_topic" default="/camera/rgb/image_raw" />
+  <arg name="camera" default="/camera/rgb" />
+  <arg name="size" default="8x6" />
+  <arg name="square" default="0.059" />
+
+  <include file="$(find freenect_launch)/launch/freenect.launch" />
+  <node name="kinect_calibration" pkg="camera_calibration" type="cameracalibrator.py" args="image:=$(arg image_topic) camera:=$(arg camera) --size $(arg size) --square $(arg square)" />
+</launch>
