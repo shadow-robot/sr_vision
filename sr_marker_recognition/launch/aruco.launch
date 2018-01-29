@@ -1,0 +1,19 @@
+<launch>
+    <arg name="marker_size" default="0.191"/>
+    <arg name="marker_id" default="1"/>
+    <arg name="reference_frame" default="camera_link"/>
+    <arg name="camera_frame" default="camera_rgb_optical_frame"/>
+    <arg name="marker_frame" default="camera_marker"/>
+
+    <!-- start ArUco -->
+    <node name="aruco_tracker" pkg="aruco_ros" type="single">
+        <remap from="/camera_info" to="/camera/rgb/camera_info" />
+        <remap from="/image" to="/camera/rgb/image_rect_color" />
+        <param name="image_is_rectified" value="true"/>
+        <param name="marker_size" value="$(arg marker_size)"/>
+        <param name="marker_id" value="$(arg marker_id)"/>
+        <param name="reference_frame" value="$(arg reference_frame)"/>
+        <param name="camera_frame" value="$(arg camera_frame)"/>
+        <param name="marker_frame" value="$(arg marker_frame)" />
+    </node>
+</launch>
