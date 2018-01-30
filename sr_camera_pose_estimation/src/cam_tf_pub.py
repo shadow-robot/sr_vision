@@ -14,29 +14,27 @@ class CameraTransformPublisher(object):
 
     def __init__(self):
         self.get_params()
-        self.transform_buffer = tf2_ros.Buffer()
-        self.listener = tf2_ros.TransformListener(self.transform_buffer)
+        #self.transform_buffer = tf2_ros.Buffer()
+        #self.listener = tf2_ros.TransformListener(self.transform_buffer)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
-        self.alvar_process = None
-        self.launch = None
         #self.pose_averager = PoseAverager(window_width=self.window_width)
-        self.ignore_first = 20
-        self.counter = 0
+        #self.ignore_first = 20
+        #self.counter = 0
+        self.broadcast_marker_to_root()
         self.run()
         while not rospy.is_shutdown():
             rospy.spin()
 
     def get_params(self):
-        #self.marker_frame = rospy.get_param('~marker_tf_name')
-        #self.root_frame = rospy.get_param('~root_frame')
+        self.marker_frame_name = rospy.get_param('~marker_frame_name')
+        self.marker_root_frame_name = rospy.get_param('~marker_root_frame_name')
         #self.camera_frame = rospy.get_param('~camera_frame')
         self.marker_to_root_pose = rospy.get_param('~marker_to_root_pose')
         #self.continuous = rospy.get_param('~continuous')
         #self.window_width = rospy.get_param('~window_width')
 
     def run(self):
-        rospy.loginfo('*********** {} ************'.format(self.marker_to_root_pose))
-        rospy.loginfo('*********** {} ************'.format(type(self.marker_to_root_pose)))
+        pass
         #rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
         #rospy.loginfo('Waiting for AR marker pose topic...')
         #rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
@@ -46,6 +44,29 @@ class CameraTransformPublisher(object):
             #self.on_ar_marker_message(ar_track_alvar_markers)
         #self.stop_ar_track_alvar()
         #self.counter = 0
+        
+    def broadcast_marker_to_root(self):        
+        marker_to_root_transform = self.get_transform(self.marker_frame_name, self.marker_root_frame_name, self.marker_to_root_pose)
+        self.broadcaster.sendTransform(marker_to_root_transform)
+        
+    @staticmethod
+    def get_transform(name, root_name, pose):
+        static_transform_stamped = TransformStamped()
+        static_transform_stamped.header.stamp = rospy.Time.now()
+
+        static_transform_stamped.header.frame_id = name
+        static_transform_stamped.child_frame_id = root_name
+
+        static_transform_stamped.transform.translation.x = pose[0]
+        static_transform_stamped.transform.translation.y = pose[1]
+        static_transform_stamped.transform.translation.z = pose[2]
+
+        quat = transformations.quaternion_from_euler(pose[3], pose[4], pose[5])
+        static_transform_stamped.transform.rotation.x = quat[0]
+        static_transform_stamped.transform.rotation.y = quat[1]
+        static_transform_stamped.transform.rotation.z = quat[2]
+        static_transform_stamped.transform.rotation.w = quat[3]
+        return static_transform_stamped
 
     #def on_ar_marker_message(self, ar_track_alvar_markers):
         #for marker in ar_track_alvar_markers.markers:
