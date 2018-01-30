@@ -5,7 +5,7 @@ import roslaunch
 import rospy
 import tf2_ros
 from ar_track_alvar_msgs.msg import AlvarMarkers
-from geometry_msgs.msg import Transform, TransformStamped
+from geometry_msgs.msg import Pose, Transform, TransformStamped
 from tf import transformations
 from pose_averager import PoseAverager
 
@@ -14,13 +14,13 @@ class CameraTransformPublisher(object):
 
     def __init__(self):
         self.get_params()
-        #self.transform_buffer = tf2_ros.Buffer()
-        #self.listener = tf2_ros.TransformListener(self.transform_buffer)
+        self.transform_buffer = tf2_ros.Buffer()
+        self.listener = tf2_ros.TransformListener(self.transform_buffer)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
         #self.pose_averager = PoseAverager(window_width=self.window_width)
         #self.ignore_first = 20
         #self.counter = 0
-        self.broadcast_marker_to_root()
+        self.broadcast_root_to_camera()
         self.run()
         while not rospy.is_shutdown():
             rospy.spin()
@@ -28,45 +28,49 @@ class CameraTransformPublisher(object):
     def get_params(self):
         self.marker_frame_name = rospy.get_param('~marker_frame_name')
         self.marker_root_frame_name = rospy.get_param('~marker_root_frame_name')
-        #self.camera_frame = rospy.get_param('~camera_frame')
+        self.camera_frame_name = rospy.get_param('~camera_frame_name')
         self.marker_to_root_pose = rospy.get_param('~marker_to_root_pose')
         #self.continuous = rospy.get_param('~continuous')
         #self.window_width = rospy.get_param('~window_width')
+        
+    def broadcast_root_to_camera(self):        
+        marker_to_marker_root_pose = self.list_to_pose(self.marker_to_root_pose) #
+        root_to_camera_transform = self.root_to_camera_transform(marker_to_marker_root_pose)
+        root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform, self.marker_root_frame_name, self.camera_frame_name)
+        self.broadcaster.sendTransform(root_to_camera_transform_stamped)
+    
+    def root_to_camera_transform(self, marker_to_marker_root_pose):
+        waiting_for_transform = True
+        while waiting_for_transform:
+            try:
+                camera_to_marker_transform = self.transform_buffer.lookup_transform(self.camera_frame_name, self.marker_frame_name, rospy.Time())
+                waiting_for_transform = False
+            except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+                rospy.logwarn("Failed to find world -> AR marker ({} -> {})transform."
+                             .format(self.camera_frame_name, self.marker_frame_name))
+                rospy.sleep(1.0)
+                continue
 
-    def run(self):
-        pass
-        #rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
-        #rospy.loginfo('Waiting for AR marker pose topic...')
-        #rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
-        #rospy.loginfo('AR marker pose topic found!')
-        #while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
-            #ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
-            #self.on_ar_marker_message(ar_track_alvar_markers)
-        #self.stop_ar_track_alvar()
-        #self.counter = 0
-        
-    def broadcast_marker_to_root(self):        
-        marker_to_root_transform = self.get_transform(self.marker_frame_name, self.marker_root_frame_name, self.marker_to_root_pose)
-        self.broadcaster.sendTransform(marker_to_root_transform)
-        
+        camera_to_marker_matrix = matrix_from_transform(camera_to_marker_transform.transform)
+        marker_to_marker_root_matrix = matrix_from_pose(marker_to_marker_root_pose)
+        camera_to_root_matrix = np.dot(camera_to_marker_matrix, marker_to_marker_root_matrix)
+        root_to_camera_matrix = transformations.inverse_matrix(camera_to_root_matrix)
+        return transform_from_matrix(root_to_camera_matrix)
+    
     @staticmethod
-    def get_transform(name, root_name, pose):
-        static_transform_stamped = TransformStamped()
-        static_transform_stamped.header.stamp = rospy.Time.now()
+    def list_to_pose(l):
+        pose = Pose()
 
-        static_transform_stamped.header.frame_id = name
-        static_transform_stamped.child_frame_id = root_name
+        pose.position.x = l[0]
+        pose.position.y = l[1]
+        pose.position.z = l[2]
 
-        static_transform_stamped.transform.translation.x = pose[0]
-        static_transform_stamped.transform.translation.y = pose[1]
-        static_transform_stamped.transform.translation.z = pose[2]
-
-        quat = transformations.quaternion_from_euler(pose[3], pose[4], pose[5])
-        static_transform_stamped.transform.rotation.x = quat[0]
-        static_transform_stamped.transform.rotation.y = quat[1]
-        static_transform_stamped.transform.rotation.z = quat[2]
-        static_transform_stamped.transform.rotation.w = quat[3]
-        return static_transform_stamped
+        quat = transformations.quaternion_from_euler(l[3], l[4], l[5])
+        pose.orientation.x = quat[0]
+        pose.orientation.y = quat[1]
+        pose.orientation.z = quat[2]
+        pose.orientation.w = quat[3]
+        return pose
 
     #def on_ar_marker_message(self, ar_track_alvar_markers):
         #for marker in ar_track_alvar_markers.markers:
@@ -111,36 +115,46 @@ class CameraTransformPublisher(object):
         #self.broadcaster.sendTransform(transform_stamped)
 
 
-#def matrix_from_transform(transform):
-    #trans = [transform.translation.x, transform.translation.y, transform.translation.z]
-    #rot = [transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w]
-    #return matrix_from_trans_rot(trans, rot)
+def matrix_from_transform(transform):
+    trans = [transform.translation.x, transform.translation.y, transform.translation.z]
+    rot = [transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w]
+    return matrix_from_trans_rot(trans, rot)
 
 
-#def matrix_from_pose(pose):
-    #trans = [pose.position.x, pose.position.y, pose.position.z]
-    #rot = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
-    #return matrix_from_trans_rot(trans, rot)
+def matrix_from_pose(pose):
+    trans = [pose.position.x, pose.position.y, pose.position.z]
+    rot = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
+    return matrix_from_trans_rot(trans, rot)
+
+def matrix_from_trans_rot(trans, rot):
+    trans_mat = transformations.translation_matrix(trans)
+    rot_mat = transformations.quaternion_matrix(rot)
+    return transformations.concatenate_matrices(trans_mat, rot_mat)
 
 
-#def matrix_from_trans_rot(trans, rot):
-    #trans_mat = transformations.translation_matrix(trans)
-    #rot_mat = transformations.quaternion_matrix(rot)
-    #return transformations.concatenate_matrices(trans_mat, rot_mat)
+def transform_from_matrix(matrix):
+    trans = transformations.translation_from_matrix(matrix)
+    rot = transformations.quaternion_from_matrix(matrix)
+    transform = Transform()
+    transform.translation.x = trans[0]
+    transform.translation.y = trans[1]
+    transform.translation.z = trans[2]
+    transform.rotation.x = rot[0]
+    transform.rotation.y = rot[1]
+    transform.rotation.z = rot[2]
+    transform.rotation.w = rot[3]
+    return transform
 
-
-#def transform_from_matrix(matrix):
-    #trans = transformations.translation_from_matrix(matrix)
-    #rot = transformations.quaternion_from_matrix(matrix)
-    #transform = Transform()
-    #transform.translation.x = trans[0]
-    #transform.translation.y = trans[1]
-    #transform.translation.z = trans[2]
-    #transform.rotation.x = rot[0]
-    #transform.rotation.y = rot[1]
-    #transform.rotation.z = rot[2]
-    #transform.rotation.w = rot[3]
-    #return transform
+def transform_to_transform_stamped(trans, name, child_name):
+    trans_stamped = TransformStamped()
+    
+    trans_stamped.header.stamp = rospy.Time.now()
+    trans_stamped.header.frame_id = name
+    trans_stamped.child_frame_id = child_name
+    
+    trans_stamped.transform = trans
+    
+    return trans_stamped
 
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")
