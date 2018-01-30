@@ -1,7 +1,7 @@
 <launch>
-    <arg name="marker_to_root_pose" default="[-0.2, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+    <arg name="marker_to_root_cartesian" default="[-0.2, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
     <arg name="marker_frame_name" default="ar_marker_0"/>
-    <arg name="marker_root_frame_name" default="ra_base_link"/>
+    <arg name="root_frame_name" default="ra_base_link"/>
     <arg name="camera_frame_name" default="camera_link"/>
     <arg name="window_width" default="500"/>
     <arg name="filtering" default="true"/>
@@ -12,9 +12,9 @@
     
     <node pkg="tf" type="static_transform_publisher" name="mock_world" args="0.5 0.0 1.0 0 0.0 0.0 world ra_base_link 1" />
     <node pkg="sr_camera_pose_estimation" type="cam_tf_pub.py" name="tmp" output="screen">
-        <rosparam param="marker_to_root_pose" subst_value="True">$(arg marker_to_root_pose)</rosparam>
+        <rosparam param="marker_to_root_cartesian" subst_value="True">$(arg marker_to_root_cartesian)</rosparam>
         <param name="marker_frame_name" value="$(arg marker_frame_name)" />
-        <param name="marker_root_frame_name" value="$(arg marker_root_frame_name)" />
+        <param name="root_frame_name" value="$(arg root_frame_name)" />
         <param name="camera_frame_name" value="$(arg camera_frame_name)" />
         <param name="window_width" value="$(arg window_width)" />
         <param name="filtering" value="$(arg filtering)" />

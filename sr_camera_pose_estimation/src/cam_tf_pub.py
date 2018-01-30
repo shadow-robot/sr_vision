@@ -11,7 +11,6 @@ from pose_averager import PoseAverager
 
 
 class CameraTransformPublisher(object):
-
     def __init__(self):
         self.get_params()
         self.transform_buffer = tf2_ros.Buffer()
@@ -26,9 +25,9 @@ class CameraTransformPublisher(object):
 
     def get_params(self):
         self.marker_frame_name = rospy.get_param('~marker_frame_name')
-        self.marker_root_frame_name = rospy.get_param('~marker_root_frame_name')
+        self.root_frame_name = rospy.get_param('~root_frame_name')
         self.camera_frame_name = rospy.get_param('~camera_frame_name')
-        self.marker_to_root_pose = rospy.get_param('~marker_to_root_pose')
+        self.marker_to_root_cartesian = rospy.get_param('~marker_to_root_cartesian')
         self.continuous = rospy.get_param('~continuous')
         self.window_width = rospy.get_param('~window_width')
         self.filtering = rospy.get_param('~filtering')
@@ -37,13 +36,13 @@ class CameraTransformPublisher(object):
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
             if not self.continuous:
                 self.counter += 1
-            marker_to_marker_root_pose = cartesian_to_pose(self.marker_to_root_pose)
-            root_to_camera_transform = self.root_to_camera_transform(marker_to_marker_root_pose)
+            marker_to_root_pose = cartesian_to_pose(self.marker_to_root_cartesian)
+            root_to_camera_transform = self.get_root_to_camera_transform(marker_to_root_pose)
             if root_to_camera_transform is not None:
-                root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform, self.marker_root_frame_name, self.camera_frame_name)
+                root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform, self.root_frame_name, self.camera_frame_name)
                 self.broadcaster.sendTransform(root_to_camera_transform_stamped)
     
-    def root_to_camera_transform(self, marker_to_marker_root_pose):
+    def get_root_to_camera_transform(self, marker_to_root_pose):
         try:
             camera_to_marker_transform = self.transform_buffer.lookup_transform(self.camera_frame_name, self.marker_frame_name, rospy.Time())
             camera_to_marker_pose = transform_to_pose(camera_to_marker_transform.transform)
@@ -52,10 +51,11 @@ class CameraTransformPublisher(object):
                 camera_to_marker_pose = self.filter_pose(camera_to_marker_pose)
             
             camera_to_marker_matrix = matrix_from_pose(camera_to_marker_pose)
-            marker_to_marker_root_matrix = matrix_from_pose(marker_to_marker_root_pose)
+            marker_to_marker_root_matrix = matrix_from_pose(marker_to_root_pose)
             camera_to_root_matrix = np.dot(camera_to_marker_matrix, marker_to_marker_root_matrix)
             root_to_camera_matrix = transformations.inverse_matrix(camera_to_root_matrix)
             return transform_from_matrix(root_to_camera_matrix)
+
         except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
             rospy.logwarn("Failed to find world -> AR marker ({} -> {})transform."
                           .format(self.camera_frame_name, self.marker_frame_name))
@@ -67,15 +67,12 @@ class CameraTransformPublisher(object):
             return self.pose_averager.new_value(pose)
         else:
             return pose
-    
 
 def cartesian_to_pose(coordinates):
     pose = Pose()
-
     pose.position.x = coordinates[0]
     pose.position.y = coordinates[1]
     pose.position.z = coordinates[2]
-
     quat = transformations.quaternion_from_euler(coordinates[3], coordinates[4], coordinates[5])
     pose.orientation.x = quat[0]
     pose.orientation.y = quat[1]
@@ -88,7 +85,6 @@ def matrix_from_transform(transform):
     rot = [transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w]
     return matrix_from_trans_rot(trans, rot)
 
-
 def matrix_from_pose(pose):
     trans = [pose.position.x, pose.position.y, pose.position.z]
     rot = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
@@ -98,7 +94,6 @@ def matrix_from_trans_rot(trans, rot):
     trans_mat = transformations.translation_matrix(trans)
     rot_mat = transformations.quaternion_matrix(rot)
     return transformations.concatenate_matrices(trans_mat, rot_mat)
-
 
 def transform_from_matrix(matrix):
     trans = transformations.translation_from_matrix(matrix)
@@ -115,18 +110,14 @@ def transform_from_matrix(matrix):
 
 def transform_to_transform_stamped(trans, name, child_name):
     trans_stamped = TransformStamped()
-    
     trans_stamped.header.stamp = rospy.Time.now()
     trans_stamped.header.frame_id = name
     trans_stamped.child_frame_id = child_name
-    
     trans_stamped.transform = trans
-    
     return trans_stamped
 
 def transform_to_pose(trans):
     pose = Pose()
-    
     pose.position.x = trans.translation.x
     pose.position.y = trans.translation.y
     pose.position.z = trans.translation.z
@@ -134,7 +125,6 @@ def transform_to_pose(trans):
     pose.orientation.y = trans.rotation.y
     pose.orientation.z = trans.rotation.z
     pose.orientation.w = trans.rotation.w
-    
     return pose
     
 
