@@ -3,8 +3,11 @@
     <arg name="marker_frame_name" default="ar_marker_0"/>
     <arg name="marker_root_frame_name" default="ra_base_link"/>
     <arg name="camera_frame_name" default="camera_link"/>
+    <arg name="window_width" default="500"/>
+    <arg name="filtering" default="true"/>
+    <arg name="continuous" default="true"/>
     
-    <!-- <include file="$(find sr_camera_launch)/launch/kinect.launch" /> -->
+    <include file="$(find sr_camera_launch)/launch/kinect.launch" />
     <include file="$(find sr_marker_recognition)/launch/alvar.launch" />
     
     <node pkg="tf" type="static_transform_publisher" name="mock_world" args="0.5 0.0 1.0 0 0.0 0.0 world ra_base_link 1" />
@@ -13,5 +16,8 @@
         <param name="marker_frame_name" value="$(arg marker_frame_name)" />
         <param name="marker_root_frame_name" value="$(arg marker_root_frame_name)" />
         <param name="camera_frame_name" value="$(arg camera_frame_name)" />
+        <param name="window_width" value="$(arg window_width)" />
+        <param name="filtering" value="$(arg filtering)" />
+        <param name="continuous" value="$(arg continuous)" />
     </node>
 </launch>
