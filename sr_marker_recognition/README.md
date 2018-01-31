@@ -52,7 +52,7 @@ Parameters available:
 
 - Frame description:
 
-Frame of a recognized Alvar marker is denoted as in the figure below:
+Frame of a recognized Aruco marker is denoted as in the figure below:
 
 ![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_launch/docs/aruco_frame.jpg)
 
