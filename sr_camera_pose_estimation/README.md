@@ -27,6 +27,8 @@ Parameters available:
 
 `marker_to_root_cartesian` - cartesian pose of the marker with respect to the root frame. The rotations in the frame are represented by [extrinsic rotations](https://en.wikipedia.org/wiki/Euler_angles#Definition_by_extrinsic_rotations) or eurler angles. To properly set this value you need to know the coordinate frame of the markers, as described [here](https://github.com/shadow-robot/sr_vision/tree/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition).
 
+`marker_frame_name` - default (for alvar) `ar_marker_0`. This is a name of the marker frame that is position with respect to the root.
+
 `root_frame_name` - default `ra_base_link`. Can be set to any static frame that is in the scene as long as the distance to the marker can be measured (or mocked).
 
 `camera_frame_name` - default `camera_link`. Frame of the camera from which we want to know the final transform to the root frame.
