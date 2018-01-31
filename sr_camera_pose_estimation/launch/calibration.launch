@@ -6,12 +6,8 @@
     <arg name="window_width" default="500"/>
     <arg name="filtering" default="true"/>
     <arg name="continuous" default="true"/>
-    
-    <include file="$(find sr_camera_launch)/launch/kinect.launch" />
-    <include file="$(find sr_marker_recognition)/launch/alvar.launch" />
-    
-    <node pkg="tf" type="static_transform_publisher" name="mock_world" args="0.5 0.0 1.0 0 0.0 0.0 world ra_base_link 1" />
-    <node pkg="sr_camera_pose_estimation" type="cam_tf_pub.py" name="tmp" output="screen">
+
+    <node pkg="sr_camera_pose_estimation" type="camera_transform_publisher.py" name="camera_transform_publisher" output="screen">
         <rosparam param="marker_to_root_cartesian" subst_value="True">$(arg marker_to_root_cartesian)</rosparam>
         <param name="marker_frame_name" value="$(arg marker_frame_name)" />
         <param name="root_frame_name" value="$(arg root_frame_name)" />
