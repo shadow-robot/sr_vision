@@ -21,7 +21,7 @@ class CameraTransformPublisher(object):
         self.alvar_process = None
         self.launch = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
-        self.ignore_first = 2500
+        self.ignore_first = 300
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
         rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
@@ -55,6 +55,7 @@ class CameraTransformPublisher(object):
 
 
     def run(self):
+        raw_input("Press Enter to start ext calibration")
         print "starting ar_track_alvar"
         self.start_ar_track_alvar()
         rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
@@ -75,16 +76,17 @@ class CameraTransformPublisher(object):
                 break
 
         # save transform to file XXX??
-        # with open('/home/user/projects/shadow_robot/base/src/sr_demos/iview_sgs/config/world2camera_tf.txt', 'a') as the_file:
-        #
-        #     the_file.write('Hello\n')
+        with open('/home/user/projects/shadow_robot/base/src/sr_demos/iview_sgs/config/world2camera_tf.txt', 'a') as the_file:
+
+            the_file.write('Hello\n')
 
         # while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
         #     ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
         #     print ar_track_alvar_markers
         #     self.on_ar_marker_message(ar_track_alvar_markers)
 
-
+        world2camera = self.transform_buffer.lookup_transform("world", "camera_bar", rospy.Time(0), rospy.Duration(3.0))
+        print world2camera
         self.stop_ar_track_alvar()
         self.counter = 0
 
