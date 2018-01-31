@@ -50,7 +50,7 @@ In this setup, following elements are used:
 - real Kinect camera with depth registration,
 - Alvar marker recognition in bundle depth mode,
 - mock `world` and `ra_base_link` frames are published using [this](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/launch/mock_world_transforms.launch) launch file,
-- [marker bundle](https://github.com/shadow-robot/common_resources/blob/kinetic-devel/sr_description_common/ar_markers/ar_marker_0_1_2_3_a4.xml) places in the view of the camera.
+- [marker bundle](https://github.com/shadow-robot/common_resources/blob/kinetic-devel/sr_description_common/ar_markers/ar_marker_0_1_2_3_a4.xml) placed in the view of the camera.
 
 After launching the nodes, following tf tree is obtained:
 
