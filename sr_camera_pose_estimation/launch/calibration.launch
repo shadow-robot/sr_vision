@@ -1,50 +1,23 @@
 <launch>
-  <arg name="sim" default="false" />
-  <arg name="depth" default="false" />
-  <arg name="marker_size" default="9.0" />
-  <arg name="max_new_marker_error" default="0.08" />
-  <arg name="max_track_error" default="0.0" />
-  <arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
-  <arg name="continuous" default="false" />
-  <arg name="window_width" default="100" />
-  <arg name="camera_root_frame" default="camera_link" />
-  <arg name="desired_camera_parent_frame" default="ra_base_link" />
-  <arg name="marker_id" default="0" />
-  <arg name="marker_tf_name" default="ar_marker_0_static" />
-
-  <arg if="$(arg depth)" name="cam_image_topic" default="/camera/depth_registered/points" />
-  <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth_registered/camera_info" />	
-  <arg if="$(arg depth)" name="output_frame" default="camera_depth_optical_frame" />
-  <arg if="$(arg depth)" name="alvar_node" default="findMarkerBundles" />
-  <arg if="$(arg depth)" name="med_filt_size" default="10" />
-  <arg unless="$(arg depth)" name="cam_image_topic" default="/camera/rgb/image_raw" />
-  <arg unless="$(arg depth)" name="cam_info_topic" default="/camera/rgb/camera_info" />	
-  <arg unless="$(arg depth)" name="output_frame" default="camera_rgb_optical_frame" />
-  <arg unless="$(arg depth)" name="alvar_node" default="findMarkerBundlesNoKinect" />
-  <arg unless="$(arg depth)" name="med_filt_size" default="" />
-
-  <node pkg="tf" type="static_transform_publisher" name="ar_bundle_broadcaster" args="0.0 0.181782910824 0.0 -1.532 0.0 0.0 ra_base_link ar_marker_bundle_static 1" />
-  <!-- useful to use interactive_transform, used instead of static_transform below, for setting calibration by adjusting point cloud to match robot in rviz -->
-  <!--node pkg="lcsr_tf_tools" type="interactive_transform_publisher" name="ar_bundle_broadcaster" args="0.0 0.28235 0.0 -1.57079632679 0.0 0.0 ra_base_link ar_marker_bundle_static 1" /-->
-  <node pkg="tf" type="static_transform_publisher" name="ar_tag_0_broadcaster" args="-0.05 0.055 0 0.0 0 0 ar_marker_bundle_static ar_marker_0_static 1" />
-  
-  <node pkg="sr_camera_pose_estimation" type="camera_transform_publisher.py" name="sr_camera_transform_publisher" output="screen" >
-    <param name="ar_marker_topic" value="ar_pose_marker" />
-    <param name="camera_image_topic" value="$(arg cam_image_topic)" />
-    <param name="marker_static_tf_name" value="$(arg marker_tf_name)" />
-    <param name="marker_id" value="$(arg marker_id)" />
-    <param name="camera_root_frame" value="$(arg camera_root_frame)" />
-    <param name="desired_camera_parent_frame" value="$(arg desired_camera_parent_frame)" />
-    <param name="continuous" value="$(arg continuous)" />
-    <param name="window_width" value="$(arg window_width)" />
-    <param name="alvar_node_type" value="$(arg alvar_node)" />
-    <param name="alvar_marker_size" value="$(arg marker_size)" />
-    <param name="alvar_max_new_marker_error" value="$(arg max_new_marker_error)" />
-    <param name="alvar_max_track_error" value="$(arg max_track_error)" />
-    <param name="alvar_cam_image_topic" value="$(arg cam_image_topic)" />
-    <param name="alvar_cam_info_topic" value="$(arg cam_info_topic)" />
-    <param name="alvar_output_frame" value="$(arg camera_root_frame)" />
-    <param name="alvar_med_filt_size" value="$(arg med_filt_size)" />
-    <param name="alvar_bundle_files" value="$(arg bundle_files)" />
-  </node>
+    <arg name="marker_to_root_cartesian" default="[-0.2, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+    <arg name="marker_frame_name" default="ar_marker_0"/>
+    <arg name="root_frame_name" default="ra_base_link"/>
+    <arg name="camera_frame_name" default="camera_link"/>
+    <arg name="window_width" default="500"/>
+    <arg name="filtering" default="true"/>
+    <arg name="continuous" default="true"/>
+    
+    <include file="$(find sr_camera_launch)/launch/kinect.launch" />
+    <include file="$(find sr_marker_recognition)/launch/alvar.launch" />
+    
+    <node pkg="tf" type="static_transform_publisher" name="mock_world" args="0.5 0.0 1.0 0 0.0 0.0 world ra_base_link 1" />
+    <node pkg="sr_camera_pose_estimation" type="cam_tf_pub.py" name="tmp" output="screen">
+        <rosparam param="marker_to_root_cartesian" subst_value="True">$(arg marker_to_root_cartesian)</rosparam>
+        <param name="marker_frame_name" value="$(arg marker_frame_name)" />
+        <param name="root_frame_name" value="$(arg root_frame_name)" />
+        <param name="camera_frame_name" value="$(arg camera_frame_name)" />
+        <param name="window_width" value="$(arg window_width)" />
+        <param name="filtering" value="$(arg filtering)" />
+        <param name="continuous" value="$(arg continuous)" />
+    </node>
 </launch>
