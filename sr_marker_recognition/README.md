@@ -44,7 +44,7 @@ Before running marker node, make sure that a camera driver is running or put bot
 
 Parameters available:
 
-`marker_size` - Default `0.1965` (mm).
+`marker_size` - Default `0.1965` (m).
 
 `marker_id` - Default `1`. Represents [this marker](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/utils/aruco.png).
 
