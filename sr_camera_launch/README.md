@@ -4,13 +4,11 @@ This is a package containing code necessary for running cameras commonly used at
 
 ## Currently supported cameras
 ###### Kinect
-- Driver
+- Driver: <http://wiki.ros.org/freenect_launch>
 
-<http://wiki.ros.org/freenect_launch>
+- Usage:
 
-- Usage
-
-To run camera in default mode:
+To run the camera in default mode:
 
 `roslaunch sr_camera_launch kinect.launch`
 
@@ -21,13 +19,11 @@ Additional flags available:
 `depth_registration` - Default `true`. Set `false` to switch off depth registration in the driver
 
 ###### Orbbec Astra
-- Driver
+- Driver: <http://wiki.ros.org/astra_launch>
 
-<http://wiki.ros.org/astra_launch>
+- Usage:
 
-- Usage
-
-To run camera in default mode:
+To run the camera in default mode:
 
 `roslaunch sr_camera_launch kinect.launch`
 
