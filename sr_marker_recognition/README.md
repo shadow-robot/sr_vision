@@ -29,7 +29,7 @@ Parameters available:
 
 Frame of a recognized Alvar marker is denoted as in the figure below:
 
-![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/docs/alvar_frame.jpg)
+![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/doc/alvar_frame.jpg)
 
 where red, green and blue axes denote x, y and z respectively.
 
@@ -54,6 +54,6 @@ Parameters available:
 
 Frame of a recognized Aruco marker is denoted as in the figure below:
 
-![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/docs/aruco_frame.jpg)
+![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/doc/aruco_frame.jpg)
 
 where red, green and blue axes denote x, y and z respectively.
