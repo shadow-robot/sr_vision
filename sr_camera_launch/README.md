@@ -25,7 +25,7 @@ Additional flags available:
 
 To run the camera in default mode:
 
-`roslaunch sr_camera_launch kinect.launch`
+`roslaunch sr_camera_launch astra.launch`
 
 Additional flags available:
 
