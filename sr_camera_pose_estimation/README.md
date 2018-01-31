@@ -5,7 +5,10 @@ This is a package containing code necessary for calibrating camera pose in the s
 ## Overview
 
 The idea of method is to find a root (usually robot base) -> camera tranform when camera -> marker and marker -> root transforms are known. The general concept is described in the figure below:
-![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/diagram_camera_pose.jpg)
+
+<p align="center">
+  <img src="https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/diagram_camera_pose.jpg" alt="schematic"/>
+</p>
 
 In order to close the tf chain and find the calibration, as seen from the figure above, package needs to be provided three pieces of information:
 - root frame - provided by mock node in this package or a properly set scene,
@@ -51,8 +54,13 @@ In this setup, following elements are used:
 
 After launching the nodes, following tf tree is obtained:
 
-![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/tf_tree_marker.jpg)
+<p align="center">
+  <img src="https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/tf_tree.jpg" alt="tf_tree"/>
+</p>
 
 The scene can be investigated in rviz, where properly positioned frames and point cloud are present:
 
-![alt text](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/calib_scene.jpg)
+<p align="center">
+  <img src="https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/calib_scene.jpg" alt="scene"/>
+</p>
+
