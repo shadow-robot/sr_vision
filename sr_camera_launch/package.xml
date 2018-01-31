@@ -50,6 +50,7 @@
   <!--   <doc_depend>doxygen</doc_depend> -->
   <buildtool_depend>catkin</buildtool_depend>
   <run_depend>freenect_launch</run_depend>
+  <run_depend>astra_launch</run_depend>
   <run_depend>rgbd_launch</run_depend>
 
 
