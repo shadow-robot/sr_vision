@@ -1,9 +1,9 @@
 <launch>
-    <arg name="marker_to_root_cartesian" default="[-0.2, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+    <arg name="marker_to_root_cartesian" default="[0.67, 0.12, 0.0, 0.0, 0.0, 3.14159265359]"/>
     <arg name="marker_frame_name" default="ar_marker_0"/>
     <arg name="root_frame_name" default="ra_base_link"/>
     <arg name="camera_frame_name" default="camera_link"/>
-    <arg name="window_width" default="500"/>
+    <arg name="window_width" default="2000"/>
     <arg name="filtering" default="true"/>
     <arg name="continuous" default="true"/>
 
