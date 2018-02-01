@@ -31,7 +31,7 @@ class CameraTransformPublisher(object):
         self.continuous = rospy.get_param('~continuous')
         self.window_width = rospy.get_param('~window_width')
         self.filtering = rospy.get_param('~filtering')
-        
+
     def broadcast_root_to_camera(self):
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
             if not self.continuous:
@@ -39,17 +39,21 @@ class CameraTransformPublisher(object):
             marker_to_root_pose = cartesian_to_pose(self.marker_to_root_cartesian)
             root_to_camera_transform = self.get_root_to_camera_transform(marker_to_root_pose)
             if root_to_camera_transform is not None:
-                root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform, self.root_frame_name, self.camera_frame_name)
+                root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform,
+                                                                                  self.root_frame_name,
+                                                                                  self.camera_frame_name)
                 self.broadcaster.sendTransform(root_to_camera_transform_stamped)
-    
+
     def get_root_to_camera_transform(self, marker_to_root_pose):
         try:
-            camera_to_marker_transform = self.transform_buffer.lookup_transform(self.camera_frame_name, self.marker_frame_name, rospy.Time())
+            camera_to_marker_transform = self.transform_buffer.lookup_transform(self.camera_frame_name,
+                                                                                self.marker_frame_name,
+                                                                                rospy.Time())
             camera_to_marker_pose = transform_to_pose(camera_to_marker_transform.transform)
 
             if self.filtering:
                 camera_to_marker_pose = self.filter_pose(camera_to_marker_pose)
-            
+
             camera_to_marker_matrix = matrix_from_pose(camera_to_marker_pose)
             marker_to_marker_root_matrix = matrix_from_pose(marker_to_root_pose)
             camera_to_root_matrix = np.dot(camera_to_marker_matrix, marker_to_marker_root_matrix)
@@ -61,12 +65,13 @@ class CameraTransformPublisher(object):
                           .format(self.camera_frame_name, self.marker_frame_name))
             rospy.sleep(1.0)
             return None
-        
+
     def filter_pose(self, pose):
         if self.window_width > 1:
             return self.pose_averager.new_value(pose)
         else:
             return pose
+
 
 def cartesian_to_pose(coordinates):
     pose = Pose()
@@ -80,20 +85,24 @@ def cartesian_to_pose(coordinates):
     pose.orientation.w = quat[3]
     return pose
 
+
 def matrix_from_transform(transform):
     trans = [transform.translation.x, transform.translation.y, transform.translation.z]
     rot = [transform.rotation.x, transform.rotation.y, transform.rotation.z, transform.rotation.w]
     return matrix_from_trans_rot(trans, rot)
+
 
 def matrix_from_pose(pose):
     trans = [pose.position.x, pose.position.y, pose.position.z]
     rot = [pose.orientation.x, pose.orientation.y, pose.orientation.z, pose.orientation.w]
     return matrix_from_trans_rot(trans, rot)
 
+
 def matrix_from_trans_rot(trans, rot):
     trans_mat = transformations.translation_matrix(trans)
     rot_mat = transformations.quaternion_matrix(rot)
     return transformations.concatenate_matrices(trans_mat, rot_mat)
+
 
 def transform_from_matrix(matrix):
     trans = transformations.translation_from_matrix(matrix)
@@ -108,6 +117,7 @@ def transform_from_matrix(matrix):
     transform.rotation.w = rot[3]
     return transform
 
+
 def transform_to_transform_stamped(trans, name, child_name):
     trans_stamped = TransformStamped()
     trans_stamped.header.stamp = rospy.Time.now()
@@ -115,6 +125,7 @@ def transform_to_transform_stamped(trans, name, child_name):
     trans_stamped.child_frame_id = child_name
     trans_stamped.transform = trans
     return trans_stamped
+
 
 def transform_to_pose(trans):
     pose = Pose()
@@ -126,7 +137,7 @@ def transform_to_pose(trans):
     pose.orientation.z = trans.rotation.z
     pose.orientation.w = trans.rotation.w
     return pose
-    
+
 
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")
