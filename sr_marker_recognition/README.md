@@ -59,6 +59,6 @@ Frame of a recognized Aruco marker is denoted as in the figure below:
 where red, green and blue axes denote x, y and z coordinate respectively.
 
 ## Troubleshooting
-- Before launching either marker tracker, make sure that camera driver is running or put both in one launch file
+- Before launching either marker tracker, make sure that camera driver is running or call both from one launch file
 - When printing the markers, make sure they are exactly the size you specified in you launch files
 - Make sure your camera is properly intrinsicly calibrated which can significantly improve marker recognition reliability
