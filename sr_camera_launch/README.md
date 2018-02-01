@@ -3,7 +3,7 @@
 This is a package containing code necessary for running cameras commonly used at Shadow.
 
 ## Currently supported cameras
-###### Kinect
+### Kinect
 - Driver: <http://wiki.ros.org/freenect_launch>
 
 - Usage:
@@ -18,7 +18,7 @@ Parameters available:
 
 `depth_registration` - Default `true`. Set `false` to switch off depth registration in the driver
 
-###### Orbbec Astra
+### Orbbec Astra
 - Driver: <http://wiki.ros.org/astra_launch>
 
 - Usage:
@@ -34,7 +34,7 @@ Parameters available:
 `depth_registration` - Default `true`. Set `false` to switch off depth registration in the driver
 
 ## Utilities
-###### Camera calibration
+### Camera calibration
 To run intrinsic calibration for the camera:
 
 `roslaunch sr_camera_launch camera_calibration.launch`
