@@ -46,7 +46,7 @@ Parameters available:
 
 `marker_size` - default *0.1965* (m).
 
-`marker_id` - Default *1*. Represents [this marker](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/utils/aruco.png).
+`marker_id` - Default *1*. Represents [this marker](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/doc/aruco.png).
 
 `reference_frame`and `camera_frame` need to be set for the specific camera driver you are using. As default they are set to work with Kinect and Astra cameras.
 
