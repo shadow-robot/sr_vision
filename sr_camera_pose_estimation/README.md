@@ -66,3 +66,6 @@ The scene can be investigated in rviz, where properly positioned frames and poin
   <img src="https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/doc/calib_scene.jpg" alt="scene"/>
 </p>
 
+## troubleshooting
+- Make sure that the camera driver is running and the marker or the bundle is recognized by the camera
+- Make sure that the position and orientation of the marker are correct with respect to the root frame of your choice
