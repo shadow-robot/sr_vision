@@ -39,9 +39,11 @@ To run intrinsic calibration for the camera:
 
 `roslaunch sr_camera_launch camera_calibration.launch`
 
-As default set to be used with Kinect and with a checker board used in Shadow workshop. To switch camera use flag:
+As default set to be used with Kinect and with a checkerboard used in Shadow workshop. To switch camera use flag:
 
 `camera_name` - set *kinect* for Kinect and *astra* for Orbbec Astra
+
+In you're using different checkerboard, `size` and `square` parameters can be adjusted. For more information on calibration, see used package [wiki](http://wiki.ros.org/camera_calibration).
 
 ## Troubleshooting
 
