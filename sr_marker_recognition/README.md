@@ -46,7 +46,7 @@ Parameters available:
 
 `marker_size` - default *0.1965* (m).
 
-`marker_id` - Default *1*. Represents [this marker](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/utils/aruco.png).
+`marker_id` - Default *1*. Represents [this marker](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition/doc/aruco.png).
 
 `reference_frame`and `camera_frame` need to be set for the specific camera driver you are using. As default they are set to work with Kinect and Astra cameras.
 
@@ -59,6 +59,6 @@ Frame of a recognized Aruco marker is denoted as in the figure below:
 where red, green and blue axes denote x, y and z coordinate respectively.
 
 ## Troubleshooting
-- Before launching either marker tracker, make sure that camera driver is running or put both in one launch file
+- Before launching either marker tracker, make sure that camera driver is running or call both from one launch file
 - When printing the markers, make sure they are exactly the size you specified in you launch files
 - Make sure your camera is properly intrinsicly calibrated which can significantly improve marker recognition reliability
