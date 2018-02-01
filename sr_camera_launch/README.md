@@ -42,3 +42,7 @@ To run intrinsic calibration for the camera:
 As default set to be used with Kinect and with a checker board used in Shadow workshop. To switch camera use flag:
 
 `camera_name` - set *kinect* for Kinect and *astra* for Orbbec Astra
+
+## Troubleshooting
+
+- If you are running the code in a container, make sure your camera is plugged in before you run/start the container
