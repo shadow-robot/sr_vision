@@ -47,4 +47,4 @@ In you're using different checkerboard, `size` and `square` parameters can be ad
 
 ## Troubleshooting
 
-- If you are running the code in a container, make sure your camera is plugged in before you run/start the container
+- If you are running the code in a docker container, make sure your camera is plugged in before you run/start the container
