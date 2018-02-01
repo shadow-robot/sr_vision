@@ -11,9 +11,9 @@ The idea of this method is to find a `root (usually robot base) -> camera` tranf
 </p>
 
 In order to close the tf chain and find the calibration, as seen from the figure above, package needs to be provided three pieces of information:
-- `root frame` - provided by a properly set scene or a [mock launch file](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/launch/mock_world_transforms.launch) in this package,
-- `camera frame -> marker frame transform` - provided by [camera driver](https://github.com/shadow-robot/sr_vision/tree/SRC-1223/F_generify_extrinsic_calibration/sr_camera_launch) and [marker recognition](https://github.com/shadow-robot/sr_vision/tree/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition) nodes.
-- `marker pose with respect to the root` - mocked or manually measured in the real scene.
+- `root frame` - provided by a properly set scene or a [mock launch file](https://github.com/shadow-robot/sr_vision/blob/SRC-1223/F_generify_extrinsic_calibration/sr_camera_pose_estimation/launch/mock_world_transforms.launch) in this package
+- `camera frame -> marker frame transform` - provided by [camera driver](https://github.com/shadow-robot/sr_vision/tree/SRC-1223/F_generify_extrinsic_calibration/sr_camera_launch) and [marker recognition](https://github.com/shadow-robot/sr_vision/tree/SRC-1223/F_generify_extrinsic_calibration/sr_marker_recognition) nodes
+- `marker pose with respect to the root` - mocked or manually measured in the real scene
 
 ## Usage
 
