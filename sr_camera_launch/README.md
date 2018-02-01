@@ -14,9 +14,9 @@ To run the camera in default mode:
 
 Parameters available:
 
-**sim** - Default *false*. Set *true* for simulated camera
+`sim` - Default *false*. Set *true* for simulated camera
 
-**depth_registration** - Default *true*. Set *false* to switch off depth registration in the driver
+`depth_registration` - Default *true*. Set *false* to switch off depth registration in the driver
 
 ### Orbbec Astra
 - Driver: <http://wiki.ros.org/astra_launch>
@@ -29,9 +29,9 @@ To run the camera in default mode:
 
 Parameters available:
 
-**sim** - Default *false*. Set *true* for simulated camera
+`sim` - Default *false*. Set *true* for simulated camera
 
-**depth_registration** - Default *true*. Set *false* to switch off depth registration in the driver
+`depth_registration` - Default *true*. Set *false* to switch off depth registration in the driver
 
 ## Utilities
 ### Camera calibration
@@ -41,4 +41,4 @@ To run intrinsic calibration for the camera:
 
 As default set to be used with Kinect and with a checker board used in Shadow workshop. To switch camera use flag:
 
-**camera_name** - set *kinect* for Kinect and *astra* for Orbbec Astra
+`camera_name` - set *kinect* for Kinect and *astra* for Orbbec Astra
