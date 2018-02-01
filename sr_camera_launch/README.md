@@ -14,9 +14,9 @@ To run the camera in default mode:
 
 Parameters available:
 
-`sim` - Default *false*. Set *true* for simulated camera
+`sim` - default *false*. Set *true* for simulated camera
 
-`depth_registration` - Default *true*. Set *false* to switch off depth registration in the driver
+`depth_registration` - default *true*. Set *false* to switch off depth registration in the driver
 
 ### Orbbec Astra
 - Driver: <http://wiki.ros.org/astra_launch>
@@ -29,9 +29,9 @@ To run the camera in default mode:
 
 Parameters available:
 
-`sim` - Default *false*. Set *true* for simulated camera
+`sim` - default *false*. Set *true* for simulated camera
 
-`depth_registration` - Default *true*. Set *false* to switch off depth registration in the driver
+`depth_registration` - default *true*. Set *false* to switch off depth registration in the driver
 
 ## Utilities
 ### Camera calibration
