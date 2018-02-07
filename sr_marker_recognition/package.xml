@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <package>
   <name>sr_marker_recognition</name>
-  <version>0.0.0</version>
+  <version>0.0.1</version>
   <description>The sr_marker_recognition package</description>
-  <maintainer email="software@shadowrobot.com">user</maintainer>
-  <license>TODO</license>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
+  <license>GDL</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>rospy</build_depend>
