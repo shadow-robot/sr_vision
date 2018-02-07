@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>The camera pose estimation package</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
-  <license>GDL</license>
+  <license>GPL</license>
 
   <buildtool_depend>catkin</buildtool_depend>
   <build_depend>ar_track_alvar</build_depend>
