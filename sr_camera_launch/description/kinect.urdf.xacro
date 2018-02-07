@@ -58,7 +58,7 @@
     </joint>
     <link name="camera_depth_optical_frame"/>
 	
-	  <!-- Kinect sensor for simulation -->
+    <!-- Kinect sensor for simulation -->
     <sim_kinect_sensor/>
   </xacro:macro>
 
