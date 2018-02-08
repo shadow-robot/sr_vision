@@ -1,0 +1,52 @@
+<launch>
+    <!-- camera args -->
+    <arg name="sim" default="false" />
+    <arg name="depth_registration" default="true" />
+    
+    <!-- marker recognition args -->
+    <arg name="depth" default="true" />
+    <arg name="bundle" default="true" />
+    <arg name="marker_size" default="9" />
+    <arg name="max_new_marker_error" default="0.08" />
+    <arg name="max_track_error" default="0.2" />
+    <arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
+
+    <!-- camera_transform_publisher args -->
+    <arg name="marker_to_root_cartesian" default="[-0.2, 0.0, 0.0, 0.0, 0.0, 0.0]"/>
+    <arg name="marker_frame_name" default="ar_marker_0"/>
+    <arg name="root_frame_name" default="ra_base_link"/>
+    <arg name="camera_frame_name" default="camera_link"/>
+    <arg name="window_width" default="500"/>
+    <arg name="filtering" default="true"/>
+    <arg name="continuous" default="true"/>
+    
+    <!-- launching mock world -->
+    <include file="$(find sr_camera_pose_estimation)/launch/mock_world_transforms.launch" />
+    
+    <!-- launching camera driver -->
+    <include file="$(find sr_camera_launch)/launch/kinect.launch">
+        <arg name="sim" value="$(arg sim)"/>
+        <arg name="depth_registration" value="$(arg depth_registration)"/>
+    </include>
+    
+    <!-- launching marker recognition -->
+    <include file="$(find sr_marker_recognition)/launch/alvar.launch">
+        <arg name="depth" value="$(arg depth)"/>
+        <arg name="bundle" value="$(arg bundle)"/>
+        <arg name="marker_size" value="$(arg marker_size)"/>
+        <arg name="max_new_marker_error" value="$(arg max_new_marker_error)"/>
+        <arg name="max_track_error" value="$(arg max_track_error)"/>
+        <arg name="bundle_files" value="$(arg bundle_files)"/>
+    </include>
+
+    <!-- running camera pose estimation -->
+    <node pkg="sr_camera_pose_estimation" type="camera_transform_publisher.py" name="camera_transform_publisher" output="screen">
+        <rosparam param="marker_to_root_cartesian" subst_value="True">$(arg marker_to_root_cartesian)</rosparam>
+        <param name="marker_frame_name" value="$(arg marker_frame_name)" />
+        <param name="root_frame_name" value="$(arg root_frame_name)" />
+        <param name="camera_frame_name" value="$(arg camera_frame_name)" />
+        <param name="window_width" value="$(arg window_width)" />
+        <param name="filtering" value="$(arg filtering)" />
+        <param name="continuous" value="$(arg continuous)" />
+    </node>
+</launch>
