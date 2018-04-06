@@ -1,0 +1,63 @@
+<launch>
+  <arg name="sim" default="false" />
+  <arg name="depth_registration" default="true" />
+  <arg name="camera" default="ensenso" />
+  <arg name="tf_prefix" default="" />
+  
+  <!-- Real camera -->
+  <include unless="$(arg sim)" file="$(find sr_halcon_ensenso)/launch/sr_halcon_ensenso.launch" >
+    <arg name="depth_registration" value="$(arg depth_registration)"/>
+  </include>
+
+  <!-- Simulated camera -->
+  <arg if="$(arg sim)" name="x" default="1.5" />
+  <arg if="$(arg sim)" name="y" default="1.5" />
+  <arg if="$(arg sim)" name="z" default="1.4" />
+  <arg if="$(arg sim)" name="R" default="0.0" />
+  <arg if="$(arg sim)" name="P" default="0.6" />
+  <arg if="$(arg sim)" name="Y" default="-2.35" />
+  
+  <!-- If simualating, convert a xacro and put on parameter server -->
+  <param if="$(arg sim)" name="camera_description" command="$(find xacro)/xacro.py $(find sr_camera_launch)/description/ensenso.urdf.xacro camera_name:=$(arg camera)" />
+  
+  <!-- If simualating, spawn a robot into Gazebo -->
+  <node if="$(arg sim)" name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param camera_description -urdf -model kinect -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)" respawn="false" output="screen" />
+  
+  <!-- If simualating, publish static transforms like the real camera drivers do -->
+  <include if="$(arg sim)" file="$(find rgbd_launch)/launch/kinect_frames.launch" />
+
+  <!-- Camera transform tree; designed in accordance with ROS REP-103, Standard Units of Measure 
+      and Coordinate Conventions. This means that the camera body frame treats the x axis as
+      "forwards", the y axis as "left", and the z axis as "up". The origin of the camera is treated
+      as the center of the four chassis mounting holes, i.e. the center of the rear face.
+      REP-103 also specifies that optical frames have different conventions: x is "right", y is
+      "down", z is "forward".-->
+  
+  <!-- Optical rotate values; used to transform from camera body frames to optical frames and back. -->
+  <arg name="pi/2" value="1.5707963267948966" />
+  <arg name="optical_rotate" value="0 0 0 -$(arg pi/2) 0 -$(arg pi/2)" />
+  <arg name="inverse_optical_rotate" value="0 0 0 $(arg pi/2) -$(arg pi/2) 0" />
+
+  <!-- Transform from world to camera_link -->
+  <node name="$(arg camera)_base_link1" pkg="tf2_ros" type="static_transform_publisher" args="$(arg x) $(arg y) $(arg z) $(arg Y) $(arg P) $(arg R) world $(arg tf_prefix)/$(arg camera)_link"/>
+
+  <!-- Somewhat arbitrary transform from _link to _rgb_frame -->
+  <node name="$(arg camera)_base_link2" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg tf_prefix)/$(arg camera)_link $(arg tf_prefix)/$(arg camera)_rgb_frame"/>
+
+  <!-- Optical rotate from _rgb_frame to _rgb_optical_frame -->
+  <node name="$(arg camera)_base_link3" pkg="tf2_ros" type="static_transform_publisher" args="$(arg optical_rotate) $(arg tf_prefix)/$(arg camera)_rgb_frame $(arg tf_prefix)/$(arg camera)_rgb_optical_frame"/>
+
+  <!-- Transform from _rgb_optical_frame to _depth_optical_frame -->
+  <node name="$(arg camera)_base_link4" pkg="tf2_ros" type="static_transform_publisher" args="-0.048 0.046 -0.036 -0.001 0.010 -0.010 $(arg tf_prefix)/$(arg camera)_rgb_optical_frame $(arg tf_prefix)/$(arg camera)_depth_optical_frame"/>
+
+  <!-- Inverse optical rotate from _depth_optical_frame to _depth_frame -->
+  <node name="$(arg camera)_base_link5" pkg="tf2_ros" type="static_transform_publisher" args="$(arg inverse_optical_rotate) $(arg tf_prefix)/$(arg camera)_depth_optical_frame $(arg tf_prefix)/$(arg camera)_depth_frame"/>
+  
+  <!-- Transforms from _depth_frame to IR camera frames; defined by N10 geometry -->
+  <node name="$(arg camera)_base_link6" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.05 0.0 0.0 0.0 0.0 $(arg tf_prefix)/$(arg camera)_depth_frame $(arg tf_prefix)/$(arg camera)_left_ir_frame"/>
+  <node name="$(arg camera)_base_link7" pkg="tf2_ros" type="static_transform_publisher" args="0.0 -0.05 0.0 0.0 0.0 0.0 $(arg tf_prefix)/$(arg camera)_depth_frame $(arg tf_prefix)/$(arg camera)_right_ir_frame"/>
+
+  <!-- Transforms from _ir_frames to _ir_optical_frames -->
+  <node name="$(arg camera)_base_link8" pkg="tf2_ros" type="static_transform_publisher" args="$(arg optical_rotate) $(arg tf_prefix)/$(arg camera)_left_ir_frame $(arg tf_prefix)/$(arg camera)_left_ir_optical_frame"/>
+  <node name="$(arg camera)_base_link9" pkg="tf2_ros" type="static_transform_publisher" args="$(arg optical_rotate) $(arg tf_prefix)/$(arg camera)_right_ir_frame $(arg tf_prefix)/$(arg camera)_right_ir_optical_frame"/>
+</launch>
