@@ -2,7 +2,7 @@
     local-name: aruco_ros
     uri: https://github.com/pal-robotics/aruco_ros
     version: kinetic-devel
-    
+
 - git:
     local-name: ar_track_alvar
     uri: https://github.com/ros-perception/ar_track_alvar
@@ -16,4 +16,9 @@
 - git:
     local-name: common_resources
     uri: https://github.com/shadow-robot/common_resources.git
+    version: kinetic-devel
+    
+- git:
+    local-name: sr_manipulation
+    uri: https://{{github_login}}:{{github_password}}@github.com/shadow-robot/sr_manipulation
     version: kinetic-devel
