@@ -13,8 +13,8 @@ from threading import Lock
 
 class MockKnownObjectsPublisher(object):
     def __init__(self):
-        self.object_regex = rospy.get_param("object_regex", ".*duplo_2x4x1_")
-        self.object_type = rospy.get_param("object_type", "duplo_2x4x1")
+        self.object_regex = rospy.get_param("~object_regex", ".*duplo_2x4x1_")
+        self.object_type = rospy.get_param("~object_type", "duplo_2x4x1")
         self.publisher = rospy.Publisher("known_objects", AvailableObjects, queue_size=1, latch=True)
         self.tf_listener = tf.TransformListener()
         self._mutex = Lock()
