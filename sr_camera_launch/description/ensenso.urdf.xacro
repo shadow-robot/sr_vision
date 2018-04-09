@@ -20,7 +20,7 @@
   	  <collision>
         <origin xyz="0.0 0.0 0.0" rpy="0 0 0"/>
   	    <geometry>
-  	      <box size="0.07271 0.27794 0.073"/>
+  	      <box size="0.045 0.150 0.045"/>
   	    </geometry>
   	  </collision>
       <inertial>
