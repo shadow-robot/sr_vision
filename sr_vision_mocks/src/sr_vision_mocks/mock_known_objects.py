@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-#
-# Copyright (C) 2017 Shadow Robot Company Ltd - All Rights Reserved.
-# Proprietary and Confidential. Unauthorized copying of the content in this file, via any medium is strictly prohibited.
 
 import rospy
 import tf
@@ -13,8 +10,8 @@ from threading import Lock
 
 class MockKnownObjectsPublisher(object):
     def __init__(self):
-        self.object_regex = rospy.get_param("~object_regex", ".*duplo_2x4x1_")
-        self.object_type = rospy.get_param("~object_type", "duplo_2x4x1")
+        self.object_regex = rospy.get_param("~object_regex")
+        self.object_type = rospy.get_param("~object_type")
         self.publisher = rospy.Publisher("known_objects", AvailableObjects, queue_size=1, latch=True)
         self.tf_listener = tf.TransformListener()
         self._mutex = Lock()
@@ -44,8 +41,8 @@ class MockKnownObjectsPublisher(object):
 
     def publish_known_objects(self):
         for object_tmp in self.output_array.objects:
-            print object_tmp.id
-        print "----------------"
+            rospy.loginfo(object_tmp.id)
+        rospy.loginfo("----------------")
         self.publisher.publish(self.output_array)
         rospy.sleep(1)
 
