@@ -6,7 +6,7 @@
 import rospy
 import tf
 import re
-from sr_manipulation_msgs.msg import AvailableObjects, GraspObject
+from sr_msgs_common.msg import AvailableObjects, GraspObject
 from geometry_msgs.msg import Pose
 from threading import Lock
 

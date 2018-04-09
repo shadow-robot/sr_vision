@@ -16,9 +16,6 @@
 - git:
     local-name: common_resources
     uri: https://github.com/shadow-robot/common_resources.git
-    version: kinetic-devel
+    version: F_adding_common_msgs
     
-- git:
-    local-name: sr_manipulation
-    uri: https://{{github_login}}:{{github_password}}@github.com/shadow-robot/sr_manipulation
-    version: kinetic-devel
+
