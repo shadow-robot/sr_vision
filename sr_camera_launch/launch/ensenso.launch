@@ -12,6 +12,7 @@
     <arg name="camera" value="$(arg camera)"/>
     <arg name="tf_prefix" value="$(arg tf_prefix)"/>
     <arg name="sim" default="false"/>
+    <arg name="pose_estimation" value="$(arg pose_estimation)"/>
   </include>
 
   <!-- Simulated camera -->
