@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+  <name>sr_vision_mocks</name>
+  <version>0.0.1</version>
+  <description>The sr_vision_mocks package</description>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
+  <license>GPL</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>geometry_msgs</run_depend>
+</package>
