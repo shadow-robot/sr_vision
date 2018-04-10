@@ -2,8 +2,7 @@
   <arg name="sim" default="false" />
   <arg name="camera" default="camera" />
   <arg name="tf_prefix" default="" />
-  <arg if="$(arg sim)" name="pose_estimation" default="false" />
-  <arg unless="$(arg sim)" name="pose_estimation" default="true" />
+  <arg name="publish_camera_tf" default="$(arg sim)" />
 
   <!-- Camera position, if simulated -->
   <arg name="x" default="1.3" />
@@ -26,7 +25,7 @@
   <arg name="inverse_optical_rotate" value="0 0 0 $(arg pi/2) -$(arg pi/2) 0" />
 
   <!-- Transform from world to camera_link, unless pose estimation is used to find this -->
-  <node unless="$(arg pose_estimation)" name="$(arg camera)_base_link1" pkg="tf2_ros" type="static_transform_publisher" args="$(arg x) $(arg y) $(arg z) $(arg Y) $(arg P) $(arg R) world $(arg tf_prefix)/$(arg camera)_link"/>
+  <node if="$(arg publish_camera_tf)" name="$(arg camera)_base_link1" pkg="tf2_ros" type="static_transform_publisher" args="$(arg x) $(arg y) $(arg z) $(arg Y) $(arg P) $(arg R) world $(arg tf_prefix)/$(arg camera)_link"/>
 
   <!-- Somewhat arbitrary transform from _link to _rgb_frame -->
   <node name="$(arg camera)_base_link2" pkg="tf2_ros" type="static_transform_publisher" args="0.0 0.0 0.0 0.0 0.0 0.0 $(arg tf_prefix)/$(arg camera)_link $(arg tf_prefix)/$(arg camera)_rgb_frame"/>
