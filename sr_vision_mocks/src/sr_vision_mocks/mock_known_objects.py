@@ -55,6 +55,6 @@ class MockKnownObjectsPublisher(object):
 if __name__ == "__main__":
     rospy.init_node("mock_known_objects_publisher")
     mock_publisher = MockKnownObjectsPublisher()
-    mock_publisher.update_known_objects()
     while not rospy.is_shutdown():
+        mock_publisher.update_known_objects()
         mock_publisher.publish_known_objects()
