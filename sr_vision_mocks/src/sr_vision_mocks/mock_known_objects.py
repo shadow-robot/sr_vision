@@ -19,6 +19,7 @@ class MockKnownObjectsPublisher(object):
         rospy.sleep(1)
 
     def update_known_objects(self):
+        self.output_array.objects = []
         object_pose = Pose()
         duplo_frames_string_list = self.find_frame_names_in_list(self.tf_listener.getFrameStrings())
         for frame_name in duplo_frames_string_list:
