@@ -11,15 +11,15 @@ from threading import Lock
 class MockRecognizedObjectsPublisher(object):
     def __init__(self):
         self.publisher = rospy.Publisher("recognized_objects", SrRecognizedObjectArray, queue_size=1, latch=True)
-        self.tf_listener = tf.TransformListener()
-        rospy.sleep(1) # waiting for tf listener to setup
         self.regex_to_type = {"^utl5_small_": "utl5_small",
                               "^duplo_2x4x1_": "duplo_2x4x1"}
         self.recognized_object_array = SrRecognizedObjectArray()
         self.update_recognized_objects_array()
 
     def update_recognized_objects_array(self):
-        all_frames_string_list = self.tf_listener.getFrameStrings()
+        tf_listener = tf.TransformListener()
+        rospy.sleep(1) # waiting for tf listener to setup
+        all_frames_string_list = tf_listener.getFrameStrings()
         self.recognized_object_array.objects = self.create_recognized_objects_array(all_frames_string_list)
 
     def create_recognized_objects_array(self, list_to_filter):
@@ -43,7 +43,6 @@ class MockRecognizedObjectsPublisher(object):
             rospy.loginfo(recognized_object.frame_name)
         rospy.loginfo("-----------------------")
         self.publisher.publish(self.recognized_object_array)
-        rospy.sleep(1)
 
 if __name__ == "__main__":
     rospy.init_node("mock_recognized_objects_publisher")
