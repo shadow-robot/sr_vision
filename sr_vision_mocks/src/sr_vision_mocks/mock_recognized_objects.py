@@ -18,7 +18,7 @@ class MockRecognizedObjectsPublisher(object):
 
     def update_recognized_objects_array(self):
         tf_listener = tf.TransformListener()
-        rospy.sleep(1) # waiting for tf listener to setup
+        rospy.sleep(1)
         all_frames_string_list = tf_listener.getFrameStrings()
         self.recognized_object_array.objects = self.create_recognized_objects_array(all_frames_string_list)
 
@@ -33,7 +33,7 @@ class MockRecognizedObjectsPublisher(object):
                 recognized_object.instance = self.get_trailing_number(recognized_object_string)
                 recognized_objects_list.append(recognized_object)
         return recognized_objects_list
-    
+
     def get_trailing_number(self, string):
         m = re.search(r'\d+$', string)
         return int(m.group()) if m else None
