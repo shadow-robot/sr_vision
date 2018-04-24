@@ -9,43 +9,56 @@ import tf
 import tf2_ros
 import rospkg
 import re
+from gazebo_ros.gazebo_interface import spawn_sdf_model_client
+from gazebo_msgs.srv import DeleteModel
 from geometry_msgs.msg import TransformStamped, Pose
 from sr_msgs_common.srv import MoveObject
 
 
 class DebugFramePublisher:
-    def __init__(self, sim=False):
+    def __init__(self, gazebo=False):
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
+        self.CONST_DESCRIPTION_PATH = rospkg.RosPack().get_path('sr_description_common')
         self.moving_object_service = rospy.Service('/move_sim_object', MoveObject, self.move_object_CB)
-        self.tf_object_names = []
-        self.tf_object_poses = []
-        self.tf_object_transforms = []
-        self.sim = sim
+        self.known_object_types = ["duplo_2x4x1", "utl5_small"]
+        self.object_names = []
+        self.object_poses = []
+        self.object_transforms = []
+        self.gazebo = gazebo
 
     def process_args(self, poses_list): 
         for pose in poses_list:
             idx = 0
             tf_name = pose.pop(0) + "_"
-            for object_name in self.tf_object_names:
+            for object_name in self.object_names:
                 if re.match(tf_name, object_name):
                     idx += 1
-            self.tf_object_names.append(tf_name + str(idx))
-            self.tf_object_poses.append([float(val) for val in pose])
+            self.object_names.append(tf_name + str(idx))
+            self.object_poses.append([float(val) for val in pose])
 
-        for name, pose in zip(self.tf_object_names, self.tf_object_poses):
-            self.tf_object_transforms.append(self.get_transform(name, pose[0:3], pose[3:6]))
+        for name, pose in zip(self.object_names, self.object_poses):
+            self.object_transforms.append(self.get_transform(name, pose[0:3], pose[3:6]))
 
     def broadcast_frames(self):
-        self.broadcaster.sendTransform(self.tf_object_transforms)
+        self.broadcaster.sendTransform(self.object_transforms)
 
-    def change_duplo_position(self, moved_object_name, new_pose):
-        for i, object_name in enumerate(self.tf_object_names):
+    def change_object_pose(self, moved_object_name, new_pose):
+        for i, object_name in enumerate(self.object_names):
             if moved_object_name == object_name:
-                self.tf_object_poses[i] = new_pose
-                self.tf_object_transforms[i] = self.get_transform(moved_object_name,
-                                                                  self.tf_object_poses[i][0:3],
-                                                                  self.tf_object_poses[i][3:6])
+                self.object_poses[i] = new_pose
+                self.object_transforms[i] = self.get_transform(moved_object_name,
+                                                                  self.object_poses[i][0:3],
+                                                                  self.object_poses[i][3:6])
                 break
+
+    def insert_all_models_in_scene(self):
+        for object_name, object_pose in zip(self.object_names, self.object_poses):
+            object_type = self.find_object_type(object_name)
+            model_sdf_file = open(self.CONST_DESCRIPTION_PATH + '/models/{}/model.sdf'.format(object_type),
+                                  'r').read()
+            object_pose = self.get_pose(object_pose[0:3], object_pose[3:6])
+            rospy.loginfo("Inserting {} at {}.".format(object_name, object_pose))
+            spawn_sdf_model_client(object_name, model_sdf_file, "namespace", object_pose, 'world', "gazebo")
 
     def move_object_CB(self, req):
         rospy.loginfo("Moving object {} to position {}".format(req.object_id, req.place_pose))
@@ -54,7 +67,7 @@ class DebugFramePublisher:
                                                                       req.place_pose.orientation.z,
                                                                       req.place_pose.orientation.w])
 
-        self.change_duplo_position(req.object_id, [req.place_pose.position.x,
+        self.change_object_pose(req.object_id, [req.place_pose.position.x,
                                                    req.place_pose.position.y,
                                                    req.place_pose.position.z,
                                                    place_orientation[0],
@@ -62,6 +75,15 @@ class DebugFramePublisher:
                                                    place_orientation[2]])
         self.broadcast_frames()
         return True
+
+    def find_object_type(self, object_name):
+        for known_object_type in self.known_object_types:
+            if re.match(known_object_type, object_name):
+                return known_object_type
+        rospy.logwarn("Unknown object type!")
+        return None
+
+
 
     @staticmethod
     def get_transform(name, position, rotation):
@@ -101,13 +123,16 @@ if __name__ == '__main__':
     rospy.init_node('my_static_tf2_broadcaster')
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('-s', '--sim', action='store_true', help='Use this flag if running in simulation')
+    parser.add_argument('-g', '--gazebo', action='store_true', help='Use this flag if running in simulation')
     parser.add_argument('-p', '--pose', action='append', nargs=7, help='Block position, use as three ' +
                                                                        'floats separated by space sign only')
     args = parser.parse_args()
 
-    frame_pub = DebugFramePublisher(args.sim)
+    frame_pub = DebugFramePublisher(args.gazebo)
     frame_pub.process_args(args.pose)
     frame_pub.broadcast_frames()
+
+    if args.gazebo:
+        frame_pub.insert_all_models_in_scene()
 
     rospy.spin()
