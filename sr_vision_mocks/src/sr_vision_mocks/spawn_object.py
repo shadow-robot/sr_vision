@@ -1,7 +1,4 @@
 #!/usr/bin/env python
-#
-# Copyright (C) 2017 Shadow Robot Company Ltd - All Rights Reserved. Proprietary and Confidential.
-# Unauthorized copying of the content in this file, via any medium is strictly prohibited.
 
 # example use:
 # rosrun sr_vision_mocks spawn_object.py -p "duplo_2x4x1" 0.7 0.6 0.763 0 0 1.57 -p "utl5_small" 0.7 0.7 0.763 0 0 0
