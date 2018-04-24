@@ -12,9 +12,7 @@ import tf
 import tf2_ros
 import rospkg
 import re
-from gazebo_msgs.srv import DeleteModel
 from geometry_msgs.msg import TransformStamped, Pose
-from gazebo_ros.gazebo_interface import spawn_sdf_model_client
 from sr_msgs_common.srv import MoveObject
 
 
