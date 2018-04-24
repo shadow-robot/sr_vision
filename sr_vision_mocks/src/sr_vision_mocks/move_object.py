@@ -2,7 +2,7 @@
 
 # Used together with spawn_object.py node
 # Example use:
-# rosrun sr_vision_mocks move_object.py -o duplo_2x4x1_0 -p 0.6 0.701 0.7633 3.14159265359 0.0 1.57079632679
+# rosrun sr_vision_mocks move_object.py -o duplo_2x4x1_0 -p 0.600 0.701 0.7633 0.0 0.0 1.57079632679
 
 import rospy
 import argparse
