@@ -26,7 +26,7 @@ class DebugFramePublisher:
         self.object_transforms = []
         self.gazebo = gazebo
 
-    def process_args(self, poses_list): 
+    def process_args(self, poses_list):
         for pose in poses_list:
             idx = 0
             tf_name = pose.pop(0) + "_"
@@ -111,7 +111,6 @@ class DebugFramePublisher:
                 return known_object_type
         rospy.logwarn("Unknown object type!")
         return None
-
 
 
     @staticmethod
