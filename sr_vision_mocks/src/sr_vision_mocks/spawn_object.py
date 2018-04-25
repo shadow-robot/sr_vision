@@ -112,7 +112,6 @@ class DebugFramePublisher:
         rospy.logwarn("Unknown object type!")
         return None
 
-
     @staticmethod
     def get_transform(name, euler_pose):
         static_transform_stamped = TransformStamped()
