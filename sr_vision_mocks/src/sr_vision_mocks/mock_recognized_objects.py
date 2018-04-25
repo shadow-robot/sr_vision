@@ -3,17 +3,17 @@
 import rospy
 import tf
 import re
-from sr_msgs_common.msg import SrRecognizedObject, SrRecognizedObjectArray
+from object_recognition_msgs.msg import RecognizedObject, RecognizedObjectArray
 from geometry_msgs.msg import Pose
 from threading import Lock
 
 
 class MockRecognizedObjectsPublisher(object):
     def __init__(self):
-        self.publisher = rospy.Publisher("recognized_objects", SrRecognizedObjectArray, queue_size=1, latch=True)
+        self.publisher = rospy.Publisher("recognized_objects", RecognizedObjectArray, queue_size=1, latch=True)
         self.regex_to_type = {"^utl5_small_": "utl5_small",
                               "^duplo_2x4x1_": "duplo_2x4x1"}
-        self.recognized_object_array = SrRecognizedObjectArray()
+        self.recognized_object_array = RecognizedObjectArray()
         self.update_recognized_objects_array()
 
     def update_recognized_objects_array(self):
@@ -27,10 +27,10 @@ class MockRecognizedObjectsPublisher(object):
         for key, value in self.regex_to_type.iteritems():
             reg_exp = re.compile(key)
             for recognized_object_string in filter(reg_exp.match, list_to_filter):
-                recognized_object = SrRecognizedObject()
-                recognized_object.type = value
-                recognized_object.frame_name = recognized_object_string
-                recognized_object.instance = self.get_trailing_number(recognized_object_string)
+                recognized_object = RecognizedObject()
+                recognized_object.type.key = value
+                recognized_object.header.frame_id = recognized_object_string
+                recognized_object.instance_id = self.get_trailing_number(recognized_object_string)
                 recognized_objects_list.append(recognized_object)
         return recognized_objects_list
 
@@ -40,7 +40,7 @@ class MockRecognizedObjectsPublisher(object):
 
     def publish_recognized_objects(self):
         for recognized_object in self.recognized_object_array.objects:
-            rospy.loginfo(recognized_object.frame_name)
+            rospy.loginfo(recognized_object.header.frame_id)
         rospy.loginfo("-----------------------")
         self.publisher.publish(self.recognized_object_array)
 
