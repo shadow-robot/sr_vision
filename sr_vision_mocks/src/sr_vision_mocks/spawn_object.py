@@ -161,5 +161,6 @@ if __name__ == '__main__':
 
     if args.gazebo:
         frame_pub.insert_all_models_in_scene()
+        rospy.on_shutdown(frame_pub.remove_all_models_from_scene)
 
     rospy.spin()
