@@ -4,7 +4,7 @@ This package provides various utilities for mocking vision solutions used at Sha
 
 ## mock_recognized_objects
 
-This node finds the tfs of recognized objects and publishes them in a proper format to `recognized_objects` topic. That topic is used by grasping pipeline defined in [sr_manipulation_grasp_conductor](https://github.com/shadow-robot/sr_manipulation/tree/F_%23SRC-1550_isee_demo/sr_manipulation_grasp_conductor/src/sr_manipulation_grasp_conductor) package.
+This node finds the tfs of recognized objects and publishes them in a proper format to `recognized_objects` topic. That topic is used by grasping pipeline defined in [sr_manipulation_grasp_conductor](https://github.com/shadow-robot/sr_manipulation/tree/kinetic-devel/sr_manipulation_grasp_conductor) package.
  
  Currently supported objects: `utl5_small`, `duplo_2x4x1`.
 
