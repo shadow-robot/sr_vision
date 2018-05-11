@@ -1,0 +1,33 @@
+<launch>
+  <arg name="camera" default="camera" />
+  <arg name="tf_prefix" default="" />
+  <arg name="publish_camera_tf" default="true"/>
+  
+  <arg name="x" default="1.3" />
+  <arg name="y" default="1.3" />
+  <arg name="z" default="1.4" />
+  <arg name="R" default="0.0" />
+  <arg name="P" default="0.6" />
+  <arg name="Y" default="-2.35" />
+  
+  <!-- If simualating, convert a xacro and put on parameter server -->
+  <param name="camera_description" command="$(find xacro)/xacro.py $(find sr_camera_launch)/description/ensenso.urdf.xacro camera_name:=$(arg camera)" />
+  
+  <!-- If simualating, spawn a robot into Gazebo -->
+  <node name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param camera_description -urdf -model kinect -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)" respawn="false" output="screen" />
+
+  <!-- Frames -->
+  <include file="$(find sr_camera_launch)/launch/ensenso_frames.launch">
+    <arg name="camera" value="$(arg camera)"/>
+    <arg name="tf_prefix" value="$(arg tf_prefix)"/>
+    <arg name="sim" value="true"/>
+    <arg name="publish_camera_tf" value="$(arg publish_camera_tf)"/>
+    <arg name="x" value="$(arg x)"/>
+    <arg name="y" value="$(arg y)"/>
+    <arg name="z" value="$(arg z)"/>
+    <arg name="R" value="$(arg R)"/>
+    <arg name="P" value="$(arg P)"/>
+    <arg name="Y" value="$(arg Y)"/>
+  </include>
+
+</launch>
