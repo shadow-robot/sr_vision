@@ -12,6 +12,8 @@ class MockRecognizedObjectsPublisher(object):
     def __init__(self):
         self.publisher = rospy.Publisher("recognized_objects", RecognizedObjectArray, queue_size=1, latch=True)
         self.regex_to_type = {"^utl5_small_": "utl5_small",
+                              "^utl5_medium_": "utl5_medium",
+                              "^utl5_large_": "utl5_large",
                               "^duplo_2x4x1_": "duplo_2x4x1"}
         self.recognized_object_array = RecognizedObjectArray()
         self.update_recognized_objects_array()
