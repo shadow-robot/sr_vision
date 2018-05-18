@@ -16,11 +16,11 @@ from sr_msgs_common.srv import MoveObject
 
 
 class DebugFramePublisher:
-    def __init__(self, gazebo=False):
+    def __init__(self, description_path='sr_description_common', gazebo=False):
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
-        self.CONST_DESCRIPTION_PATH = rospkg.RosPack().get_path('sr_description_common')
+        self.CONST_DESCRIPTION_PATH = rospkg.RosPack().get_path(description_path)
         self.moving_object_service = rospy.Service('/move_sim_object', MoveObject, self.move_object_CB)
-        self.known_object_types = ["duplo_2x4x1", "utl5_small"]
+        self.known_object_types = ["duplo_2x4x1", "utl5_small", "utl5_medium", "utl5_large"]
         self.object_names = []
         self.object_euler_poses = []
         self.object_transforms = []
@@ -153,9 +153,10 @@ if __name__ == '__main__':
     parser.add_argument('-g', '--gazebo', action='store_true', help='Use this flag if running in simulation')
     parser.add_argument('-p', '--pose', action='append', nargs=7, help='Block position, use as three ' +
                                                                        'floats separated by space sign only')
+    parser.add_argument('-d', '--description', default='sr_description_common')
     args = parser.parse_args()
 
-    frame_pub = DebugFramePublisher(args.gazebo)
+    frame_pub = DebugFramePublisher(args.description, args.gazebo)
     frame_pub.process_args(args.pose)
     frame_pub.broadcast_frames()
 
