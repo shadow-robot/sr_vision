@@ -14,7 +14,8 @@ class MockRecognizedObjectsPublisher(object):
         self.regex_to_type = {"^utl5_small_": "utl5_small",
                               "^utl5_medium_": "utl5_medium",
                               "^utl5_large_": "utl5_large",
-                              "^duplo_2x4x1_": "duplo_2x4x1"}
+                              "^duplo_2x4x1_": "duplo_2x4x1",
+                              "^mujoco_box_": "mujoco_box"}
         self.recognized_object_array = RecognizedObjectArray()
         self.update_recognized_objects_array()
 
@@ -32,7 +33,7 @@ class MockRecognizedObjectsPublisher(object):
                 recognized_object = RecognizedObject()
                 recognized_object.type.key = value
                 recognized_object.header.frame_id = recognized_object_string
-                recognized_object.instance_id = self.get_trailing_number(recognized_object_string)
+                #recognized_object.instance_id = self.get_trailing_number(recognized_object_string)
                 recognized_objects_list.append(recognized_object)
         return recognized_objects_list
 
