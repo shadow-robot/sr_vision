@@ -14,7 +14,7 @@
   <arg if="$(arg sim)" name="P" default="0.6" />
   <arg if="$(arg sim)" name="Y" default="-0.75" />
   <!-- If simualating, convert a xacro and put on parameter server -->
-  <param if="$(arg sim)" name="kinect_description" command="$(find xacro)/xacro.py $(find sr_camera_launch)/description/astra.urdf.xacro" />
+  <param if="$(arg sim)" name="kinect_description" command="$(find xacro)/xacro.py $(find sr_description_common)/sensors/astra.urdf.xacro" />
   <!-- If simualating, spawn a robot into Gazebo -->
   <node if="$(arg sim)" name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param kinect_description -urdf -model kinect -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)" respawn="false" output="screen" />
   <!-- If simualating, publish static transforms like the real camera drivers do -->
