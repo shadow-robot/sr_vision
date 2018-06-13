@@ -15,7 +15,7 @@
   <arg if="$(arg sim)" name="Y" default="-2.35" />
   
   <!-- If simualating, convert a xacro and put on parameter server -->
-  <param if="$(arg sim)" name="kinect_description" command="$(find xacro)/xacro.py $(find sr_camera_launch)/description/kinect.urdf.xacro" />
+  <param if="$(arg sim)" name="kinect_description" command="$(find xacro)/xacro.py $(find sr_description_common)/sensors/kinect.urdf.xacro" />
   
   <!-- If simualating, spawn a robot into Gazebo -->
   <node if="$(arg sim)" name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param kinect_description -urdf -model kinect -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)" respawn="false" output="screen" />
