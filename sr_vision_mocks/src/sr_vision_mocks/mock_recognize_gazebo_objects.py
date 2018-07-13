@@ -11,6 +11,7 @@ from gazebo_msgs.msg import ModelStates
 from geometry_msgs.msg import TransformStamped
 from object_recognition_msgs.msg import RecognizedObjectArray, RecognizedObject
 
+
 class MockRecognizeGazeboObjects(object):
     def __init__(self):
         self.recognized_object_array = RecognizedObjectArray()
