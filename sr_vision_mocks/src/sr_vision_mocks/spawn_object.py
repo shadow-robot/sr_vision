@@ -147,14 +147,14 @@ class DebugFramePublisher:
         return pose
 
 if __name__ == '__main__':
-    rospy.init_node('my_static_tf2_broadcaster')
+    rospy.init_node('spawn_object')
 
     parser = argparse.ArgumentParser()
     parser.add_argument('-g', '--gazebo', action='store_true', help='Use this flag if running in simulation')
     parser.add_argument('-p', '--pose', action='append', nargs=7, help='Block position, use as three ' +
                                                                        'floats separated by space sign only')
     parser.add_argument('-d', '--description', default='sr_description_common')
-    args = parser.parse_args()
+    args = parser.parse_args(rospy.myargv()[1:])
 
     frame_pub = DebugFramePublisher(args.description, args.gazebo)
     frame_pub.process_args(args.pose)
