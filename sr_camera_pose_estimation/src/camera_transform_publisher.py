@@ -31,6 +31,7 @@ class CameraTransformPublisher(object):
         self.continuous = rospy.get_param('~continuous')
         self.window_width = rospy.get_param('~window_width')
         self.filtering = rospy.get_param('~filtering')
+        self.static_launch_output = rospy.get_param("~output_static")
 
     def broadcast_root_to_camera(self):
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
@@ -42,6 +43,10 @@ class CameraTransformPublisher(object):
                 root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform,
                                                                                   self.root_frame_name,
                                                                                   self.camera_frame_name)
+                if self.static_launch_output != "":
+                    launch_file_from_tf(root_to_camera_transform_stamped, self.static_launch_output)
+                    exit(0);
+
                 self.broadcaster.sendTransform(root_to_camera_transform_stamped)
 
     def get_root_to_camera_transform(self, marker_to_root_pose):
@@ -138,6 +143,19 @@ def transform_to_pose(trans):
     pose.orientation.w = trans.rotation.w
     return pose
 
+
+def launch_file_from_tf(tf, output_file):
+    text = ("<launch>\n"
+            "  <node pkg='tf' name='camera_calibration_publisher'\n"
+            "        type='static_transform_publisher'\n"
+            "        args='%f %f %f %f %f %f %f %s %s 100'/>\n"
+            "</launch>\n" )  % (
+                tf.transform.translation.x, tf.transform.translation.y, tf.transform.translation.z,
+                tf.transform.rotation.x, tf.transform.rotation.y, tf.transform.rotation.z, tf.transform.rotation.w,
+                tf.header.frame_id, tf.child_frame_id)
+    with open(output_file, "w") as output:
+        output.write(text)
+    rospy.loginfo("Wrote static tf to %s" % output_file)
 
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")
