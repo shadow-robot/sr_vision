@@ -233,7 +233,8 @@ protected:
 
     // Did we get a target
     std::string target = goal->target;
-    if ( target != "" ) {
+    if ( target != "" )
+    {
       if ( target == "nearest" )
         segmentReferece(SEGMENT_SORT_BY_DISTANCE);
       else if ( target == "centered" )
