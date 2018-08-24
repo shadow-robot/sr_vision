@@ -45,7 +45,7 @@ class CameraTransformPublisher(object):
                                                                                   self.camera_frame_name)
                 if self.static_launch_output != "":
                     launch_file_from_tf(root_to_camera_transform_stamped, self.static_launch_output)
-                    exit(0);
+                    exit(0)
 
                 self.broadcaster.sendTransform(root_to_camera_transform_stamped)
 
@@ -149,7 +149,7 @@ def launch_file_from_tf(tf, output_file):
             "  <node pkg='tf' name='camera_calibration_publisher'\n"
             "        type='static_transform_publisher'\n"
             "        args='%f %f %f %f %f %f %f %s %s 100'/>\n"
-            "</launch>\n" )  % (
+            "</launch>\n") % (
                 tf.transform.translation.x, tf.transform.translation.y, tf.transform.translation.z,
                 tf.transform.rotation.x, tf.transform.rotation.y, tf.transform.rotation.z, tf.transform.rotation.w,
                 tf.header.frame_id, tf.child_frame_id)
