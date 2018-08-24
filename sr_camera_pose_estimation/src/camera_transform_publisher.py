@@ -45,7 +45,7 @@ class CameraTransformPublisher(object):
                                                                                   self.camera_frame_name)
                 if self.static_launch_output != "":
                     launch_file_from_tf(root_to_camera_transform_stamped, self.static_launch_output)
-                    exit(0)
+                    self.static_launch_output = ""
 
                 self.broadcaster.sendTransform(root_to_camera_transform_stamped)
 
