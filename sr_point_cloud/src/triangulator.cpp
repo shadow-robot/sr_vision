@@ -281,10 +281,13 @@ void Triangulator::mirror_mesh_(Cloud *cloud)
 
   //  correspondences will be 0 - 1  and  2 - 3
   //  one of these points is max_pt and the other 3 will be constructed by adding x and y from min_pt
-  Vector3f points[] = {Vector3f(min_pt.x, max_pt.y, max_pt.z),
-                       Vector3f(max_pt.x, max_pt.y, max_pt.z),
-                       Vector3f(min_pt.x, min_pt.y, max_pt.z),
-                       Vector3f(max_pt.x, min_pt.y, max_pt.z)};
+  Vector3f points[] =
+  {
+    Vector3f(min_pt.x, max_pt.y, max_pt.z),
+    Vector3f(max_pt.x, max_pt.y, max_pt.z),
+    Vector3f(min_pt.x, min_pt.y, max_pt.z),
+    Vector3f(max_pt.x, min_pt.y, max_pt.z)
+  };
 
   // get transformation according to back side of bounding box
   // If the point cloud includes outlier points the bounding box will be much bigger than it should
