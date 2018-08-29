@@ -1,5 +1,5 @@
 <launch>
-  <arg name="camera_info_url" default="$(find sr_camera_launch)/calibration/logitech_brio_f35.yaml"/>
+  <arg name="camera_info_url" default="file://$(find sr_camera_launch)/calibration/logitech_brio_f35.yaml"/>
   <arg name="focus" default="35"/>
   <node name="usb_cam" pkg="usb_cam" type="usb_cam_node" output="screen" >
     <param name="video_device" value="/dev/video1" />
