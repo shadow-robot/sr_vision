@@ -6,6 +6,7 @@
     <arg name="window_width" default="2000"/>
     <arg name="filtering" default="true"/>
     <arg name="continuous" default="true"/>
+    <arg name="output_static" default=""/>
 
     <node pkg="sr_camera_pose_estimation" type="camera_transform_publisher.py" name="camera_transform_publisher" output="screen">
         <rosparam param="marker_to_root_cartesian" subst_value="True">$(arg marker_to_root_cartesian)</rosparam>
@@ -15,5 +16,6 @@
         <param name="window_width" value="$(arg window_width)" />
         <param name="filtering" value="$(arg filtering)" />
         <param name="continuous" value="$(arg continuous)" />
+        <param name="output_static" value="$(arg output_static)"/>
     </node>
 </launch>
