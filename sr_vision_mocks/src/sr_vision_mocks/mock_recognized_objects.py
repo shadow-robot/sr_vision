@@ -3,20 +3,27 @@
 import rospy
 import tf
 import re
+import argparse
 from object_recognition_msgs.msg import RecognizedObject, RecognizedObjectArray
 from geometry_msgs.msg import Pose
 from threading import Lock
 
 
 class MockRecognizedObjectsPublisher(object):
-    def __init__(self):
+    def __init__(self, additional_regex_list):
         self.publisher = rospy.Publisher("recognized_objects", RecognizedObjectArray, queue_size=1, latch=True)
         self.regex_to_type = {"^utl5_small_": "utl5_small",
                               "^utl5_medium_": "utl5_medium",
                               "^utl5_large_": "utl5_large",
                               "^duplo_2x4x1_": "duplo_2x4x1"}
+        if additional_regex_list:
+            self.update_regex_dictionary(additional_regex_list)
         self.recognized_object_array = RecognizedObjectArray()
         self.update_recognized_objects_array()
+
+    def update_regex_dictionary(self, additional_regex_list):
+        for regex in additional_regex_list:
+            self.regex_to_type["^{}".format(regex)] = regex
 
     def update_recognized_objects_array(self):
         tf_listener = tf.TransformListener()
@@ -48,7 +55,10 @@ class MockRecognizedObjectsPublisher(object):
 
 if __name__ == "__main__":
     rospy.init_node("mock_recognized_objects_publisher")
-    mock_publisher = MockRecognizedObjectsPublisher()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-r', '--regex', action='append', help='Regex that should be recognized by the node')
+    args = parser.parse_args(rospy.myargv()[1:])
+    mock_publisher = MockRecognizedObjectsPublisher(args.regex)
     while not rospy.is_shutdown():
         mock_publisher.update_recognized_objects_array()
         mock_publisher.publish_recognized_objects()
