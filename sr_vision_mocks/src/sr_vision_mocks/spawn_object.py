@@ -74,7 +74,9 @@ class DebugFramePublisher:
         rospy.wait_for_service('gazebo/delete_model')
         for spawned_object in self.spawned_objects:
             try:
+                print "*************8 here 3"
                 delete_model = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
+                print "**********8 model name: {}".format(spawned_object['name'])
                 delete_model(spawned_object['name'])
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: {}".format(e))
