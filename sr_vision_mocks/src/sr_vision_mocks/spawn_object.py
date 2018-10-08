@@ -57,8 +57,7 @@ class DebugFramePublisher:
         for spawned_object in self.spawned_objects:
             object_name = spawned_object['name']
             object_type = self.find_object_type(object_name)
-            model_sdf_file = open(self.CONST_DESCRIPTION_PATH + '/models/{}/model.sdf'.format(object_type),
-                        'r').read()
+            model_sdf_file = open(self.CONST_DESCRIPTION_PATH + '/models/{}/model.sdf'.format(object_type), 'r').read()
             object_pose = self.get_pose(spawned_object['euler_pose'])
             rospy.loginfo("Inserting {} at {}.".format(object_name, object_pose))
             spawn_sdf_model_client(object_name, model_sdf_file, "namespace", object_pose, 'world', "gazebo")
