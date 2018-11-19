@@ -11,6 +11,8 @@ from threading import Lock
 
 class MockRecognizedObjectsPublisher(object):
     def __init__(self, additional_regex_list):
+        self.tf_listener = tf.TransformListener()
+        rospy.sleep(1)
         self.publisher = rospy.Publisher("recognized_objects", RecognizedObjectArray, queue_size=1, latch=True)
         self.regex_to_type = {"^utl5_small_": "utl5_small",
                               "^utl5_medium_": "utl5_medium",
@@ -26,9 +28,7 @@ class MockRecognizedObjectsPublisher(object):
             self.regex_to_type["^{}".format(regex)] = regex
 
     def update_recognized_objects_array(self):
-        tf_listener = tf.TransformListener()
-        rospy.sleep(1)
-        all_frames_string_list = tf_listener.getFrameStrings()
+        all_frames_string_list = self.tf_listener.getFrameStrings()
         self.recognized_object_array.objects = self.create_recognized_objects_array(all_frames_string_list)
 
     def create_recognized_objects_array(self, list_to_filter):
