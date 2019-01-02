@@ -21,32 +21,32 @@ class DebugFramePublisher:
         self.CONST_DESCRIPTION_PATH = rospkg.RosPack().get_path(description_path)
         self.moving_object_service = rospy.Service('/move_sim_object', MoveObject, self.move_object_CB)
         self.known_object_types = ["duplo_2x4x1", "utl5_small", "utl5_medium", "utl5_large"]
-        self.object_names = []
-        self.object_euler_poses = []
-        self.object_transforms = []
+        self.spawned_objects = []
         self.gazebo = gazebo
 
     def process_args(self, poses_list):
         for pose in poses_list:
             idx = 0
             tf_name = pose.pop(0) + "_"
-            for object_name in self.object_names:
-                if re.match(tf_name, object_name):
+            for spawned_object in self.spawned_objects:
+                if re.match(tf_name, spawned_object['name']):
                     idx += 1
-            self.object_names.append(tf_name + str(idx))
-            self.object_euler_poses.append([float(val) for val in pose])
-
-        for name, euler_pose in zip(self.object_names, self.object_euler_poses):
-            self.object_transforms.append(self.get_transform(name, euler_pose))
+            object_name = tf_name + str(idx)
+            object_euler_pose = [float(val) for val in pose]
+            object_transform = self.get_transform(object_name, object_euler_pose)
+            self.spawned_objects.append({'name': object_name,
+                                         'euler_pose': object_euler_pose,
+                                         'transform': object_transform})
 
     def broadcast_frames(self):
-        self.broadcaster.sendTransform(self.object_transforms)
+        object_transforms = [spawned_object['transform'] for spawned_object in self.spawned_objects]
+        self.broadcaster.sendTransform(object_transforms)
 
     def change_object_pose(self, moved_object_name, new_euler_pose):
-        for i, object_name in enumerate(self.object_names):
-            if moved_object_name == object_name:
-                self.object_euler_poses[i] = new_euler_pose
-                self.object_transforms[i] = self.get_transform(moved_object_name, self.object_euler_poses[i])
+        for spawned_object in self.spawned_objects:
+            if moved_object_name == spawned_object['name']:
+                spawned_object['euler_pose'] = new_euler_pose
+                spawn_object['transform'] = self.get_transform(moved_object_name, new_euler_pose)
                 break
 
     def change_model_pose_in_scene(self, object_name, new_pose):
@@ -54,11 +54,11 @@ class DebugFramePublisher:
         self.insert_model_in_scene(object_name, new_pose)
 
     def insert_all_models_in_scene(self):
-        for object_name, object_euler_pose in zip(self.object_names, self.object_euler_poses):
+        for spawned_object in self.spawned_objects:
+            object_name = spawned_object['name']
             object_type = self.find_object_type(object_name)
-            model_sdf_file = open(self.CONST_DESCRIPTION_PATH + '/models/{}/model.sdf'.format(object_type),
-                                  'r').read()
-            object_pose = self.get_pose(object_euler_pose)
+            model_sdf_file = open(self.CONST_DESCRIPTION_PATH + '/models/{}/model.sdf'.format(object_type), 'r').read()
+            object_pose = self.get_pose(spawned_object['euler_pose'])
             rospy.loginfo("Inserting {} at {}.".format(object_name, object_pose))
             spawn_sdf_model_client(object_name, model_sdf_file, "namespace", object_pose, 'world', "gazebo")
 
@@ -71,12 +71,13 @@ class DebugFramePublisher:
 
     def remove_all_models_from_scene(self):
         rospy.wait_for_service('gazebo/delete_model')
-        for object_name in self.object_names:
+        for spawned_object in self.spawned_objects:
             try:
                 delete_model = rospy.ServiceProxy('gazebo/delete_model', DeleteModel)
-                delete_model(object_name)
+                delete_model(spawned_object['name'])
             except rospy.ServiceException, e:
                 rospy.logerr("Service call failed: {}".format(e))
+        self.spawned_objects = []
 
     def remove_model_from_scene(self, object_name):
         rospy.wait_for_service('gazebo/delete_model')
@@ -85,6 +86,10 @@ class DebugFramePublisher:
             delete_model(object_name)
         except rospy.ServiceException, e:
             rospy.logerr("Service call failed: {}".format(e))
+        for idx, spawned_object in enumerate(self.spawned_objects):
+            if object_name == spawn_object['name']:
+                del spawned_objects[idx]
+                break
 
     def move_object_CB(self, req):
         rospy.loginfo("Moving object {} to position {}".format(req.object_id, req.place_pose))
