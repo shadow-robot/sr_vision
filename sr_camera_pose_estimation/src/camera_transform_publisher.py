@@ -6,20 +6,17 @@ import rospy
 import sr_vision_common
 import tf2_ros
 from ar_track_alvar_msgs.msg import AlvarMarkers
-from geometry_msgs.msg import Transform, TransformStamped
+from geometry_msgs.msg import Pose, Transform, TransformStamped
 from tf import transformations
 from sr_vision_common.pose_averager import PoseAverager
 
 
 class CameraTransformPublisher(object):
-
     def __init__(self):
         self.get_params()
         self.transform_buffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.transform_buffer)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
-        self.alvar_process = None
-        self.launch = None
         self.pose_averager = PoseAverager(window_width=self.window_width)
         self.ignore_first = self.window_width * 2
         rospy.loginfo("Starting camera transform publisher.")
@@ -30,105 +27,76 @@ class CameraTransformPublisher(object):
         rospy.loginfo('Marker ID:           {}'.format(self.marker_id))
         rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
         self.counter = 0
-        self.run()
+        self.broadcast_root_to_camera()
         while not rospy.is_shutdown():
             rospy.spin()
 
     def get_params(self):
-        self.ar_marker_topic = rospy.get_param('~ar_marker_topic')
-        self.camera_image_topic = rospy.get_param('~camera_image_topic')
-        self.marker_static_tf_name = rospy.get_param('~marker_static_tf_name')
-        self.marker_id = rospy.get_param('~marker_id')
-        self.camera_root_frame = rospy.get_param('~camera_root_frame')
-        self.desired_camera_parent_frame = rospy.get_param('~desired_camera_parent_frame')
+        self.marker_frame_name = rospy.get_param('~marker_frame_name')
+        self.root_frame_name = rospy.get_param('~root_frame_name')
+        self.camera_frame_name = rospy.get_param('~camera_frame_name')
+        self.marker_to_root_cartesian = rospy.get_param('~marker_to_root_cartesian')
         self.continuous = rospy.get_param('~continuous')
         self.window_width = rospy.get_param('~window_width')
-        self.alvar_node_type = rospy.get_param('~alvar_node_type')
-        self.alvar_marker_size = rospy.get_param('~alvar_marker_size')
-        self.alvar_max_new_marker_error = rospy.get_param('~alvar_max_new_marker_error')
-        self.alvar_max_track_error = rospy.get_param('~alvar_max_track_error')
-        self.alvar_cam_image_topic = rospy.get_param('~alvar_cam_image_topic')
-        self.alvar_cam_info_topic = rospy.get_param('~alvar_cam_info_topic')
-        self.alvar_output_frame = rospy.get_param('~alvar_output_frame')
-        self.alvar_med_filt_size = rospy.get_param('~alvar_med_filt_size')
-        self.alvar_bundle_files = rospy.get_param('~alvar_bundle_files')
+        self.filtering = rospy.get_param('~filtering')
+        self.static_launch_output = rospy.get_param("~output_static")
 
-    def run(self):
-        self.start_ar_track_alvar()
-        rospy.loginfo('World Root Frame:    {}'.format(self.desired_camera_parent_frame))
-        rospy.loginfo('Waiting for AR marker pose topic...')
-        rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers)
-        rospy.loginfo('AR marker pose topic found!')
+    def broadcast_root_to_camera(self):
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
-            ar_track_alvar_markers = rospy.wait_for_message(self.ar_marker_topic, AlvarMarkers,
-                                                            timeout=1)
-            self.on_ar_marker_message(ar_track_alvar_markers)
-        self.stop_ar_track_alvar()
-        self.counter = 0
+            if not self.continuous:
+                self.counter += 1
+            marker_to_root_pose = cartesian_to_pose(self.marker_to_root_cartesian)
+            root_to_camera_transform = self.get_root_to_camera_transform(marker_to_root_pose)
+            if root_to_camera_transform is not None:
+                root_to_camera_transform_stamped = transform_to_transform_stamped(root_to_camera_transform,
+                                                                                  self.root_frame_name,
+                                                                                  self.camera_frame_name)
+                if self.static_launch_output != "":
+                    launch_file_from_tf(root_to_camera_transform_stamped, self.static_launch_output)
+                    self.static_launch_output = ""
 
-    def on_ar_marker_message(self, ar_track_alvar_markers):
-        for marker in ar_track_alvar_markers.markers:
-            if marker.id == self.marker_id:
-                self.on_new_pose(marker.pose.pose)
-            else:
-                rospy.loginfo('Ignoring pose for marked id {}'.format(marker.id))
+                self.broadcaster.sendTransform(root_to_camera_transform_stamped)
 
-    def on_new_pose(self, pose):
-        self.counter += 1
-        if self.window_width > 1:
-            self.publish_camera_pose(self.pose_averager.new_value(pose))
-        else:
-            self.publish_camera_pose(pose)
-
-    def publish_camera_pose(self, lens_marker_pose):
+    def get_root_to_camera_transform(self, marker_to_root_pose):
         try:
-            world_marker_trans = self.transform_buffer. \
-                                 lookup_transform(self.desired_camera_parent_frame,
-                                                  self.marker_static_tf_name, rospy.Time())
-        except (tf2_ros.LookupException, tf2_ros.ConnectivityException,
-                tf2_ros.ExtrapolationException):
-            rospy.logerr("Failed to find world -> AR marker ({} -> {})transform."
-                         .format(self.desired_camera_parent_frame, self.marker_static_tf_name))
-            return
-        self.transform = self.generate_world_camera_tf(lens_marker_pose, world_marker_trans)
-        self.publish_transform()
+            camera_to_marker_transform = self.transform_buffer.lookup_transform(self.camera_frame_name,
+                                                                                self.marker_frame_name,
+                                                                                rospy.Time())
+            camera_to_marker_pose = transform_to_pose(camera_to_marker_transform.transform)
 
-    def generate_world_camera_tf(self, lens_marker_pose, world_marker_tf):
-        lens_marker_matrix = matrix_from_pose(lens_marker_pose)
-        world_marker_matrix = matrix_from_transform(world_marker_tf.transform)
-        world_lens_matrix = np.dot(world_marker_matrix,
-                                   transformations.inverse_matrix(lens_marker_matrix))
-        return transform_from_matrix(world_lens_matrix)
+            if self.filtering:
+                camera_to_marker_pose = self.filter_pose(camera_to_marker_pose)
 
-    def publish_transform(self):
-        transform_stamped = TransformStamped()
-        transform_stamped.header.stamp = rospy.get_rostime()
-        transform_stamped.transform = self.transform
-        transform_stamped.header.frame_id = self.desired_camera_parent_frame
-        transform_stamped.child_frame_id = self.camera_root_frame
-        self.broadcaster.sendTransform(transform_stamped)
+            camera_to_marker_matrix = matrix_from_pose(camera_to_marker_pose)
+            marker_to_marker_root_matrix = matrix_from_pose(marker_to_root_pose)
+            camera_to_root_matrix = np.dot(camera_to_marker_matrix, marker_to_marker_root_matrix)
+            root_to_camera_matrix = transformations.inverse_matrix(camera_to_root_matrix)
+            return transform_from_matrix(root_to_camera_matrix)
 
-    def start_ar_track_alvar(self):
-        if self.alvar_process is None:
-            package = 'ar_track_alvar'
-            executable = self.alvar_node_type
-            args = '{} {} {} {} {} {}{} {}'.format(self.alvar_marker_size,
-                                                   self.alvar_max_new_marker_error,
-                                                   self.alvar_max_track_error,
-                                                   self.alvar_cam_image_topic,
-                                                   self.alvar_cam_info_topic,
-                                                   self.alvar_output_frame,
-                                                   ' {}'.format(self.alvar_med_filt_size) if
-                                                   (executable == 'findMarkerBundles') else '',
-                                                   self.alvar_bundle_files)
-            node = roslaunch.core.Node(package, executable, args=args)
-            self.launch = roslaunch.scriptapi.ROSLaunch()
-            self.launch.start()
-            self.alvar_process = self.launch.launch(node)
+        except (tf2_ros.LookupException, tf2_ros.ConnectivityException, tf2_ros.ExtrapolationException):
+            rospy.logwarn("Failed to find world -> AR marker ({} -> {})transform."
+                          .format(self.camera_frame_name, self.marker_frame_name))
+            rospy.sleep(1.0)
+            return None
 
-    def stop_ar_track_alvar(self):
-        if self.launch is not None:
-            self.launch.stop()
+    def filter_pose(self, pose):
+        if self.window_width > 1:
+            return self.pose_averager.new_value(pose)
+        else:
+            return pose
+
+
+def cartesian_to_pose(coordinates):
+    pose = Pose()
+    pose.position.x = coordinates[0]
+    pose.position.y = coordinates[1]
+    pose.position.z = coordinates[2]
+    quat = transformations.quaternion_from_euler(coordinates[3], coordinates[4], coordinates[5])
+    pose.orientation.x = quat[0]
+    pose.orientation.y = quat[1]
+    pose.orientation.z = quat[2]
+    pose.orientation.w = quat[3]
+    return pose
 
 
 def matrix_from_transform(transform):
@@ -161,6 +129,41 @@ def transform_from_matrix(matrix):
     transform.rotation.z = rot[2]
     transform.rotation.w = rot[3]
     return transform
+
+
+def transform_to_transform_stamped(trans, name, child_name):
+    trans_stamped = TransformStamped()
+    trans_stamped.header.stamp = rospy.Time.now()
+    trans_stamped.header.frame_id = name
+    trans_stamped.child_frame_id = child_name
+    trans_stamped.transform = trans
+    return trans_stamped
+
+
+def transform_to_pose(trans):
+    pose = Pose()
+    pose.position.x = trans.translation.x
+    pose.position.y = trans.translation.y
+    pose.position.z = trans.translation.z
+    pose.orientation.x = trans.rotation.x
+    pose.orientation.y = trans.rotation.y
+    pose.orientation.z = trans.rotation.z
+    pose.orientation.w = trans.rotation.w
+    return pose
+
+
+def launch_file_from_tf(tf, output_file):
+    text = ("<launch>\n"
+            "  <node pkg='tf' name='camera_calibration_publisher'\n"
+            "        type='static_transform_publisher'\n"
+            "        args='%f %f %f %f %f %f %f %s %s 100'/>\n"
+            "</launch>\n") % (
+                tf.transform.translation.x, tf.transform.translation.y, tf.transform.translation.z,
+                tf.transform.rotation.x, tf.transform.rotation.y, tf.transform.rotation.z, tf.transform.rotation.w,
+                tf.header.frame_id, tf.child_frame_id)
+    with open(output_file, "w") as output:
+        output.write(text)
+    rospy.loginfo("Wrote static tf to %s" % output_file)
 
 if __name__ == "__main__":
     rospy.init_node("sat_camera_transform_publisher")

@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+  <name>sr_camera_launch</name>
+  <version>0.0.1</version>
+  <description>The sr_camera_launch package</description>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
+  <license>GPL</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <run_depend>freenect_launch</run_depend>
+  <run_depend>astra_launch</run_depend>
+  <run_depend>rgbd_launch</run_depend>
+
+</package>

@@ -1,0 +1,25 @@
+<launch>
+  <arg name="sim" default="false" />
+  <arg name="depth_registration" default="true" />
+  
+  <!-- Real camera -->
+  <include unless="$(arg sim)" file="$(find freenect_launch)/launch/freenect.launch" />
+  <param if="$(arg depth_registration)" name="/camera/driver/depth_registration" type="bool" value="true" />
+
+  <!-- Simulated camera -->
+  <arg if="$(arg sim)" name="x" default="1.5" />
+  <arg if="$(arg sim)" name="y" default="1.5" />
+  <arg if="$(arg sim)" name="z" default="1.4" />
+  <arg if="$(arg sim)" name="R" default="0.0" />
+  <arg if="$(arg sim)" name="P" default="0.6" />
+  <arg if="$(arg sim)" name="Y" default="-2.35" />
+  
+  <!-- If simualating, convert a xacro and put on parameter server -->
+  <param if="$(arg sim)" name="kinect_description" command="$(find xacro)/xacro.py $(find sr_description_common)/sensors/kinect.urdf.xacro" />
+  
+  <!-- If simualating, spawn a robot into Gazebo -->
+  <node if="$(arg sim)" name="spawn_urdf" pkg="gazebo_ros" type="spawn_model" args="-param kinect_description -urdf -model kinect -x $(arg x) -y $(arg y) -z $(arg z) -R $(arg R) -P $(arg P) -Y $(arg Y)" respawn="false" output="screen" />
+  
+  <!-- If simualating, publish static transforms like the real camera drivers do -->
+  <include if="$(arg sim)" file="$(find rgbd_launch)/launch/kinect_frames.launch" />
+</launch>

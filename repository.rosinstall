@@ -1,0 +1,19 @@
+- git:
+    local-name: aruco_ros
+    uri: https://github.com/shadow-robot/aruco_ros
+    version: B_msg_comp_before_marker_publish
+    
+- git:
+    local-name: ar_track_alvar
+    uri: https://github.com/ros-perception/ar_track_alvar
+    version: kinetic-devel
+    
+- git:
+    local-name: easy_handeye
+    uri: https://github.com/marcoesposito1988/easy_handeye
+    version: master
+    
+- git:
+    local-name: common_resources
+    uri: https://github.com/shadow-robot/common_resources.git
+    version: kinetic-devel
