@@ -10,5 +10,5 @@
   <run_depend>freenect_launch</run_depend>
   <run_depend>astra_launch</run_depend>
   <run_depend>rgbd_launch</run_depend>
-
+  <run_depend>usb_cam</run_depend>
 </package>
