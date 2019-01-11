@@ -6,7 +6,7 @@
     <param name="image_width" value="4096" />
     <param name="image_height" value="2160" />
     <param name="pixel_format" value="mjpeg" />
-    <param name="camera_frame_id" value="camera" />
+    <param name="camera_frame_id" value="camera_link" />
     <param name="io_method" value="mmap"/>
     <param name="framerate" value="5"/>
     <param name="sharpness" value="100"/>
