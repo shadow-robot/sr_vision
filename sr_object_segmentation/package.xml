@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>Object segmentation algorithms with benchmarking</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
-  <license>Private</license>
+  <license>GPL</license>
   <author email="marine.charnet@gmail.com">Marine Charnet</author>
 
   <!-- The *_depend tags are used to specify dependencies -->
