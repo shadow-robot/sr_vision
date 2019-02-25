@@ -4,7 +4,7 @@
   <version>0.0.1</version>
   <description>Point cloud object recognition and tracking.</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
-  <license>Private</license>
+  <license>GPL</license>
   <author email="mark@shadowrobot.com">Mark Pitchless</author>
   <author email="yi@shadowrobot.com">Yi Li</author>
 
