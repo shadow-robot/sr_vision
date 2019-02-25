@@ -5,7 +5,7 @@
   <description>Package contains camera calibration node</description>
   <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
 
-  <license>Private</license>
+  <license>GPL</license>
 
   <author>Andriy Petlovanyy</author>
   <buildtool_depend>catkin</buildtool_depend>
