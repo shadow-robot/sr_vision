@@ -24,6 +24,7 @@ import tf2_ros
 import rospkg
 import re
 from gazebo_ros.gazebo_interface import spawn_sdf_model_client
+from gazebo_msgs.msg import LinkStates
 from gazebo_msgs.srv import DeleteModel
 from geometry_msgs.msg import TransformStamped, Pose
 from sr_msgs_common.srv import MoveObject
@@ -75,6 +76,8 @@ class DebugFramePublisher:
             object_pose = self.get_pose(spawned_object['euler_pose'])
             rospy.loginfo("Inserting {} at {}.".format(object_name, object_pose))
             spawn_sdf_model_client(object_name, model_sdf_file, "namespace", object_pose, 'world', "gazebo")
+        self.check_objects_spawned([spawned_object['name'] for spawned_object in self.spawned_objects],
+                                   rospy.Duration(5.0))
 
     def insert_model_in_scene(self, object_name, object_pose):
         object_type = self.find_object_type(object_name)
@@ -82,6 +85,7 @@ class DebugFramePublisher:
                               'r').read()
         rospy.loginfo("Inserting {} at {}.".format(object_name, object_pose))
         spawn_sdf_model_client(object_name, model_sdf_file, "namespace", object_pose, 'world', "gazebo")
+        self.check_objects_spawned(object_name, rospy.Duration(5.0))
 
     def remove_all_models_from_scene(self):
         rospy.wait_for_service('gazebo/delete_model')
@@ -130,6 +134,31 @@ class DebugFramePublisher:
                 return known_object_type
         rospy.logwarn("Unknown object type!")
         return None
+
+    @staticmethod
+    def check_objects_spawned(object_names, timeout_duration=rospy.Duration()):
+        start_time = rospy.Time.now()
+        deadline = start_time + timeout_duration
+
+        if not isinstance(object_names, list):
+            object_names = [object_names]
+
+        while not rospy.is_shutdown():
+            link_states = rospy.wait_for_message("/gazebo/link_states", LinkStates)
+            failed_object_name = None
+            for object_name in object_names:
+                if not (object_name + "::link") in link_states.name:
+                    rospy.logdebug("Object spawner: object {0} not yet present in Gazebo.".format(object_name))
+                    failed_object_name = object_name
+                    break
+            if failed_object_name is None:
+                rospy.loginfo("Objects confirmed as spawned.")
+                return True
+            if rospy.Time.now() > deadline:
+                rospy.logerr("Failed to spawn object {0} after {1} ns.".format(failed_object_name, timeout_duration))
+                return False
+            rospy.logwarn_throttle(5, "Still waiting for object {0} to spawn after {1} ns.".format(
+                failed_object_name, rospy.Time.now() - start_time))
 
     @staticmethod
     def get_transform(name, euler_pose):
