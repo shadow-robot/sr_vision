@@ -1,5 +1,5 @@
 <launch>
-  <arg name="map_file" default="$(find sr_utl5)/config/alvar_to_boxes_map.yaml" />
+  <arg name="map_file" default="$(find sr_alvar_object_recognition)/config/alvar_to_boxes_map.yaml" />
 
   <node pkg="sr_alvar_object_recognition" type="alvar_to_object" name="alvar_based_object_recognition">
     <rosparam file="$(arg map_file)"/>

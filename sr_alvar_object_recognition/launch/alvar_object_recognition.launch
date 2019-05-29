@@ -1,6 +1,6 @@
 <launch>
   <!-- Alvar to object args -->
-  <arg name="map_file" default="$(find sr_utl5)/config/alvar_to_boxes_map.yaml" />
+  <arg name="map_file" default="$(find sr_alvar_object_recognition)/config/alvar_to_boxes_map.yaml" />
 
   <!-- Marker recognition args -->
   <arg name="depth" default="false" />
@@ -25,7 +25,7 @@
   </include>
 
   <!-- Converting alvar markers to objects -->
-  <include file="$(find sr_utl5)/launch/alvar_to_object.launch">
+  <include file="$(find sr_alvar_object_recognition)/launch/alvar_to_object.launch">
     <arg name="map_file" value="$(arg map_file)"/>
   </include>
 </launch>
