@@ -1,0 +1,31 @@
+<launch>
+  <!-- Alvar to object args -->
+  <arg name="map_file" default="$(find sr_utl5)/config/alvar_to_boxes_map.yaml" />
+
+  <!-- Marker recognition args -->
+  <arg name="depth" default="false" />
+  <arg name="bundle" default="false" />
+  <arg name="marker_size" default="3" />
+  <arg name="max_new_marker_error" default="0.01" />
+  <arg name="max_track_error" default="0.001" />
+  <arg name="cam_image_topic" value="/usb_cam/image_raw" />
+  <arg name="cam_info_topic" value="/usb_cam/camera_info"/>
+  <arg name="output_frame" default="camera_link" />
+
+  <!-- Running marker recognition -->
+  <include file="$(find sr_marker_recognition)/launch/alvar.launch">
+    <arg name="depth" value="$(arg depth)"/>
+    <arg name="bundle" value="$(arg bundle)"/>
+    <arg name="marker_size" default="$(arg marker_size)"/>
+    <arg name="max_new_marker_error" default="$(arg max_new_marker_error)"/>
+    <arg name="max_track_error" default="$(arg max_track_error)"/>
+    <arg name="cam_image_topic" value="$(arg cam_image_topic)" />
+    <arg name="cam_info_topic" value="$(arg cam_info_topic)"/>
+    <arg name="output_frame" value="$(arg output_frame)" />
+  </include>
+
+  <!-- Converting alvar markers to objects -->
+  <include file="$(find sr_utl5)/launch/alvar_to_object.launch">
+    <arg name="map_file" value="$(arg map_file)"/>
+  </include>
+</launch>

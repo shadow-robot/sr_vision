@@ -1,0 +1,97 @@
+#!/usr/bin/env python
+
+import rospy
+from ar_track_alvar_msgs.msg import AlvarMarkers
+from object_recognition_msgs.msg import RecognizedObjectArray, RecognizedObject
+from geometry_msgs.msg import PoseStamped
+from tf import TransformBroadcaster, TransformListener
+
+
+class SrUtlArToObject(object):
+    def __init__(self):
+        self._tf_listener = TransformListener()
+        rospy.sleep(5)  # Wait for tf listener to have info
+
+        self._recognized_array_pub = rospy.Publisher("/recognized_objects", RecognizedObjectArray, queue_size=1)
+        self._ar_subscriber = rospy.Subscriber("/ar_pose_marker", AlvarMarkers, self._ar_callback)
+        self._tf_broadcaster = TransformBroadcaster()
+        self._map = rospy.get_param("~ar_to_object_map", {})
+
+    def _ar_callback(self, msg):
+        objects_with_markers = {}
+
+        for marker in msg.markers:
+            marker_frame_id = "ar_marker_" + str(marker.id)
+
+            if marker_frame_id in self._map:
+                object_id = self._map[marker_frame_id]['object_id']
+                if (object_id not in objects_with_markers):
+                    objects_with_markers[object_id] = marker
+                else:
+                    objects_with_markers[object_id] = self._select_best_marker(marker,  objects_with_markers[object_id])
+
+        self._publish_objects(objects_with_markers)
+
+    def _select_best_marker(self, marker1, marker2):
+        if (marker1.pose.pose.position.z > marker2.pose.pose.position.z):
+            return marker1
+        else:
+            return marker2
+
+    def _publish_objects(self, objects_with_markers):
+        output_array = RecognizedObjectArray()
+        for object_id in objects_with_markers:
+            marker = objects_with_markers[object_id]
+            marker_frame_id = "ar_marker_" + str(marker.id)
+
+            parent_frame_id = marker.header.frame_id
+
+            parent_frame_id_string = parent_frame_id
+            marker_frame_id_string = "/" + marker_frame_id
+            object_frame_id_string = "/" + self._map[marker_frame_id]['object_id']
+
+            object_pose = self._object_pose_from_marker_id(marker_frame_id)
+
+            new_pose = self._tf_listener.transformPose(parent_frame_id_string, object_pose)
+            # average raw pose, then apply object pose as translation + rotation + do timeout
+
+            # def some kind of filtering
+
+            self._tf_broadcaster.sendTransform([new_pose.pose.position.x,
+                                                new_pose.pose.position.y,
+                                                new_pose.pose.position.z],
+                                               [new_pose.pose.orientation.x,
+                                                new_pose.pose.orientation.y,
+                                                new_pose.pose.orientation.z,
+                                                new_pose.pose.orientation.w],
+                                               rospy.Time.now(),
+                                               object_frame_id_string,
+                                               new_pose.header.frame_id)
+
+            recognized_object = RecognizedObject()
+            recognized_object.type.key = self._map[marker_frame_id]['object_type']
+            recognized_object.header.frame_id = self._map[marker_frame_id]['object_id']
+
+            output_array.objects.append(recognized_object)
+
+        self._recognized_array_pub.publish(output_array)
+
+    def _object_pose_from_marker_id(self, marker_frame_id):
+        object_pose = PoseStamped()
+        object_pose.header.frame_id = marker_frame_id
+
+        object_pose.pose.position.x = self._map[marker_frame_id]['object_pose_in_ar_frame']['position']['x']
+        object_pose.pose.position.y = self._map[marker_frame_id]['object_pose_in_ar_frame']['position']['y']
+        object_pose.pose.position.z = self._map[marker_frame_id]['object_pose_in_ar_frame']['position']['z']
+
+        object_pose.pose.orientation.x = self._map[marker_frame_id]['object_pose_in_ar_frame']['orientation']['x']
+        object_pose.pose.orientation.y = self._map[marker_frame_id]['object_pose_in_ar_frame']['orientation']['y']
+        object_pose.pose.orientation.z = self._map[marker_frame_id]['object_pose_in_ar_frame']['orientation']['z']
+        object_pose.pose.orientation.w = self._map[marker_frame_id]['object_pose_in_ar_frame']['orientation']['w']
+        return object_pose
+
+
+if __name__ == "__main__":
+    rospy.init_node("ar_based_object_recognition")
+    reconiser = SrUtlArToObject()
+    rospy.spin()
