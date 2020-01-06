@@ -1,0 +1,252 @@
+ar_to_object_map:
+  ar_marker_0:
+    object_id: small_box_0
+    object_type: small_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0
+        z: -0.024
+      orientation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+
+  ar_marker_1:
+    object_id: small_box_0
+    object_type: small_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.013
+        z: -0.0235
+      orientation:
+        x: 0.707
+        y: 0.0
+        z: 0.0
+        w: 0.707
+
+  ar_marker_2:
+    object_id: small_box_0
+    object_type: small_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.013
+        z: -0.032
+      orientation:
+        x: 0.5
+        y: -0.5
+        z: 0.5
+        w: 0.5
+
+  ar_marker_3:
+    object_id: small_box_1
+    object_type: small_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0
+        z: -0.024
+      orientation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+
+  ar_marker_4:
+    object_id: small_box_1
+    object_type: small_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.013
+        z: -0.0235
+      orientation:
+        x: 0.707
+        y: 0.0
+        z: 0.0
+        w: 0.707
+
+  ar_marker_5:
+    object_id: small_box_1
+    object_type: small_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.013
+        z: -0.032
+      orientation:
+        x: 0.5
+        y: -0.5
+        z: 0.5
+        w: 0.5
+
+  ar_marker_6:
+    object_id: medium_box_0
+    object_type: medium_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0
+        z: -0.047
+      orientation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+
+  ar_marker_7:
+    object_id: medium_box_0
+    object_type: medium_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0235
+        z: -0.0355
+      orientation:
+        x: 0.707
+        y: 0.0
+        z: 0.0
+        w: 0.707
+
+  ar_marker_8:
+    object_id: medium_box_0
+    object_type: medium_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0235
+        z: -0.0825
+      orientation:
+        x: 0.5
+        y: -0.5
+        z: 0.5
+        w: 0.5
+
+  ar_marker_9:
+    object_id: medium_box_1
+    object_type: medium_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0
+        z: -0.047
+      orientation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+
+  ar_marker_10:
+    object_id: medium_box_1
+    object_type: medium_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0235
+        z: -0.0355
+      orientation:
+        x: 0.707
+        y: 0.0
+        z: 0.0
+        w: 0.707
+
+  ar_marker_11:
+    object_id: medium_box_1
+    object_type: medium_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0235
+        z: -0.0825
+      orientation:
+        x: 0.5
+        y: -0.5
+        z: 0.5
+        w: 0.5
+
+  ar_marker_12:
+    object_id: large_box_0
+    object_type: large_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0
+        z: -0.066
+      orientation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+
+  ar_marker_13:
+    object_id: large_box_0
+    object_type: large_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.033
+        z: -0.0455
+      orientation:
+        x: 0.707
+        y: 0.0
+        z: 0.0
+        w: 0.707
+
+  ar_marker_14:
+    object_id: large_box_0
+    object_type: large_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.033
+        z: -0.077
+      orientation:
+        x: 0.5
+        y: -0.5
+        z: 0.5
+        w: 0.5
+
+  ar_marker_15:
+    object_id: large_box_1
+    object_type: large_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.0
+        z: -0.066
+      orientation:
+        x: 0.0
+        y: 0.0
+        z: 0.0
+        w: 1.0
+
+  ar_marker_16:
+    object_id: large_box_1
+    object_type: large_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.033
+        z: -0.0455
+      orientation:
+        x: 0.707
+        y: 0.0
+        z: 0.0
+        w: 0.707
+
+  ar_marker_17:
+    object_id: large_box_1
+    object_type: large_box
+    object_pose_in_ar_frame:
+      position:
+        x: 0.0
+        y: 0.033
+        z: -0.077
+      orientation:
+        x: 0.5
+        y: -0.5
+        z: 0.5
+        w: 0.5

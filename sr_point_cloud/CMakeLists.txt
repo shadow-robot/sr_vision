@@ -18,9 +18,8 @@ find_package(catkin REQUIRED COMPONENTS
   sensor_msgs
   tf
   object_recognition_msgs
+  sr_vision_msgs
 )
-
-find_package(sr_vision_msgs REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
@@ -182,7 +181,6 @@ add_executable(triangulator
 
 add_dependencies(triangulator
   ${PROJECT_NAME}_gencfg
-  sr_vision_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
 
@@ -211,8 +209,6 @@ add_executable(cloud_services
 )
 
 add_dependencies(cloud_services
-  sr_grasp_msgs_gencpp
-  sr_vision_msgs_gencpp
   ${catkin_EXPORTED_TARGETS}
 )
 
