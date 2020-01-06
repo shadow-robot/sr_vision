@@ -17,11 +17,12 @@
 import numpy as np
 import roslaunch
 import rospy
+import sr_vision_common
 import tf2_ros
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from geometry_msgs.msg import Pose, Transform, TransformStamped
 from tf import transformations
-from pose_averager import PoseAverager
+from sr_vision_common.pose_averager import PoseAverager
 
 
 class CameraTransformPublisher(object):
@@ -31,7 +32,14 @@ class CameraTransformPublisher(object):
         self.listener = tf2_ros.TransformListener(self.transform_buffer)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
         self.pose_averager = PoseAverager(window_width=self.window_width)
-        self.ignore_first = 20
+        self.ignore_first = self.window_width * 2
+        rospy.loginfo("Starting camera transform publisher.")
+        rospy.loginfo('Parameters:')
+        rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
+        rospy.loginfo('Camera Topic:        {}'.format(self.camera_image_topic))
+        rospy.loginfo('Marker Transform:   {}'.format(self.marker_static_tf_name))
+        rospy.loginfo('Marker ID:           {}'.format(self.marker_id))
+        rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
         self.counter = 0
         self.broadcast_root_to_camera()
         while not rospy.is_shutdown():
