@@ -1,0 +1,17 @@
+<launch>
+  <!-- The window width, in samples, of object pose averaging. -->
+  <arg name='averaging_window_width' default='20'/>
+  <!-- The name of the recognized_objects topic to subscribe to. -->
+  <arg name='input_recognized_objects_topic' default='recognized_objects'/>
+  <!-- The name of the filtered/managed recognized_objects topic to publish. -->
+  <arg name='output_recognized_objects_topic' default='recognized_objects_managed'/>
+  <!-- The publishing rate of filtered/remembered recognized objects and transforms -->
+  <arg name='publish_rate' default='1'/>
+
+  <node name='sr_object_manager' pkg='sr_object_manager' type='manager.py' output='screen'>
+    <param name='averaging_window_width' value='$(arg averaging_window_width)'/>
+    <param name='input_recognized_objects_topic' value='$(arg input_recognized_objects_topic)'/>
+    <param name='output_recognized_objects_topic' value='$(arg output_recognized_objects_topic)'/>
+    <param name='publish_rate' value='$(arg publish_rate)'/>
+  </node>
+</launch>
