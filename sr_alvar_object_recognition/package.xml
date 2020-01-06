@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package>
+  <name>sr_alvar_object_recognition</name>
+  <version>0.0.0</version>
+  <description>The sr_alvar_object_recognition package</description>
+  <maintainer email="software@shadowrobot.com">Shadow Robot's software team</maintainer>
+  <license>GPL</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <build_depend>rospy</build_depend>
+  <run_depend>rospy</run_depend>
+  <run_depend>sr_marker_recognition</run_depend>
+  <run_depend>ar_track_alvar</run_depend>
+</package>
