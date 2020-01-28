@@ -3,6 +3,16 @@
 sr_vision
 ------------
 
+## Melodic migration notes 
+### 28/01/2020
+Several packages have been temporarily disabled or deliberately broken, rendering them partially or completely unusable. This has been done in order to quickly allow the repository to correctly build on our CI servers. Affected packages:
+- sr_camera_launch
+- sr_handeye_calibration
+- sr_marker_recognition
+- sr_object_segmentation
+- sr_object_tracking
+- sr_point_cloud
+
 ## Overview
 Contains our vision related algorithm (segmentation, tracking, recognition, etc...)
 

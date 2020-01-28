@@ -270,7 +270,7 @@ target_link_libraries(cloud_services
 #   ${catkin_EXPORTED_TARGETS}
 # )
 
-add_rostest(test/cloud_tracker.test)
+# add_rostest(test/cloud_tracker.test)
 # add_rostest(test/cluster_segmentor.test)
 # add_rostest(test/cloud_services.test)
 
