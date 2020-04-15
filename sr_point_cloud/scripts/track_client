@@ -21,11 +21,10 @@ if __name__ == '__main__':
         goal = TrackGoal()
         goal.target = cmd
         client.send_goal(goal)
-        #client.wait_for_result(rospy.Duration.from_sec(10.0))
-        #client.cancel_goal()
+        # client.wait_for_result(rospy.Duration.from_sec(10.0))
+        # client.cancel_goal()
     elif cmd in ["cancel", "stop"]:
         client.cancel_all_goals()
     else:
         print "Unknown command: " + cmd
         sys.exit(4)
-
