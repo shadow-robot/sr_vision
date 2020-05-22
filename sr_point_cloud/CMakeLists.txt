@@ -104,8 +104,8 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   #LIBRARIES
-  CATKIN_DEPENDS message_runtime sr_vision_msgs
-  DEPENDS boost orocos_kdl
+  CATKIN_DEPENDS message_runtime sr_vision_msgs sensor_msgs actionlib_msgs geometry_msgs
+  DEPENDS Boost orocos_kdl
 )
 
 ###########
