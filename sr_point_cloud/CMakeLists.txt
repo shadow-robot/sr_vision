@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf
   object_recognition_msgs
   sr_vision_msgs
+  Boost
 )
 
 ## System dependencies are found with CMake's conventions
@@ -104,7 +105,7 @@ generate_dynamic_reconfigure_options(
 catkin_package(
   INCLUDE_DIRS include
   #LIBRARIES
-  CATKIN_DEPENDS message_runtime sr_vision_msgs
+  CATKIN_DEPENDS message_runtime sr_vision_msgs sensor_msgs actionlib_msgs geometry_msgs
   DEPENDS boost orocos_kdl
 )
 

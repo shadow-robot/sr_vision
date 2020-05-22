@@ -164,8 +164,6 @@ if (CATKIN_ENABLE_TESTING)
   add_rostest(test/test_simple_translation.test)
   add_rostest(test/test_three_points_translation_and_rotation.test)
   add_rostest(test/test_translation_and_rotation.test)
-
+  ## Add folders to be run by python nosetests
+  catkin_add_nosetests(test/test_constraints_errors.py)
 endif()
-
-## Add folders to be run by python nosetests
-catkin_add_nosetests(test/test_constraints_errors.py)

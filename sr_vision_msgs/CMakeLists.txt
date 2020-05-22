@@ -90,7 +90,7 @@ generate_messages(
 catkin_package(
 #  INCLUDE_DIRS include
 #  LIBRARIES sr_vision_msgs
-  CATKIN_DEPENDS sensor_msgs std_msgs message_runtime
+  CATKIN_DEPENDS sensor_msgs std_msgs message_runtime pcl_msgs shape_msgs actionlib_msgs
 #  DEPENDS system_lib
 )
 
