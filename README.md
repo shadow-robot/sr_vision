@@ -1,3 +1,9 @@
+Check | Status
+---|---
+Build|[<img src="https://codebuild.eu-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiekp2RG9STHAxQ1hFNVBUS1FXSGltcDRrTW1xeWRJcnkwN1ZYUDlYQVRGUyt6dEgyTy9aMk1JRDIybHUvL2h0c2IyNXRjT3huZC96endlUXJ3Y2N0dDFzPSIsIml2UGFyYW1ldGVyU3BlYyI6ImVoZ1hDcDR0RVVsUTlBdVUiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=melodic-devel"/>](https://eu-west-2.console.aws.amazon.com/codesuite/codebuild/projects/auto_sr_vision_melodic-devel_install_check/)
+Style|[<img src="https://codebuild.eu-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoiMHZ1bGlGUWlFRUs3b0NoT3plQnpYZmJxY3JtL1F0RFAzaUN3QnVEa0dBdEVocUJpZlpRQWdtUEVrS0N3cDNwRkZQSis4a2lTNjZLUnp3VjZCOTVOaUlBPSIsIml2UGFyYW1ldGVyU3BlYyI6InF4M1gyUkQ4aWNkbjNHRkwiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=melodic-devel"/>](https://eu-west-2.console.aws.amazon.com/codesuite/codebuild/projects/auto_sr_vision_melodic-devel_style_check/)
+Code Coverage|[<img src="https://codebuild.eu-west-2.amazonaws.com/badges?uuid=eyJlbmNyeXB0ZWREYXRhIjoia2tHWGxxN1FFMFZTSlVGNVhlTGVjWUE2b1ZzdGhJYkxnVms5Z3JWOC95MFNQYXROUUw1Z2xoOU9YMmxuWGtDQ2lEOVBRMVJBTEpPMERIZzlCdmZwOGJZPSIsIml2UGFyYW1ldGVyU3BlYyI6ImFKQXRPQW15Tkh6ckxjOHEiLCJtYXRlcmlhbFNldFNlcmlhbCI6MX0%3D&branch=melodic-devel"/>](https://eu-west-2.console.aws.amazon.com/codesuite/codebuild/projects/auto_sr_vision_melodic-devel_code_coverage/)
+
 [![Build Status](https://api.shippable.com/projects/5551c20fedd7f2c052e9809d/badge?branchName=kinetic-devel)](https://app.shippable.com/projects/5551c20fedd7f2c052e9809d) [![Circle CI](https://circleci.com/gh/shadow-robot/sr_vision.svg?style=shield)](https://circleci.com/gh/shadow-robot/sr_vision) [![Documentation Status](https://readthedocs.org/projects/sr-vision/badge/?version=latest)](http://sr-vision.readthedocs.org/)
 
 sr_vision
