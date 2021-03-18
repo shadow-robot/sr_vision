@@ -35,11 +35,6 @@ class CameraTransformPublisher(object):
         self.ignore_first = self.window_width * 2
         rospy.loginfo("Starting camera transform publisher.")
         rospy.loginfo('Parameters:')
-        rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
-        rospy.loginfo('Camera Topic:        {}'.format(self.camera_image_topic))
-        rospy.loginfo('Marker Transform:   {}'.format(self.marker_static_tf_name))
-        rospy.loginfo('Marker ID:           {}'.format(self.marker_id))
-        rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
         self.counter = 0
         self.broadcast_root_to_camera()
         while not rospy.is_shutdown():
@@ -53,7 +48,7 @@ class CameraTransformPublisher(object):
         self.continuous = rospy.get_param('~continuous')
         self.window_width = rospy.get_param('~window_width')
         self.filtering = rospy.get_param('~filtering')
-        self.static_launch_output = rospy.get_param("~output_static")
+        self.static_launch_output = rospy.get_param("~output_static", "")
 
     def broadcast_root_to_camera(self):
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
