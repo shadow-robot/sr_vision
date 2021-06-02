@@ -7,15 +7,15 @@
     <arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
 
     <arg if="$(arg depth)" name="cam_image_topic" default="/camera/depth_registered/points" />
-    <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth_registered/camera_info" />
+    <arg if="$(arg depth)" name="cam_info_topic" default="/camera/depth/camera_info" />
     <arg if="$(arg depth)" name="output_frame" default="camera_depth_optical_frame" />
     <arg if="$(arg depth)" name="med_filt_size" default="10" />
     <arg if="$(eval arg('depth') and arg('bundle'))" name="alvar_node" default="findMarkerBundles" />
     <arg if="$(eval arg('depth') and not arg('bundle'))" name="alvar_node" default="individualMarkers" />
 
-    <arg unless="$(arg depth)" name="cam_image_topic" default="/camera/rgb/image_raw" />
-    <arg unless="$(arg depth)" name="cam_info_topic" default="/camera/rgb/camera_info" />
-    <arg unless="$(arg depth)" name="output_frame" default="camera_rgb_optical_frame" />
+    <arg unless="$(arg depth)" name="cam_image_topic" default="/camera/color/image_raw" />
+    <arg unless="$(arg depth)" name="cam_info_topic" default="/camera/color/camera_info" />
+    <arg unless="$(arg depth)" name="output_frame" default="camera_color_optical_frame" />
     <arg unless="$(arg depth)" name="med_filt_size" default="" />
     <arg unless="$(eval arg('depth') or not arg('bundle'))" name="alvar_node" default="findMarkerBundlesNoKinect" />
     <arg unless="$(eval arg('depth') or arg('bundle'))" name="alvar_node" default="individualMarkersNoKinect" />

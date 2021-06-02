@@ -17,12 +17,12 @@
 import numpy as np
 import roslaunch
 import rospy
-import sr_vision_common
+# import sr_vision_common
 import tf2_ros
 from ar_track_alvar_msgs.msg import AlvarMarkers
 from geometry_msgs.msg import Pose, Transform, TransformStamped
 from tf import transformations
-from sr_vision_common.pose_averager import PoseAverager
+# from sr_vision_common.pose_averager import PoseAverager
 
 
 class CameraTransformPublisher(object):
@@ -31,15 +31,15 @@ class CameraTransformPublisher(object):
         self.transform_buffer = tf2_ros.Buffer()
         self.listener = tf2_ros.TransformListener(self.transform_buffer)
         self.broadcaster = tf2_ros.StaticTransformBroadcaster()
-        self.pose_averager = PoseAverager(window_width=self.window_width)
+        # self.pose_averager = PoseAverager(window_width=self.window_width)
         self.ignore_first = self.window_width * 2
-        rospy.loginfo("Starting camera transform publisher.")
-        rospy.loginfo('Parameters:')
-        rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
-        rospy.loginfo('Camera Topic:        {}'.format(self.camera_image_topic))
-        rospy.loginfo('Marker Transform:   {}'.format(self.marker_static_tf_name))
-        rospy.loginfo('Marker ID:           {}'.format(self.marker_id))
-        rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
+        # rospy.loginfo("Starting camera transform publisher.")
+        # rospy.loginfo('Parameters:')
+        # rospy.loginfo('AR Marker Topic:     {}'.format(self.ar_marker_topic))
+        # rospy.loginfo('Camera Topic:        {}'.format(self.camera_image_topic))
+        # rospy.loginfo('Marker Transform:   {}'.format(self.marker_static_tf_name))
+        # rospy.loginfo('Marker ID:           {}'.format(self.marker_id))
+        # rospy.loginfo('Camera Root Frame:   {}'.format(self.camera_root_frame))
         self.counter = 0
         self.broadcast_root_to_camera()
         while not rospy.is_shutdown():
@@ -53,7 +53,9 @@ class CameraTransformPublisher(object):
         self.continuous = rospy.get_param('~continuous')
         self.window_width = rospy.get_param('~window_width')
         self.filtering = rospy.get_param('~filtering')
-        self.static_launch_output = rospy.get_param("~output_static")
+        # self.static_launch_output = rospy.get_param("~output_static")
+        self.static_launch_output = ""
+
 
     def broadcast_root_to_camera(self):
         while not rospy.is_shutdown() and (self.continuous or self.counter < (self.window_width + self.ignore_first)):
@@ -78,8 +80,8 @@ class CameraTransformPublisher(object):
                                                                                 rospy.Time())
             camera_to_marker_pose = transform_to_pose(camera_to_marker_transform.transform)
 
-            if self.filtering:
-                camera_to_marker_pose = self.filter_pose(camera_to_marker_pose)
+            # if self.filtering:
+                # camera_to_marker_pose = self.filter_pose(camera_to_marker_pose)
 
             camera_to_marker_matrix = matrix_from_pose(camera_to_marker_pose)
             marker_to_marker_root_matrix = matrix_from_pose(marker_to_root_pose)
