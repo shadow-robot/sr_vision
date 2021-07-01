@@ -6,13 +6,13 @@
     <!-- marker recognition args -->
     <arg name="depth" default="false" />
     <arg name="bundle" default="false" />
-    <arg name="marker_size" default="9" /> <!-- set cm for markers here .. all need to be same size-->
+    <arg name="marker_size" default="3.5" /> <!-- set cm for markers here .. all need to be same size-->
     <arg name="max_new_marker_error" default="0.08" />
     <arg name="max_track_error" default="0.2" />
     <arg name="bundle_files" default="$(find sr_description_common)/ar_markers/ar_marker_0_1_2_3_a4.xml" />
 
     <!-- camera_transform_publisher args -->
-    <arg name="marker_to_root_cartesian" default="[-0.64, -0.2, 0.0, 0.0, 0.0, 0.0]"/> <!-- CAN CHANGE THIS -->
+    <arg name="marker_to_root_cartesian" default="[-1.20, -0.74, 0.0, 0.0, 0.0, 0.0]"/> <!-- CAN CHANGE THIS -->
     <arg name="marker_frame_name" default="ar_marker_0"/>
     <arg name="root_frame_name" default="ra_base_link"/>
     <arg name="camera_frame_name" default="camera_link"/>
