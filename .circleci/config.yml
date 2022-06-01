@@ -5,7 +5,7 @@ jobs:
     docker:
       - image: shadowrobot/build-tools:xenial-kinetic
         environment:
-          toolset_branch: master
+          toolset_branch: legacy
           server_type: circle
           ros_release_name: kinetic
           ubuntu_version_name: xenial
