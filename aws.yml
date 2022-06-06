@@ -5,7 +5,7 @@ settings:
   ros:
     release: melodic
   docker:
-    image: shadowrobot/build-tools
+    image: public.ecr.aws/shadowrobot/build-tools
     tag: bionic-melodic
   template_project_name: template_unit_tests_and_code_coverage
   toolset:
